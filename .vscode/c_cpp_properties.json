@@ -4,6 +4,7 @@
             "name": "Win32",
             "includePath": [
                 "${workspaceFolder}/**",
+                "${workspaceFolder}/external/**",
                 "C:\\msys64\\ucrt64\\include\\"
             ],
             "defines": ["_DEBUG", "UNICODE", "_UNICODE"],
