@@ -16,8 +16,8 @@ typedef struct Vec2 {
 
 typedef struct Canvas {
     Color *pixels;
-    int width;
-    int height;
+    size_t width;
+    size_t height;
 } Canvas;
 
 void clear_canvas(Canvas c){
