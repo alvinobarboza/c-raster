@@ -112,12 +112,11 @@ int main(void)
         EndDrawing();
     }
 
-closeWindow:  
-    CloseWindow();
-
+closeWindow:      
     free(canvas.pixels);
     UnloadImage(img);
     UnloadTexture(renderTexture);
 
+    CloseWindow();    
     return 0;
 }
