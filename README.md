@@ -7,3 +7,4 @@ Rasterizer implementation inspired on this book;
 https://gabrielgambetta.com/computer-graphics-from-scratch/
 
 -   Draw Lines = Done
+-   Draw Filled Triangle = Done
