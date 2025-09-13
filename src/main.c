@@ -5,28 +5,54 @@
 
 #include "raylib.h"
 
-#define WIDTH  1920
+#define WIDTH  1080
 #define HEIGHT 1080
 #define OPAQUE 255
 #define TARGET_FPS 30
 
-typedef struct Vertex {
-    int x;
-    int y;
-    float h;
-} Vertex;
 
-void swap_vec_values(Vertex *p1, Vertex *p2) {
-    Vertex temp = *p1;
-    *p1 = *p2;
-    *p2 = temp;
-}
+typedef struct Viewport {
+    float width, height, d;
+} Viewport;
 
 typedef struct Canvas {
     Color *pixels;
     int width;
     int height;
+    Viewport view;
 } Canvas;
+
+typedef struct Point {
+    int x, y;
+    float h;
+} Point;
+
+typedef struct Vertex
+{
+    float x, y, z;
+} Vertex;
+
+void swap_vec_values(Point *p1, Point *p2) {
+    Point temp = *p1;
+    *p1 = *p2;
+    *p2 = temp;
+}
+
+Point viewport_to_canvas(Canvas c, float x, float y) {
+    return (Point) {
+        .h = 1.0f,
+        .x = x * c.width/c.view.width,
+        .y = y * c.height/c.view.height
+    };
+}
+
+Point project_vertex(Canvas c, Vertex v) {
+    return viewport_to_canvas(
+        c, 
+        v.x * c.view.d / v.z,
+        v.y * c.view.d / v.z
+    );
+}
 
 void clear_canvas(Canvas c){
     size_t length = c.height * c.width;
@@ -77,7 +103,7 @@ float * interpolate(int i0, float d0, int i1, float d1) {
     return values;
 }
 
-void draw_line(Canvas c, Vertex pos0, Vertex pos1 , Color color){
+void draw_line(Canvas c, Point pos0, Point pos1 , Color color){
     int dx = pos1.x - pos0.x;
     int dy = pos1.y - pos0.y;
     // printf("--------dx: %d dy: %d---------\n", dx, dy);
@@ -114,13 +140,13 @@ void draw_line(Canvas c, Vertex pos0, Vertex pos1 , Color color){
     free(xs);
 }
 
-void draw_wireframe_triangle(Canvas c, Vertex p0, Vertex p1, Vertex p2, Color color) {
+void draw_wireframe_triangle(Canvas c, Point p0, Point p1, Point p2, Color color) {
     draw_line(c, p0, p1, color);
     draw_line(c, p1, p2, color);
     draw_line(c, p2, p0, color);
 }
 
-void draw_filled_triangle(Canvas c, Vertex p0, Vertex p1, Vertex p2, Color color) {
+void draw_filled_triangle(Canvas c, Point p0, Point p1, Point p2, Color color) {
     // Sort the points so that p0.y <= p1.y <= p2.y
     if (p1.y < p0.y) swap_vec_values(&p1, &p0);
     if (p2.y < p0.y) swap_vec_values(&p2, &p0);
@@ -218,6 +244,7 @@ int main(void)
         .pixels = malloc(sizeof(Color) * WIDTH * HEIGHT),
         .width = WIDTH,
         .height = HEIGHT,
+        .view = (Viewport) {.d = 1.0f, .height = 1.0f, .width = 1.0f}
     };
 
     SetConfigFlags(FLAG_WINDOW_RESIZABLE | FLAG_WINDOW_ALWAYS_RUN | FLAG_MSAA_4X_HINT);
@@ -247,24 +274,35 @@ int main(void)
       
         }
 
-        Vertex point1 = {0};
-        Vertex point2 = {0};
-        Vertex point3 = {0};
+        // The four "front" vertices
+        Vertex vAf = (Vertex){.x = -2,.y = -0.5,.z = 5};
+        Vertex vBf = (Vertex){.x = -2,.y =  0.5,.z = 5};
+        Vertex vCf = (Vertex){.x = -1,.y =  0.5,.z = 5};
+        Vertex vDf = (Vertex){.x = -1,.y = -0.5,.z = 5};
 
-        point1.x = -200;
-        point1.y = -250;
-        point1.h = .2f;
-        
-        point2.x = 200;
-        point2.y = 50;
-        point2.h = .3f;
-        
-        point3.x = 20;
-        point3.y = 250;
-        point3.h = .9f;
+        // The four "back" vertices
+        Vertex vAb = (Vertex){.x = -2,.y = -0.5,.z = 6};
+        Vertex vBb = (Vertex){.x = -2,.y =  0.5,.z = 6};
+        Vertex vCb = (Vertex){.x = -1,.y =  0.5,.z = 6};
+        Vertex vDb = (Vertex){.x = -1,.y = -0.5,.z = 6};
 
-        draw_filled_triangle(canvas, point1, point2, point3, GREEN);
-        draw_wireframe_triangle(canvas, point1, point2, point3, BLACK);
+        // The front face
+        draw_line(canvas ,project_vertex(canvas, vAf), project_vertex(canvas, vBf), BLUE);
+        draw_line(canvas ,project_vertex(canvas, vBf), project_vertex(canvas, vCf), BLUE);
+        draw_line(canvas ,project_vertex(canvas, vCf), project_vertex(canvas, vDf), BLUE);
+        draw_line(canvas ,project_vertex(canvas, vDf), project_vertex(canvas, vAf), BLUE);
+
+        // The back face
+        draw_line(canvas ,project_vertex(canvas, vAb), project_vertex(canvas, vBb), RED);
+        draw_line(canvas ,project_vertex(canvas, vBb), project_vertex(canvas, vCb), RED);
+        draw_line(canvas ,project_vertex(canvas, vCb), project_vertex(canvas, vDb), RED);
+        draw_line(canvas ,project_vertex(canvas, vDb), project_vertex(canvas, vAb), RED);
+
+        // The front-to-back edges
+        draw_line(canvas ,project_vertex(canvas, vAf), project_vertex(canvas, vAb), GREEN);
+        draw_line(canvas ,project_vertex(canvas, vBf), project_vertex(canvas, vBb), GREEN);
+        draw_line(canvas ,project_vertex(canvas, vCf), project_vertex(canvas, vCb), GREEN);
+        draw_line(canvas ,project_vertex(canvas, vDf), project_vertex(canvas, vDb), GREEN);
 
         UpdateTexture(renderTexture, canvas.pixels);
 
