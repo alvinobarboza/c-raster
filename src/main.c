@@ -10,6 +10,15 @@
 #define OPAQUE 255
 #define TARGET_FPS 30
 
+typedef struct Vec3
+{
+    float x, y, z;
+} Vec3;
+
+typedef struct Vec4
+{
+    float x, y, z, w;
+} Vec4;
 
 typedef struct Viewport {
     float width, height, d;
@@ -20,6 +29,8 @@ typedef struct Canvas {
     int width;
     int height;
     Viewport view;
+    Vec3 roation;
+    Vec3 position;
 } Canvas;
 
 typedef struct Point {
@@ -31,6 +42,28 @@ typedef struct Vertex
 {
     float x, y, z;
 } Vertex;
+
+typedef struct Triangle
+{
+    size_t v1, v2, v3;
+    Color color;
+} Triangle;
+
+typedef struct ModelData
+{   
+    size_t vertsCount;
+    size_t trisCount;
+    Vertex *verts;
+    Triangle *tris;
+} ModelData ;
+
+typedef struct Instance
+{
+    ModelData *model;
+    Vec3 rotation;
+    Vec3 scale;
+    Vec3 transform;
+} Instance;
 
 void swap_vec_values(Point *p1, Point *p2) {
     Point temp = *p1;
@@ -141,6 +174,8 @@ void draw_line(Canvas c, Point pos0, Point pos1 , Color color){
 }
 
 void draw_wireframe_triangle(Canvas c, Point p0, Point p1, Point p2, Color color) {
+    // printf("p1: %dx%d -> p2: %dx%d -> p3: %dx%d Color: R%dG%dB%dA%d\n", 
+    //     p0.x, p0.y, p1.x, p1.y, p2.x, p2.y, color.r, color.g, color.b, color.a);
     draw_line(c, p0, p1, color);
     draw_line(c, p1, p2, color);
     draw_line(c, p2, p0, color);
@@ -238,6 +273,61 @@ void draw_filled_triangle(Canvas c, Point p0, Point p1, Point p2, Color color) {
     free(h012);
 }
 
+// Cube Data =========
+Vertex verts[]  = {
+    { 1.0f,  1.0f,  1.0f},
+    {-1.0f,  1.0f,  1.0f},
+    {-1.0f, -1.0f,  1.0f},
+    { 1.0f, -1.0f,  1.0f},
+    { 1.0f,  1.0f, -1.0f},
+    {-1.0f,  1.0f, -1.0f},
+    {-1.0f, -1.0f, -1.0f},
+    { 1.0f, -1.0f, -1.0f},
+};
+
+Triangle tris[] = {
+    {.v1 = 0, .v2 = 1, .v3 = 2, .color = RED},
+    {.v1 = 0, .v2 = 2, .v3 = 3, .color = RED},
+    {.v1 = 4, .v2 = 0, .v3 = 3, .color = GREEN},
+    {.v1 = 4, .v2 = 3, .v3 = 7, .color = GREEN},
+    {.v1 = 5, .v2 = 4, .v3 = 7, .color = BLUE},
+    {.v1 = 5, .v2 = 7, .v3 = 6, .color = BLUE},
+    {.v1 = 1, .v2 = 5, .v3 = 6, .color = YELLOW},
+    {.v1 = 1, .v2 = 6, .v3 = 2, .color = YELLOW},
+    {.v1 = 4, .v2 = 5, .v3 = 1, .color = PURPLE},
+    {.v1 = 4, .v2 = 1, .v3 = 0, .color = PURPLE},
+    {.v1 = 2, .v2 = 6, .v3 = 7, .color = MAGENTA},
+    {.v1 = 2, .v2 = 7, .v3 = 3, .color = MAGENTA},
+};
+
+// Cube Data ========
+
+void render_triangle(Canvas c, Triangle tri, const Point *projected) {
+    draw_wireframe_triangle(
+        c, 
+        projected[tri.v1],
+        projected[tri.v2],
+        projected[tri.v3], 
+        tri.color);
+}
+
+void render_model(Canvas c, Instance instance) {
+    Point *points = malloc(sizeof(Point)*instance.model->vertsCount);
+
+    for (size_t i = 0; i < instance.model->vertsCount; i++){
+        Vertex v = instance.model->verts[i];
+        v.x += instance.transform.x;
+        v.y += instance.transform.y;
+        v.z += instance.transform.z;
+        points[i] = project_vertex(c, v);
+    }
+
+    for (size_t i = 0; i < instance.model->trisCount; i++) {
+        render_triangle(c, instance.model->tris[i], points);
+    }
+    free(points);
+}
+
 int main(void)
 {
     Canvas canvas = (Canvas) {
@@ -254,6 +344,20 @@ int main(void)
     Texture2D renderTexture = LoadTextureFromImage(img);
     
     SetTargetFPS(TARGET_FPS);
+
+    ModelData cube = (ModelData) {
+        .tris = tris,
+        .verts = verts,
+        .trisCount = 12,
+        .vertsCount = 8,
+    };
+
+    Instance instance = (Instance) {
+        .model = &cube,
+        .rotation = (Vec3){0},
+        .scale = (Vec3){.x = 1.0f, .y = 1.0f, .z = 1.0f},
+        .transform = (Vec3){.x = -1.5, .y = 0.0f, .z = 7.0f},
+    };
 
     while (!WindowShouldClose())
     {
@@ -274,35 +378,7 @@ int main(void)
       
         }
 
-        // The four "front" vertices
-        Vertex vAf = (Vertex){.x = -2,.y = -0.5,.z = 5};
-        Vertex vBf = (Vertex){.x = -2,.y =  0.5,.z = 5};
-        Vertex vCf = (Vertex){.x = -1,.y =  0.5,.z = 5};
-        Vertex vDf = (Vertex){.x = -1,.y = -0.5,.z = 5};
-
-        // The four "back" vertices
-        Vertex vAb = (Vertex){.x = -2,.y = -0.5,.z = 6};
-        Vertex vBb = (Vertex){.x = -2,.y =  0.5,.z = 6};
-        Vertex vCb = (Vertex){.x = -1,.y =  0.5,.z = 6};
-        Vertex vDb = (Vertex){.x = -1,.y = -0.5,.z = 6};
-
-        // The front face
-        draw_line(canvas ,project_vertex(canvas, vAf), project_vertex(canvas, vBf), BLUE);
-        draw_line(canvas ,project_vertex(canvas, vBf), project_vertex(canvas, vCf), BLUE);
-        draw_line(canvas ,project_vertex(canvas, vCf), project_vertex(canvas, vDf), BLUE);
-        draw_line(canvas ,project_vertex(canvas, vDf), project_vertex(canvas, vAf), BLUE);
-
-        // The back face
-        draw_line(canvas ,project_vertex(canvas, vAb), project_vertex(canvas, vBb), RED);
-        draw_line(canvas ,project_vertex(canvas, vBb), project_vertex(canvas, vCb), RED);
-        draw_line(canvas ,project_vertex(canvas, vCb), project_vertex(canvas, vDb), RED);
-        draw_line(canvas ,project_vertex(canvas, vDb), project_vertex(canvas, vAb), RED);
-
-        // The front-to-back edges
-        draw_line(canvas ,project_vertex(canvas, vAf), project_vertex(canvas, vAb), GREEN);
-        draw_line(canvas ,project_vertex(canvas, vBf), project_vertex(canvas, vBb), GREEN);
-        draw_line(canvas ,project_vertex(canvas, vCf), project_vertex(canvas, vCb), GREEN);
-        draw_line(canvas ,project_vertex(canvas, vDf), project_vertex(canvas, vDb), GREEN);
+        render_model(canvas, instance);
 
         UpdateTexture(renderTexture, canvas.pixels);
 
