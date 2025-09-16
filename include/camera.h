@@ -2,7 +2,7 @@
 #define _CAMERA_H
 
 #include "raylib.h"
-#include "vector.h"
+#include "transforms.h"
 
 #define OPAQUE 255
 

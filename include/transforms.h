@@ -1,5 +1,5 @@
-#ifndef _VECTOR_H
-#define _VECTOR_H
+#ifndef _TRANSFORMS_H
+#define _TRANSFORMS_H
 
 typedef struct Vec3 {
     float x, y, z;

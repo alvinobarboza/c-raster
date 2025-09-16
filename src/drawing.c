@@ -182,9 +182,9 @@ void render_model(Cam c, Instance instance) {
 
     for (size_t i = 0; i < instance.model->vertsCount; i++){
         Vec3 v = instance.model->verts[i];
-        v.x += instance.transform.x;
-        v.y += instance.transform.y;
-        v.z += instance.transform.z;
+        v.x += instance.translation.x;
+        v.y += instance.translation.y;
+        v.z += instance.translation.z;
         points[i] = project_vertex(c, v);
     }
 

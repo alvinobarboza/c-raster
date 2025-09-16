@@ -3,7 +3,7 @@
 
 #include <stddef.h>
 
-#include "vector.h"
+#include "transforms.h"
 #include "raylib.h"
 
 typedef struct Triangle {
@@ -22,7 +22,7 @@ typedef struct Instance {
     ModelData *model;
     Vec3 rotation;
     Vec3 scale;
-    Vec3 transform;
+    Vec3 translation;
 } Instance;
 
 #endif

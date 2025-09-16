@@ -2,6 +2,7 @@
     "files.associations": {
         "pthread.h": "c",
         "raylib.h": "c",
-        "camera.h": "c"
+        "camera.h": "c",
+        "drawing.h": "c"
     }
 }
