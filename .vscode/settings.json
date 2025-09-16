@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "pthread.h": "c",
-        "raylib.h": "c"
+        "raylib.h": "c",
+        "camera.h": "c"
     }
 }

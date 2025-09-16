@@ -1,10 +1,12 @@
 CC = gcc
 SRC = ./src
+INCLUDE = ./include
 BIN = ./bin
 CFLAGS = -std=c99 -Wall -Wextra
 CFLAGS_O = $(CFLAGS) -O2
 
 include_paths = -I./external/raylib/include/
+include_paths += -I./include/
 
 lib_paths_linux = -L./external/raylib/lib-linux/
 
@@ -25,12 +27,7 @@ dependencies_win += -lopengl32
 bin_linux = $(BIN)/c_raster
 bin_win = $(BIN)/c_raster.exe
 
-source_files = $(SRC)/main.c
-
-# Default target
-.PHONY: run
-run: build
-	$(bin_linux)
+source_files = $(SRC)/*.c
 
 # Target for building the project
 .PHONY: build
@@ -40,6 +37,11 @@ ifeq ($(OS),Windows_NT)
 else
 	$(CC) $(source_files) $(CFLAGS) $(include_paths) $(lib_paths_linux) $(dependencies_linux) -o $(bin_linux) 
 endif
+
+# Default target
+.PHONY: run
+run: build
+	$(bin_linux)
 
 # Target for building the project
 .PHONY: release
