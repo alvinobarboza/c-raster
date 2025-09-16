@@ -99,6 +99,37 @@ int main(void)
     {
         clear_canvas(camera);
 
+        if (IsKeyDown(KEY_W)) {
+            camera.position.z -= .5f;
+            compute_rot_transl_mat(camera.matrixTransform, camera.rotation, camera.position);
+        }
+        
+        if (IsKeyDown(KEY_S)) {
+            camera.position.z += .5f;
+            compute_rot_transl_mat(camera.matrixTransform, camera.rotation, camera.position);
+        }
+
+        if (IsKeyDown(KEY_A)) {
+            camera.position.x += .5f;
+            compute_rot_transl_mat(camera.matrixTransform, camera.rotation, camera.position);
+        }
+        
+        if (IsKeyDown(KEY_D)) {
+            camera.position.x -= .5f;
+            compute_rot_transl_mat(camera.matrixTransform, camera.rotation, camera.position);
+        }
+        
+        if (IsKeyDown(KEY_SPACE)) {
+            camera.position.y -= .5f;
+            compute_rot_transl_mat(camera.matrixTransform, camera.rotation, camera.position);
+        }
+        
+        if (IsKeyDown(KEY_LEFT_CONTROL)) {
+            camera.position.y += .5f;
+            compute_rot_transl_mat(camera.matrixTransform, camera.rotation, camera.position);
+        }
+
+
         if (IsWindowResized()) {
             camera.height = GetScreenHeight();
             camera.width = GetScreenWidth();
