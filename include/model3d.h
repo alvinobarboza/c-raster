@@ -23,6 +23,7 @@ typedef struct Instance {
     Vec3 rotation;
     Vec3 scale;
     Vec3 translation;
+    float *matrixTransform;
 } Instance;
 
 #endif

@@ -47,8 +47,13 @@ int main(void)
         .canvas = malloc(sizeof(Color) * WIDTH * HEIGHT),
         .width = WIDTH,
         .height = HEIGHT,
-        .view = (Viewport) {.d = 1.0f, .height = 1.0f, .width = (float)WIDTH / (float)HEIGHT}
+        .view = (Viewport) {.d = 1.0f, .height = 1.0f, .width = (float)WIDTH / (float)HEIGHT},
+        .position = (Vec3) {.x = 1.0f, .y = 1.0f, .z = 1.0f},
+        .rotation = (Vec3) {.x = 0.0f, .y = 45.0f, .z = 0.0f},
     };
+
+    camera.matrixTransform = init_matrix();
+    compute_rot_transl_mat(camera.matrixTransform, camera.rotation, camera.position);
 
     SetConfigFlags(FLAG_WINDOW_RESIZABLE | FLAG_WINDOW_ALWAYS_RUN | FLAG_MSAA_4X_HINT);
     InitWindow(camera.width, camera.height, "raylib [core] example - basic window");
@@ -79,6 +84,16 @@ int main(void)
             .translation = (Vec3){.x = 1.25, .y = 2.0f, .z = 7.5f},
         }
     };
+
+    for (size_t i = 0; i < 2; i++) {
+        instances[i].matrixTransform = init_matrix();
+        compute_sca_rot_transl_mat(
+            instances[i].matrixTransform, 
+            instances[i].scale,
+            instances[i].rotation, 
+            instances[i].translation
+        );
+    }
 
     while (!WindowShouldClose())
     {

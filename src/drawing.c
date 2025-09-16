@@ -181,10 +181,11 @@ void render_model(Cam c, Instance instance) {
     Point *points = malloc(sizeof(Point)*instance.model->vertsCount);
 
     for (size_t i = 0; i < instance.model->vertsCount; i++){
-        Vec3 v = instance.model->verts[i];
-        v.x += instance.translation.x;
-        v.y += instance.translation.y;
-        v.z += instance.translation.z;
+
+        // TODO : Correct rotation direction
+
+        Vec3 v = mult_matrix_by_vec3(instance.matrixTransform,instance.model->verts[i]);
+        v = mult_matrix_by_vec3(c.matrixTransform,v);
         points[i] = project_vertex(c, v);
     }
 

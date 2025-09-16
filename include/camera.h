@@ -18,8 +18,9 @@ typedef struct Cam {
     int width;
     int height;
     Viewport view;
-    Vec3 roation;
+    Vec3 rotation;
     Vec3 position;
+    float *matrixTransform;
 } Cam;
 
 // Point in the screen(screen coord), whole number (int)
