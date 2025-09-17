@@ -51,6 +51,7 @@ int main(void)
         .scale = (Vec3) {.x = 1.0f, .y = 1.0f, .z = 1.0f},
         .position = (Vec3) {.x = 0.0f, .y = 0.0f, .z = 0.0f},
         .rotation = (Vec3) {.x = 0.0f, .y = 0.0f, .z = 0.0f},
+        .moveDirection = (Vec3) { .x = 0.0f, .y = 0.0f, .z = -1.0f}
     };
 
     camera.matrixTransform = init_matrix();
@@ -106,57 +107,27 @@ int main(void)
         clear_canvas(camera);
 
         if (IsKeyDown(KEY_W)) {
-            camera.position.z -= .5f;
-            compute_matrix(
-                camera.matrixTransform, 
-                camera.scale,
-                camera.rotation, 
-                camera.position);
+            camera_move_forward(&camera, .5f);
         }
         
         if (IsKeyDown(KEY_S)) {
-            camera.position.z += .5f;
-            compute_matrix(
-                camera.matrixTransform, 
-                camera.scale,
-                camera.rotation, 
-                camera.position);
+            camera_move_backward(&camera, .5f);
         }
 
         if (IsKeyDown(KEY_A)) {
-            camera.position.x += .5f;
-            compute_matrix(
-                camera.matrixTransform, 
-                camera.scale,
-                camera.rotation, 
-                camera.position);
+            camera_move_left(&camera, .5f);
         }
         
         if (IsKeyDown(KEY_D)) {
-            camera.position.x -= .5f;
-            compute_matrix(
-                camera.matrixTransform, 
-                camera.scale,
-                camera.rotation, 
-                camera.position);
+            camera_move_right(&camera, .5f);
         }
         
         if (IsKeyDown(KEY_SPACE)) {
-            camera.position.y -= .5f;
-            compute_matrix(
-                camera.matrixTransform, 
-                camera.scale,
-                camera.rotation, 
-                camera.position);
+            camera_move_up(&camera, .5f);
         }
         
         if (IsKeyDown(KEY_LEFT_CONTROL)) {
-            camera.position.y += .5f;
-            compute_matrix(
-                camera.matrixTransform, 
-                camera.scale,
-                camera.rotation, 
-                camera.position);
+            camera_move_down(&camera, .5f);
         }
 
         if (IsKeyDown(KEY_UP)) {

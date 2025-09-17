@@ -15,13 +15,14 @@ typedef struct Viewport {
 // "Cam" to avoid conflict with raylib "Camera"
 typedef struct Cam {
     Color *canvas;
+    float *matrixTransform;
+    Viewport view;
     int width;
     int height;
-    Viewport view;
     Vec3 scale;
     Vec3 rotation;
     Vec3 position;
-    float *matrixTransform;
+    Vec3 moveDirection;
 } Cam;
 
 // Point in the screen(screen coord), whole number (int)
@@ -36,5 +37,13 @@ void clear_canvas(Cam c);
 
 Point viewport_to_canvas(Cam c, float x, float y);
 Point project_vertex(Cam c, Vec3 v);
+
+// TODO: Implementation
+void camera_move_forward(Cam *c, float unit);
+void camera_move_backward(Cam *c, float unit);
+void camera_move_left(Cam *c, float unit);
+void camera_move_right(Cam *c, float unit);
+void camera_move_up(Cam *c, float unit);
+void camera_move_down(Cam *c, float unit);
 
 #endif
