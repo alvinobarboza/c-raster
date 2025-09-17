@@ -48,12 +48,18 @@ int main(void)
         .width = WIDTH,
         .height = HEIGHT,
         .view = (Viewport) {.d = 1.0f, .height = 1.0f, .width = (float)WIDTH / (float)HEIGHT},
-        .position = (Vec3) {.x = 1.0f, .y = 1.0f, .z = 1.0f},
-        .rotation = (Vec3) {.x = 0.0f, .y = 45.0f, .z = 0.0f},
+        .scale = (Vec3) {.x = 0.0f, .y = 1.0f, .z = 1.0f},
+        .position = (Vec3) {.x = 0.0f, .y = 0.0f, .z = 0.0f},
+        .rotation = (Vec3) {.x = 0.0f, .y = 0.0f, .z = 0.0f},
     };
 
     camera.matrixTransform = init_matrix();
-    compute_rot_transl_mat(camera.matrixTransform, camera.rotation, camera.position);
+    compute_matrix(
+        camera.matrixTransform, 
+        camera.scale,
+        camera.rotation, 
+        camera.position
+    );
 
     SetConfigFlags(FLAG_WINDOW_RESIZABLE | FLAG_WINDOW_ALWAYS_RUN | FLAG_MSAA_4X_HINT);
     InitWindow(camera.width, camera.height, "raylib [core] example - basic window");
@@ -79,7 +85,7 @@ int main(void)
         },
         (Instance) {
             .model = &cube,
-            .rotation = (Vec3){0},
+            .rotation = (Vec3){.x = 0.0f, .y = 45.0f, .z = 0.0f},
             .scale = (Vec3){.x = 1.0f, .y = 1.0f, .z = 1.0f},
             .translation = (Vec3){.x = 1.25, .y = 2.0f, .z = 7.5f},
         }
@@ -87,7 +93,7 @@ int main(void)
 
     for (size_t i = 0; i < 2; i++) {
         instances[i].matrixTransform = init_matrix();
-        compute_sca_rot_transl_mat(
+        compute_matrix(
             instances[i].matrixTransform, 
             instances[i].scale,
             instances[i].rotation, 
@@ -101,32 +107,92 @@ int main(void)
 
         if (IsKeyDown(KEY_W)) {
             camera.position.z -= .5f;
-            compute_rot_transl_mat(camera.matrixTransform, camera.rotation, camera.position);
+            compute_matrix(
+                camera.matrixTransform, 
+                camera.scale,
+                camera.rotation, 
+                camera.position);
         }
         
         if (IsKeyDown(KEY_S)) {
             camera.position.z += .5f;
-            compute_rot_transl_mat(camera.matrixTransform, camera.rotation, camera.position);
+            compute_matrix(
+                camera.matrixTransform, 
+                camera.scale,
+                camera.rotation, 
+                camera.position);
         }
 
         if (IsKeyDown(KEY_A)) {
             camera.position.x += .5f;
-            compute_rot_transl_mat(camera.matrixTransform, camera.rotation, camera.position);
+            compute_matrix(
+                camera.matrixTransform, 
+                camera.scale,
+                camera.rotation, 
+                camera.position);
         }
         
         if (IsKeyDown(KEY_D)) {
             camera.position.x -= .5f;
-            compute_rot_transl_mat(camera.matrixTransform, camera.rotation, camera.position);
+            compute_matrix(
+                camera.matrixTransform, 
+                camera.scale,
+                camera.rotation, 
+                camera.position);
         }
         
         if (IsKeyDown(KEY_SPACE)) {
             camera.position.y -= .5f;
-            compute_rot_transl_mat(camera.matrixTransform, camera.rotation, camera.position);
+            compute_matrix(
+                camera.matrixTransform, 
+                camera.scale,
+                camera.rotation, 
+                camera.position);
         }
         
         if (IsKeyDown(KEY_LEFT_CONTROL)) {
             camera.position.y += .5f;
-            compute_rot_transl_mat(camera.matrixTransform, camera.rotation, camera.position);
+            compute_matrix(
+                camera.matrixTransform, 
+                camera.scale,
+                camera.rotation, 
+                camera.position);
+        }
+
+        if (IsKeyDown(KEY_UP)) {
+            camera.rotation.x -= 7.5f;
+            compute_matrix(
+                camera.matrixTransform, 
+                camera.scale,
+                camera.rotation, 
+                camera.position);
+        }
+        
+        if (IsKeyDown(KEY_DOWN)) {
+            camera.rotation.x += 7.5f;
+            compute_matrix(
+                camera.matrixTransform, 
+                camera.scale,
+                camera.rotation, 
+                camera.position);
+        }
+
+        if (IsKeyDown(KEY_LEFT)) {
+            camera.rotation.y += 7.5f;
+            compute_matrix(
+                camera.matrixTransform, 
+                camera.scale,
+                camera.rotation, 
+                camera.position);
+        }
+        
+        if (IsKeyDown(KEY_RIGHT)) {
+            camera.rotation.y -= 7.5f;
+            compute_matrix(
+                camera.matrixTransform, 
+                camera.scale,
+                camera.rotation, 
+                camera.position);
         }
 
 

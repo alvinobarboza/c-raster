@@ -18,6 +18,7 @@ typedef struct Cam {
     int width;
     int height;
     Viewport view;
+    Vec3 scale;
     Vec3 rotation;
     Vec3 position;
     float *matrixTransform;

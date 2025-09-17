@@ -18,13 +18,9 @@ typedef struct Vec4 {
 // Must deallocate after use
 float *init_matrix(); 
 
-// Compute rotation and translation matrix (XYZ)
-// This order rotation > translation(No effect since it is the fourth element)
-void compute_rot_transl_mat(float *mat, Vec3 angle, Vec3 translation);
-
 // Compute scale, rotation and translation matrix (XYZ)
 // This order scale > rotation > translation(No effect since it is the fourth element)
-void compute_sca_rot_transl_mat(float *mat, Vec3 scale, Vec3 angle, Vec3 translation);
+void compute_matrix(float *mat, Vec3 scale, Vec3 angle, Vec3 translation);
 
 // Multiply given vector by a arbitrary matrix
 Vec3 mult_matrix_by_vec3(float *mat, Vec3 v);
