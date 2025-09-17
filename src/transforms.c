@@ -43,12 +43,24 @@ void compute_matrix(float *mat, Vec3 scale, Vec3 angle, Vec3 translation) {
 
 Vec3 mult_matrix_by_vec3(float *mat, Vec3 v) {
     float v4[MAT_LENGTH] = {v.x, v.y, v.z, 1.0f};
+    float result[MAT_LENGTH] = {0.0f, 0.0f, 0.0f, 0.0f};
 
     for (size_t row = 0; row < MAT_LENGTH; row++) {
         for (size_t col = 0; col < MAT_LENGTH; col++) {
-            v4[row] += mat[row*MAT_LENGTH+col];
+            result[row] += v4[col] * mat[row*MAT_LENGTH+col];
         }            
     }        
     
-    return (Vec3) {.x = v4[0], .y = v4[1], .z = v4[2]};
+    return (Vec3) {.x = result[0], .y = result[1], .z = result[2]};
+}
+
+void matrix_multiplication(float *mat_a, float *mat_b, float *result) {
+    for (size_t row = 0; row < MAT_LENGTH; row++) {
+        for (size_t col = 0; col < MAT_LENGTH; col++) {
+            result[row*MAT_LENGTH+col] = 0.0f;
+            for (size_t k = 0; k < MAT_LENGTH; k++) {
+                result[row*MAT_LENGTH+col] += mat_a[row*MAT_LENGTH+k] * mat_b[k*MAT_LENGTH+col];
+            }
+        }
+    }
 }

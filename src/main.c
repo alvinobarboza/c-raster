@@ -48,7 +48,7 @@ int main(void)
         .width = WIDTH,
         .height = HEIGHT,
         .view = (Viewport) {.d = 1.0f, .height = 1.0f, .width = (float)WIDTH / (float)HEIGHT},
-        .scale = (Vec3) {.x = 0.0f, .y = 1.0f, .z = 1.0f},
+        .scale = (Vec3) {.x = 1.0f, .y = 1.0f, .z = 1.0f},
         .position = (Vec3) {.x = 0.0f, .y = 0.0f, .z = 0.0f},
         .rotation = (Vec3) {.x = 0.0f, .y = 0.0f, .z = 0.0f},
     };
@@ -79,7 +79,7 @@ int main(void)
     Instance instances[2] = {
         (Instance) {
             .model = &cube,
-            .rotation = (Vec3){0},
+            .rotation = (Vec3){.x = 0.0f, .y = 45.0f, .z = 0.0f},
             .scale = (Vec3){.x = 1.0f, .y = 1.0f, .z = 1.0f},
             .translation = (Vec3){.x = -1.5, .y = 0.0f, .z = 7.0f},
         },
@@ -160,7 +160,20 @@ int main(void)
         }
 
         if (IsKeyDown(KEY_UP)) {
-            camera.rotation.x -= 7.5f;
+            // instances[0].rotation.y += 10.0f;
+
+            // compute_matrix(
+            //     instances[0].matrixTransform, 
+            //     instances[0].scale,
+            //     instances[0].rotation, 
+            //     instances[0].translation
+            // );
+            if (camera.rotation.x < 90.0f) {
+                camera.rotation.x += 7.5f;
+            } else {
+                camera.rotation.x = 90.f;
+            }
+            
             compute_matrix(
                 camera.matrixTransform, 
                 camera.scale,
@@ -169,7 +182,11 @@ int main(void)
         }
         
         if (IsKeyDown(KEY_DOWN)) {
-            camera.rotation.x += 7.5f;
+            if (camera.rotation.x > -90.0f) {
+                camera.rotation.x -= 7.5f;
+            } else {
+                camera.rotation.x = -90.f;
+            }
             compute_matrix(
                 camera.matrixTransform, 
                 camera.scale,
@@ -178,7 +195,16 @@ int main(void)
         }
 
         if (IsKeyDown(KEY_LEFT)) {
-            camera.rotation.y += 7.5f;
+            // instances[0].rotation.z += 10.0f;
+
+            // compute_matrix(
+            //     instances[0].matrixTransform, 
+            //     instances[0].scale,
+            //     instances[0].rotation, 
+            //     instances[0].translation
+            // );
+
+            camera.rotation.y -= 7.5f;
             compute_matrix(
                 camera.matrixTransform, 
                 camera.scale,
@@ -187,7 +213,7 @@ int main(void)
         }
         
         if (IsKeyDown(KEY_RIGHT)) {
-            camera.rotation.y -= 7.5f;
+            camera.rotation.y += 7.5f;
             compute_matrix(
                 camera.matrixTransform, 
                 camera.scale,

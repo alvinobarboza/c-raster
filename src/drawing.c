@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
+#include <stdio.h>
 #include "drawing.h"
 
 // Must deallocate after use
@@ -179,13 +180,13 @@ void render_triangle(Cam c, Triangle tri, const Point *projected) {
 
 void render_model(Cam c, Instance instance) {
     Point *points = malloc(sizeof(Point)*instance.model->vertsCount);
+    float *m_transform = init_matrix();
 
     for (size_t i = 0; i < instance.model->vertsCount; i++){
 
         // TODO : Correct rotation direction
-
-        Vec3 v = mult_matrix_by_vec3(instance.matrixTransform,instance.model->verts[i]);
-        v = mult_matrix_by_vec3(c.matrixTransform,v);
+        matrix_multiplication(c.matrixTransform, instance.matrixTransform, m_transform);
+        Vec3 v = mult_matrix_by_vec3(m_transform, instance.model->verts[i]);
         points[i] = project_vertex(c, v);
     }
 
@@ -193,4 +194,5 @@ void render_model(Cam c, Instance instance) {
         render_triangle(c, instance.model->tris[i], points);
     }
     free(points);
+    free(m_transform);
 }
