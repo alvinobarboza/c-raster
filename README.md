@@ -10,3 +10,4 @@ https://gabrielgambetta.com/computer-graphics-from-scratch/
 -   Draw Filled Triangle = Done
 -   Shaded Triangle = Done
 -   Perspective Projection = Done
+-   Describing and rendering a scene - Done (With camera controls)
