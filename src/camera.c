@@ -21,9 +21,9 @@ void put_pixel(Cam c, Color color, int x, int y) {
 void clear_canvas(Cam c) { 
     size_t length = c.height * c.width;
     for(size_t i = 0; i < length; i++) {
-        c.canvas[i].r = OPAQUE;
-        c.canvas[i].g = OPAQUE;
-        c.canvas[i].b = OPAQUE;
+        c.canvas[i].r = 50;
+        c.canvas[i].g = 50;
+        c.canvas[i].b = 50;
         c.canvas[i].a = OPAQUE;
     }
 }
@@ -42,4 +42,97 @@ Point project_vertex(Cam c, Vec3 v) {
         v.x * c.view.d / v.z,
         v.y * c.view.d / v.z
     );
+}
+
+void update_camera_transforms(Cam *c){
+    if ( c->matrixTransform == NULL) {
+        return;
+    }
+
+    float scale[M4X4];
+    float rotation[M4X4];
+    float rotationTransposed[M4X4];
+    float translation[M4X4];
+    float result[M4X4];
+
+    make_scale_matrix(scale, c->scale);
+
+    make_rotation_matrix(rotation, c->rotation);
+    matrix_transpose(rotation, rotationTransposed);
+
+    make_translation_matrix(translation, vec3_multiply(c->position, -1));
+
+    matrix_multiplication(scale, rotationTransposed, result);
+    matrix_multiplication(result, translation,  c->matrixTransform);
+}
+
+void camera_move_forward(Cam *c, float unit){
+    float rotation[M4X4];
+    make_rotation_matrix(rotation, c->rotation);
+
+    Vec3 direction = mult_matrix_by_vec3(rotation, c->forwardDirection);
+	Vec3 normalDirection = vec3_normal(direction);
+
+	c->position.x += normalDirection.x * unit;
+	c->position.y += normalDirection.y * unit;
+	c->position.z += normalDirection.z * unit;
+
+    update_camera_transforms(c);
+}
+
+void camera_move_backward(Cam *c, float unit){
+    camera_move_forward(c, -unit);
+}
+
+void camera_move_up(Cam *c, float unit){
+    c->position.y += unit;
+    update_camera_transforms(c);
+}
+
+void camera_move_down(Cam *c, float unit){
+    camera_move_up(c, -unit);
+}
+
+void camera_move_left(Cam *c, float unit){
+    float rotation[M4X4];
+    make_rotation_matrix(rotation, c->rotation);
+
+    Vec3 direction = mult_matrix_by_vec3(rotation, c->forwardDirection);
+	Vec3 sideDirection = vec3_cross(direction, (Vec3){.x = 0, .y = 1, .z = 0});
+	Vec3 normalDirection = vec3_normal(sideDirection);
+
+	c->position.x += normalDirection.x * unit;
+	c->position.y += normalDirection.y * unit;
+	c->position.z += normalDirection.z * unit;
+
+    update_camera_transforms(c);
+}
+
+void camera_move_right(Cam *c, float unit){
+    camera_move_left(c, -unit);
+}
+
+void camera_turn_left(Cam *c, float unit){
+    c->rotation.y += unit;
+    update_camera_transforms(c);
+}
+
+void camera_turn_right(Cam *c, float unit){
+    camera_turn_left(c, -unit);
+}
+
+void camera_turn_up(Cam *c, float unit){
+    c->rotation.x += unit;
+
+    if (c->rotation.x < -90.0f){
+        c->rotation.x = -90.0f;
+    } else if (c->rotation.x > 90.0f){
+        c->rotation.x = 90.0f;
+    }
+
+    update_camera_transforms(c);
+}
+
+void camera_turn_down(Cam *c, float unit){
+    camera_turn_up(c, -unit);
 }

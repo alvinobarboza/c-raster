@@ -3,6 +3,9 @@
         "pthread.h": "c",
         "raylib.h": "c",
         "camera.h": "c",
-        "drawing.h": "c"
+        "drawing.h": "c",
+        "model3d.h": "c",
+        "stdio.h": "c",
+        "transforms.h": "c"
     }
 }

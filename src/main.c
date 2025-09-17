@@ -10,7 +10,7 @@
 
 #define WIDTH  1080
 #define HEIGHT 1080
-#define TARGET_FPS 30
+#define TARGET_FPS 60
 
 // Cube Data =========
 Vec3 verts[]  = {
@@ -35,40 +35,59 @@ Triangle tris[] = {
     {.v1 = 1, .v2 = 6, .v3 = 2, .color = YELLOW},
     {.v1 = 4, .v2 = 5, .v3 = 1, .color = PURPLE},
     {.v1 = 4, .v2 = 1, .v3 = 0, .color = PURPLE},
-    {.v1 = 2, .v2 = 6, .v3 = 7, .color = MAGENTA},
-    {.v1 = 2, .v2 = 7, .v3 = 3, .color = MAGENTA},
+    {.v1 = 2, .v2 = 6, .v3 = 7, .color = (Color) {.a = OPAQUE, .r = 0, .g = OPAQUE, .b = OPAQUE} },
+    {.v1 = 2, .v2 = 7, .v3 = 3, .color = (Color) {.a = OPAQUE, .r = 0, .g = OPAQUE, .b = OPAQUE} },
 };
 
 // Cube Data ========
 
+void move_cube(Instance *instance) {
+    if (IsKeyDown(KEY_I)) {
+        instance->position.z += .5f;
+        update_instance_transforms(instance);
+    }
+    
+    if (IsKeyDown(KEY_K)) {
+        instance->position.z -= .5f;
+        update_instance_transforms(instance);
+    }
+
+    if (IsKeyDown(KEY_J)) {
+        instance->position.x -= .5f;
+        update_instance_transforms(instance);
+    }
+    
+    if (IsKeyDown(KEY_L)) {
+        instance->position.x += .5f;
+        update_instance_transforms(instance);
+    }
+    
+    if (IsKeyDown(KEY_U)) {
+        instance->rotation.y += .5f;
+        update_instance_transforms(instance);
+    }
+    
+    if (IsKeyDown(KEY_O)) {
+        instance->rotation.y -= .5f;
+        update_instance_transforms(instance);
+    }
+}
+
 int main(void)
 {
+    float moveSpeed = 15.0f;
+    float turnSpeed = 70.0f;
+
     Cam camera = (Cam) {
         .canvas = malloc(sizeof(Color) * WIDTH * HEIGHT),
         .width = WIDTH,
         .height = HEIGHT,
         .view = (Viewport) {.d = 1.0f, .height = 1.0f, .width = (float)WIDTH / (float)HEIGHT},
         .scale = (Vec3) {.x = 1.0f, .y = 1.0f, .z = 1.0f},
-        .position = (Vec3) {.x = 0.0f, .y = 0.0f, .z = 0.0f},
-        .rotation = (Vec3) {.x = 0.0f, .y = 0.0f, .z = 0.0f},
-        .moveDirection = (Vec3) { .x = 0.0f, .y = 0.0f, .z = -1.0f}
+        .position = (Vec3) {.x = -3.0f, .y = 1.0f, .z = 2.0f},
+        .rotation = (Vec3) {.x = 0.0f, .y = -30.0f, .z = 0.0f},
+        .forwardDirection = (Vec3) { .x = 0.0f, .y = 0.0f, .z = 1.0f}
     };
-
-    camera.matrixTransform = init_matrix();
-    compute_matrix(
-        camera.matrixTransform, 
-        camera.scale,
-        camera.rotation, 
-        camera.position
-    );
-
-    SetConfigFlags(FLAG_WINDOW_RESIZABLE | FLAG_WINDOW_ALWAYS_RUN | FLAG_MSAA_4X_HINT);
-    InitWindow(camera.width, camera.height, "raylib [core] example - basic window");
-
-    Image img = GenImageColor(camera.width, camera.height, RAYWHITE);
-    Texture2D renderTexture = LoadTextureFromImage(img);
-    
-    SetTargetFPS(TARGET_FPS);
 
     ModelData cube = (ModelData) {
         .tris = tris,
@@ -80,118 +99,89 @@ int main(void)
     Instance instances[2] = {
         (Instance) {
             .model = &cube,
-            .rotation = (Vec3){.x = 0.0f, .y = 45.0f, .z = 0.0f},
-            .scale = (Vec3){.x = 1.0f, .y = 1.0f, .z = 1.0f},
-            .translation = (Vec3){.x = -1.5, .y = 0.0f, .z = 7.0f},
+            .position = (Vec3){.x = -1.5, .y = 0.0f, .z = 7.0f},
+            .rotation = (Vec3){.x = 0.0f, .y = 0.0f, .z = 0.0f},
+            .scale = (Vec3){.x = .75f, .y = .75f, .z = .75f},
         },
         (Instance) {
             .model = &cube,
-            .rotation = (Vec3){.x = 0.0f, .y = 45.0f, .z = 0.0f},
+            .position = (Vec3){.x = 1.25, .y = 2.5f, .z = 7.5f},
+            .rotation = (Vec3){.x = 0.0f, .y = 195.0f, .z = 0.0f},
             .scale = (Vec3){.x = 1.0f, .y = 1.0f, .z = 1.0f},
-            .translation = (Vec3){.x = 1.25, .y = 2.0f, .z = 7.5f},
         }
     };
+    
+    camera.matrixTransform = init_matrix();
+    update_camera_transforms(&camera);
+
 
     for (size_t i = 0; i < 2; i++) {
         instances[i].matrixTransform = init_matrix();
-        compute_matrix(
-            instances[i].matrixTransform, 
-            instances[i].scale,
-            instances[i].rotation, 
-            instances[i].translation
-        );
+        update_instance_transforms(&instances[i]);
     }
-
+    
+    SetConfigFlags(FLAG_WINDOW_RESIZABLE | FLAG_WINDOW_ALWAYS_RUN | FLAG_MSAA_4X_HINT);
+    InitWindow(camera.width, camera.height, "raylib [core] example - basic window");
+    
+    Image img = GenImageColor(camera.width, camera.height, RAYWHITE);
+    Texture2D renderTexture = LoadTextureFromImage(img);
+    
+    SetTargetFPS(TARGET_FPS);
+    // goto closeWindow;
+    
     while (!WindowShouldClose())
     {
         clear_canvas(camera);
 
+        move_cube(&instances[1]);
+        float delta = GetFrameTime();
+
+        float deltaMoveSpeed = moveSpeed * delta;
+        float deltaTurnSpeed = turnSpeed * delta;
+
         if (IsKeyDown(KEY_W)) {
-            camera_move_forward(&camera, .5f);
+            camera_move_forward(&camera, deltaMoveSpeed);
         }
         
         if (IsKeyDown(KEY_S)) {
-            camera_move_backward(&camera, .5f);
+            camera_move_backward(&camera, deltaMoveSpeed);
         }
 
         if (IsKeyDown(KEY_A)) {
-            camera_move_left(&camera, .5f);
+            camera_move_left(&camera, deltaMoveSpeed);
         }
         
         if (IsKeyDown(KEY_D)) {
-            camera_move_right(&camera, .5f);
+            camera_move_right(&camera, deltaMoveSpeed);
         }
         
         if (IsKeyDown(KEY_SPACE)) {
-            camera_move_up(&camera, .5f);
+            camera_move_up(&camera, deltaMoveSpeed);
         }
         
         if (IsKeyDown(KEY_LEFT_CONTROL)) {
-            camera_move_down(&camera, .5f);
+            camera_move_down(&camera, deltaMoveSpeed);
         }
 
         if (IsKeyDown(KEY_UP)) {
-            // instances[0].rotation.y += 10.0f;
-
-            // compute_matrix(
-            //     instances[0].matrixTransform, 
-            //     instances[0].scale,
-            //     instances[0].rotation, 
-            //     instances[0].translation
-            // );
-            if (camera.rotation.x < 90.0f) {
-                camera.rotation.x += 7.5f;
-            } else {
-                camera.rotation.x = 90.f;
-            }
-            
-            compute_matrix(
-                camera.matrixTransform, 
-                camera.scale,
-                camera.rotation, 
-                camera.position);
+            camera_turn_up(&camera, deltaTurnSpeed);
         }
         
         if (IsKeyDown(KEY_DOWN)) {
-            if (camera.rotation.x > -90.0f) {
-                camera.rotation.x -= 7.5f;
-            } else {
-                camera.rotation.x = -90.f;
-            }
-            compute_matrix(
-                camera.matrixTransform, 
-                camera.scale,
-                camera.rotation, 
-                camera.position);
+            camera_turn_down(&camera, deltaTurnSpeed);
         }
 
         if (IsKeyDown(KEY_LEFT)) {
-            // instances[0].rotation.z += 10.0f;
-
-            // compute_matrix(
-            //     instances[0].matrixTransform, 
-            //     instances[0].scale,
-            //     instances[0].rotation, 
-            //     instances[0].translation
-            // );
-
-            camera.rotation.y -= 7.5f;
-            compute_matrix(
-                camera.matrixTransform, 
-                camera.scale,
-                camera.rotation, 
-                camera.position);
+            camera_turn_left(&camera, deltaTurnSpeed);
         }
         
         if (IsKeyDown(KEY_RIGHT)) {
-            camera.rotation.y += 7.5f;
-            compute_matrix(
-                camera.matrixTransform, 
-                camera.scale,
-                camera.rotation, 
-                camera.position);
+            camera_turn_right(&camera, deltaTurnSpeed);
         }
 
+        // TODO: Use mouse to look around
+        // Vector2 mouse = GetMouseDelta();
+        // printf("mouse x:%+03.02f y:%+03.02f\n",mouse.x, mouse.y);
 
         if (IsWindowResized()) {
             camera.height = GetScreenHeight();
@@ -221,14 +211,19 @@ int main(void)
             ClearBackground(RAYWHITE);
 
             DrawTexture(renderTexture, 0, 0, RAYWHITE);
-            DrawText("Hello from raylib!", 190, 200, 20, LIGHTGRAY);
             DrawFPS(15,15);
         EndDrawing();
         // break;
     }
 
-closeWindow:      
+closeWindow:
+    for (size_t i = 0; i < 2; i++)
+    {
+        free(instances[i].matrixTransform);
+    }
+    
     free(camera.canvas);
+    free(camera.matrixTransform);
     UnloadImage(img);
     UnloadTexture(renderTexture);
 

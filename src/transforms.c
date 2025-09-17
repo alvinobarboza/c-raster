@@ -1,6 +1,7 @@
 #include <stddef.h>
 #include <math.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "transforms.h"
 
@@ -11,14 +12,34 @@ float *init_matrix() {
         return NULL;
     }
 
+    float identity[M4X4] = {
+        1, 0, 0, 0,
+        0, 1, 0, 0,
+        0, 0, 1, 0,
+        0, 0, 0, 1,
+    };
+
     for (size_t i = 0; i < M4X4; i++) {
-        matrix[i] = 0.0f;
+        matrix[i] = identity[i];
     }
 
     return matrix;
 }
 
-void compute_matrix(float *mat, Vec3 scale, Vec3 angle, Vec3 translation) {
+void make_scale_matrix(float *mat, Vec3 scale) {
+    float tempMat[M4X4] = {
+        scale.x, 0.0f,    0.0f,    0.0f,
+        0.0f,    scale.y, 0.0f,    0.0f,
+        0.0f,    0.0f,    scale.z, 0.0f,
+        0.0f,    0.0f,    0.0f,    1.0f,
+	};
+    
+    for (size_t i = 0; i < M4X4; i++) {
+        mat[i] = tempMat[i];
+    }
+}
+
+void make_rotation_matrix(float *mat, Vec3 angle) {
     float cosa = cos(angle.x * -T_DEG2RAD);
 	float sina = sin(angle.x * -T_DEG2RAD);
 
@@ -30,10 +51,24 @@ void compute_matrix(float *mat, Vec3 scale, Vec3 angle, Vec3 translation) {
 
 	// Formula for general 3D roation using matrix
     float tempMat[M4X4] = {
-    scale.x * (cosb * cosga), sina*sinb*cosga - cosa*singa,             cosa*sinb*cosga + sina*singa, translation.x,
-    cosb * singa,             scale.y * (sina*sinb*singa + cosa*cosga), cosa*sinb*singa - sina*cosga, translation.y,
-    -sinb,                    sina * cosb,                              scale.z * (cosa * cosb),      translation.z,
-    0.0f,                     0.0f,                                     0.0f,                         1.0f,
+        cosb * cosga, sina*sinb*cosga - cosa*singa, cosa*sinb*cosga + sina*singa, 0.0f,
+        cosb * singa, sina*sinb*singa + cosa*cosga, cosa*sinb*singa - sina*cosga, 0.0f,
+        -sinb,        sina * cosb,                  cosa * cosb,                  0.0f,
+        0.0f,         0.0f,                         0.0f,                         1.0f,
+	};
+    
+    for (size_t i = 0; i < M4X4; i++) {
+        mat[i] = tempMat[i];
+    }
+}
+
+
+void make_translation_matrix(float *mat, Vec3 position) {
+    float tempMat[M4X4] = {
+        1.0f,   0.0f,   0.0f,   position.x,
+        0.0f,   1.0f,   0.0f,   position.y,
+        0.0f,   0.0f,   1.0f,   position.z,
+        0.0f,   0.0f,   0.0f,   1.0f,
 	};
     
     for (size_t i = 0; i < M4X4; i++) {
@@ -63,4 +98,54 @@ void matrix_multiplication(float *mat_a, float *mat_b, float *result) {
             }
         }
     }
+}
+
+void matrix_transpose(float *mat, float *transposed) {
+    for (size_t row = 0; row < MAT_LENGTH; row++) {
+        for (size_t col = 0; col < MAT_LENGTH; col++) {
+            transposed[col*MAT_LENGTH+row] = mat[row*MAT_LENGTH+col];
+        }
+    }    
+}
+
+void print_mat(const char *name,float *mat) {
+    printf("=====<%s>=======\n", name);
+    for (size_t row = 0; row < MAT_LENGTH; row++)
+    {
+        for (size_t col = 0; col < MAT_LENGTH; col++)
+        {
+            printf("%+02.02f ", mat[row*MAT_LENGTH+col]);
+        }
+        puts("");
+    }
+    puts("===============");
+}
+
+float vec3_dot(Vec3 v) {
+    return v.x*v.x + v.y*v.y + v.z*v.z;
+}
+
+float vec3_length(Vec3 v) {
+    return sqrtf(vec3_dot(v));
+}
+
+
+Vec3 vec3_multiply(Vec3 v, float n) {
+    return (Vec3) {
+        .x = v.x * n,
+        .y = v.y * n,
+        .z = v.z * n
+    };
+}
+
+Vec3 vec3_normal(Vec3 v) {
+    return vec3_multiply(v, vec3_length(v));
+}
+
+Vec3 vec3_cross(Vec3 v1, Vec3 v2) {
+    return (Vec3){
+		.x = v1.y*v2.z - v1.z*v2.y,
+		.y = v1.z*v2.x - v1.x*v2.z,
+		.z = v1.x*v2.y - v1.y*v2.x,
+	};
 }

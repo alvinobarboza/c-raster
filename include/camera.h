@@ -22,7 +22,7 @@ typedef struct Cam {
     Vec3 scale;
     Vec3 rotation;
     Vec3 position;
-    Vec3 moveDirection;
+    Vec3 forwardDirection;
 } Cam;
 
 // Point in the screen(screen coord), whole number (int)
@@ -38,12 +38,18 @@ void clear_canvas(Cam c);
 Point viewport_to_canvas(Cam c, float x, float y);
 Point project_vertex(Cam c, Vec3 v);
 
-// TODO: Implementation
+void update_camera_transforms(Cam *c);
+
 void camera_move_forward(Cam *c, float unit);
 void camera_move_backward(Cam *c, float unit);
 void camera_move_left(Cam *c, float unit);
 void camera_move_right(Cam *c, float unit);
 void camera_move_up(Cam *c, float unit);
 void camera_move_down(Cam *c, float unit);
+
+void camera_turn_left(Cam *c, float unit);
+void camera_turn_right(Cam *c, float unit);
+void camera_turn_up(Cam *c, float unit);
+void camera_turn_down(Cam *c, float unit);
 
 #endif

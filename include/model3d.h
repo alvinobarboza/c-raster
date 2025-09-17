@@ -22,8 +22,10 @@ typedef struct Instance {
     ModelData *model;
     Vec3 rotation;
     Vec3 scale;
-    Vec3 translation;
+    Vec3 position;
     float *matrixTransform;
 } Instance;
+
+void update_instance_transforms(Instance *instance);
 
 #endif
