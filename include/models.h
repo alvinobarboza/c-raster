@@ -18,11 +18,18 @@ typedef struct ModelData {
     Triangle *tris;
 } ModelData ;
 
+typedef struct Sphere {
+    Vec3 center;
+    float radius;
+} Sphere;
+
+
 typedef struct Instance {
     ModelData *model;
     Vec3 rotation;
     Vec3 scale;
     Vec3 position;
+    Sphere boundingSphere;
     float *matrixTransform;
 } Instance;
 
