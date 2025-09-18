@@ -121,6 +121,10 @@ void print_mat(const char *name,float *mat) {
     puts("===============");
 }
 
+void print_vec3(const char *name, Vec3 v) {
+    printf("%s { .x: %+02.02f, .y: %+02.02f, z: %+02.02f }\n", name, v.x, v.y, v.z);
+}
+
 float vec3_dot(Vec3 v) {
     return v.x*v.x + v.y*v.y + v.z*v.z;
 }
@@ -152,4 +156,12 @@ Vec3 vec3_cross(Vec3 v1, Vec3 v2) {
 		.y = v1.z*v2.x - v1.x*v2.z,
 		.z = v1.x*v2.y - v1.y*v2.x,
 	};
+}
+
+Vec3 vec3_add(Vec3 v1, Vec3 v2) {
+    return (Vec3) {
+        .x = v1.x + v2.x,
+        .y = v1.y + v2.y,
+        .z = v1.z + v2.z,
+    };
 }

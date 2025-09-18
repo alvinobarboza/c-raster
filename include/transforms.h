@@ -34,6 +34,7 @@ void matrix_multiplication(float *mat_a, float *mat_b, float *result);
 
 // For debug purposes
 void print_mat(const char *name, float *mat);
+void print_vec3(const char *name, Vec3 v);
 
 // Vector Maths
 float vec3_dot(Vec3 v);
@@ -41,5 +42,6 @@ float vec3_length(Vec3 v);
 Vec3 vec3_normal(Vec3 v);
 Vec3 vec3_cross(Vec3 v1, Vec3 v2);
 Vec3 vec3_multiply(Vec3 v, float n);
+Vec3 vec3_add(Vec3 v1, Vec3 v2);
 
 #endif
