@@ -7,6 +7,7 @@
 #include "camera.h"
 #include "models.h"
 #include "render.h"
+#include "scene.h"
 
 #define WIDTH  1080
 #define HEIGHT 1080
@@ -37,6 +38,13 @@ Triangle tris[] = {
     {.v1 = 4, .v2 = 1, .v3 = 0, .color = PURPLE},
     {.v1 = 2, .v2 = 6, .v3 = 7, .color = (Color) {.a = OPAQUE, .r = 0, .g = OPAQUE, .b = OPAQUE} },
     {.v1 = 2, .v2 = 7, .v3 = 3, .color = (Color) {.a = OPAQUE, .r = 0, .g = OPAQUE, .b = OPAQUE} },
+};
+
+static ModelData cube = (ModelData) {
+    .tris = tris,
+    .verts = verts,
+    .trisCount = 12,
+    .vertsCount = 8,
 };
 
 // Cube Data ========
@@ -83,13 +91,6 @@ int main(void)
         (Vec3) {.x = -3.0f, .y = 1.0f, .z = 2.0f},
         (Vec3) {.x = 0.0f, .y = -30.0f, .z = 0.0f}
     );
-
-    ModelData cube = (ModelData) {
-        .tris = tris,
-        .verts = verts,
-        .trisCount = 12,
-        .vertsCount = 8,
-    };
 
     Instance instances[2] = {
         (Instance) {
@@ -196,6 +197,7 @@ int main(void)
       
         }
 
+        // TODO: render_scene(camera, scene);
         for(size_t i = 0; i < 2; i++){
             render_model(camera, instances[i]);
         }
@@ -213,9 +215,8 @@ int main(void)
     }
 
 closeWindow:
-    for (size_t i = 0; i < 2; i++)
-    {
-        free(instances[i].matrixTransform);
+    for (int i = 0; i < scene.objectCount; i++) {
+        free(scene.instances[i].matrixTransform);
     }
     
     free(camera.canvas);
