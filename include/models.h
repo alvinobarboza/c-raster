@@ -1,5 +1,5 @@
-#ifndef _MODEL_3D_H
-#define _MODEL_3D_H
+#ifndef _MODELS_H
+#define _MODELS_H
 
 #include <stddef.h>
 

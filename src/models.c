@@ -1,4 +1,4 @@
-#include "model3d.h"
+#include "models.h"
 #include "transforms.h"
 
 void update_instance_transforms(Instance *instance) {

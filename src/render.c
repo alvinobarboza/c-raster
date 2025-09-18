@@ -2,7 +2,7 @@
 #include <math.h>
 #include <string.h>
 #include <stdio.h>
-#include "drawing.h"
+#include "render.h"
 
 // Must deallocate after use
 float * interpolate(int i0, float d0, int i1, float d1) {
