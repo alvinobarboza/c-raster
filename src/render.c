@@ -178,6 +178,7 @@ void render_triangle(Cam c, Triangle tri, const Point *projected) {
         tri.color);
 }
 
+// TODO: Clippe tris behind camera 
 void render_model(Cam c, Instance instance) {
     Point *points = malloc(sizeof(Point)*instance.model->vertsCount);
     float m_transform[M4X4];
