@@ -5,8 +5,8 @@
 #include "raylib.h"
 #include "transforms.h"
 #include "camera.h"
-#include "model3d.h"
-#include "drawing.h"
+#include "models.h"
+#include "render.h"
 
 #define WIDTH  1080
 #define HEIGHT 1080
