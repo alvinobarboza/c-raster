@@ -194,3 +194,9 @@ void render_model(Cam c, Instance instance) {
     }
     free(points);
 }
+
+void render_scene(Cam c, Scene scene) {
+    for(size_t i = 0; i < scene.objectCount; i++){
+        render_model(c, scene.instances[i]);
+    }
+}

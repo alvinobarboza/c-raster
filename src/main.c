@@ -197,13 +197,8 @@ int main(void)
       
         }
 
-        // TODO: render_scene(camera, scene);
-        for(size_t i = 0; i < 2; i++){
-            render_model(camera, instances[i]);
-        }
-
+        render_scene(camera, scene);
         UpdateTexture(renderTexture, camera.canvas);
-
         
         BeginDrawing();
             ClearBackground(RAYWHITE);
@@ -215,7 +210,7 @@ int main(void)
     }
 
 closeWindow:
-    for (int i = 0; i < scene.objectCount; i++) {
+    for (size_t i = 0; i < scene.objectCount; i++) {
         free(scene.instances[i].matrixTransform);
     }
     

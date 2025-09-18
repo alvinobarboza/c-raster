@@ -5,7 +5,7 @@
 
 typedef struct Scene {
     Instance *instances;
-    int objectCount;
+    size_t objectCount;
 } Scene;
 
 
