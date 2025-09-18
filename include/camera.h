@@ -5,11 +5,18 @@
 #include "transforms.h"
 
 #define OPAQUE 255
+#define FRUSTUM_PLANES 5
 
 // To be honest, this is actually aspect ratio related
 typedef struct Viewport {
     float width, height, d;
 } Viewport;
+
+// View planes for clipping objects out
+typedef struct ViewPlane {
+    Vec3 normal;
+    float d;
+} ViewPlane;
 
 // Camera struct holding all render related properties
 // "Cam" to avoid conflict with raylib "Camera"
@@ -23,6 +30,7 @@ typedef struct Cam {
     Vec3 rotation;
     Vec3 position;
     Vec3 forwardDirection;
+    ViewPlane frustum[FRUSTUM_PLANES];
 } Cam;
 
 // Point in the screen(screen coord), whole number (int)
@@ -37,6 +45,8 @@ void clear_canvas(Cam c);
 
 Point viewport_to_canvas(Cam c, float x, float y);
 Point project_vertex(Cam c, Vec3 v);
+
+Cam init_camera(int w, int h, Vec3 position, Vec3 rotation);
 
 void update_camera_transforms(Cam *c);
 

@@ -78,16 +78,11 @@ int main(void)
     float moveSpeed = 15.0f;
     float turnSpeed = 70.0f;
 
-    Cam camera = (Cam) {
-        .canvas = malloc(sizeof(Color) * WIDTH * HEIGHT),
-        .width = WIDTH,
-        .height = HEIGHT,
-        .view = (Viewport) {.d = 1.0f, .height = 1.0f, .width = (float)WIDTH / (float)HEIGHT},
-        .scale = (Vec3) {.x = 1.0f, .y = 1.0f, .z = 1.0f},
-        .position = (Vec3) {.x = -3.0f, .y = 1.0f, .z = 2.0f},
-        .rotation = (Vec3) {.x = 0.0f, .y = -30.0f, .z = 0.0f},
-        .forwardDirection = (Vec3) { .x = 0.0f, .y = 0.0f, .z = 1.0f}
-    };
+    Cam camera = init_camera(
+        WIDTH, HEIGHT, 
+        (Vec3) {.x = -3.0f, .y = 1.0f, .z = 2.0f},
+        (Vec3) {.x = 0.0f, .y = -30.0f, .z = 0.0f}
+    );
 
     ModelData cube = (ModelData) {
         .tris = tris,
@@ -110,10 +105,6 @@ int main(void)
             .scale = (Vec3){.x = 1.0f, .y = 1.0f, .z = 1.0f},
         }
     };
-    
-    camera.matrixTransform = init_matrix();
-    update_camera_transforms(&camera);
-
 
     for (size_t i = 0; i < 2; i++) {
         instances[i].matrixTransform = init_matrix();

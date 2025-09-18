@@ -1,4 +1,5 @@
 #include <stddef.h>
+#include <stdlib.h>
 #include "camera.h"
 
 void swap_point_values(Point *p1, Point *p2) {
@@ -42,6 +43,54 @@ Point project_vertex(Cam c, Vec3 v) {
         v.x * c.view.d / v.z,
         v.y * c.view.d / v.z
     );
+}
+
+Cam init_camera(int w, int h, Vec3 position, Vec3 rotation) {
+
+    // TODO: Calculate correct frustum for give aspect-ratio
+
+    ViewPlane near = (ViewPlane) {
+        .normal = (Vec3){.x = 0, .y = 0, .z = 1.0f},
+        .d = 1.0f
+    };
+    
+    ViewPlane left = (ViewPlane) {
+        .normal = vec3_normal((Vec3){.x = 1.0f, .y = 0, .z = 1.0f}),
+        .d = 0
+    };
+
+    ViewPlane right = (ViewPlane) {
+        .normal = vec3_normal((Vec3){.x = -1.0f, .y = 0, .z = 1.0f}),
+        .d = 0
+    };
+    
+    ViewPlane top = (ViewPlane) {
+        .normal = vec3_normal((Vec3){.x = 0, .y = -1.0f, .z = 1.0f}),
+        .d = 0
+    };
+    
+    ViewPlane bottom = (ViewPlane) {
+        .normal = vec3_normal((Vec3){.x = 0, .y = 1.0f, .z = 1.0f}),
+        .d = 0
+    };
+
+
+    Cam camera = (Cam) {
+        .canvas = malloc(sizeof(Color) * w * h),
+        .width = w,
+        .height = h,
+        .view = (Viewport) {.d = 1.0f, .height = 1.0f, .width =  (float)h / (float)w},
+        .scale = (Vec3) {.x = 1.0f, .y = 1.0f, .z = 1.0f},
+        .position = position,
+        .rotation = rotation,
+        .forwardDirection = (Vec3) { .x = 0.0f, .y = 0.0f, .z = 1.0f},
+        .frustum = {near, left, right, top, bottom}
+    };
+    
+    camera.matrixTransform = init_matrix();
+    update_camera_transforms(&camera);
+
+    return camera;
 }
 
 void update_camera_transforms(Cam *c){
