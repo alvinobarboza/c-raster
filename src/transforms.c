@@ -139,7 +139,11 @@ Vec3 vec3_multiply(Vec3 v, float n) {
 }
 
 Vec3 vec3_normal(Vec3 v) {
-    return vec3_multiply(v, vec3_length(v));
+    float n = vec3_length(v);
+    v.x = v.x / n;
+    v.y = v.y / n;
+    v.z = v.z / n;
+    return v;
 }
 
 Vec3 vec3_cross(Vec3 v1, Vec3 v2) {
