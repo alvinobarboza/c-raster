@@ -110,6 +110,11 @@ int main(void)
         instances[i].matrixTransform = init_matrix();
         update_instance_transforms(&instances[i]);
     }
+
+    Scene scene = (Scene) {
+        .instances = instances,
+        .objectCount = 2
+    };
     
     SetConfigFlags(FLAG_WINDOW_RESIZABLE | FLAG_WINDOW_ALWAYS_RUN | FLAG_MSAA_4X_HINT);
     InitWindow(camera.width, camera.height, "raylib [core] example - basic window");
