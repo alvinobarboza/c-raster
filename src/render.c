@@ -187,17 +187,27 @@ float signed_distance_to_point(ViewPlane plane, Vec3 vertex) {
 // TODO: Clippe tris behind camera 
 void render_model(Cam c, Instance instance) {
     Point *points = malloc(sizeof(Point)*instance.model->vertsCount);
-    float m_transform[M4X4];
 
-    for (size_t i = 0; i < instance.model->vertsCount; i++){
-        matrix_multiplication(c.matrixTransform, instance.matrixTransform, m_transform);
-        Vec3 v = mult_matrix_by_vec3(m_transform, instance.model->verts[i]);
-        points[i] = project_vertex(c, v);
+    if (instance.model->trisClippedCount > 0) {
+        for (size_t i = 0; i < instance.model->trisClippedCount; i++){
+            Triangle t = instance.model->trisClipped[i];
+            points[t.v1] = project_vertex(c, instance.model->vertsWorld[t.v1]);
+            points[t.v2] = project_vertex(c, instance.model->vertsWorld[t.v2]);
+            points[t.v3] = project_vertex(c, instance.model->vertsWorld[t.v3]);
+        }
+        for (size_t i = 0; i < instance.model->trisClippedCount; i++){
+            render_triangle(c, instance.model->trisClipped[i], points);
+        }
+    } else {
+        for (size_t i = 0; i < instance.model->vertsCount; i++){
+            points[i] = project_vertex(c, instance.model->vertsWorld[i]);
+        }
+
+        for (size_t i = 0; i < instance.model->trisCount; i++) {
+            render_triangle(c, instance.model->tris[i], points);
+        }
     }
 
-    for (size_t i = 0; i < instance.model->trisCount; i++) {
-        render_triangle(c, instance.model->tris[i], points);
-    }
     free(points);
 }
 
@@ -205,20 +215,59 @@ void render_scene(Cam c, Scene scene) {
     float m_transform[M4X4];
 
     for(size_t i = 0; i < scene.objectCount; i++){
-        matrix_multiplication(c.matrixTransform, scene.instances[i].matrixTransform, m_transform);
-        Vec3 v = mult_matrix_by_vec3(m_transform, scene.instances[i].boundingSphere.center);
+        
+        Instance *clipped = &scene.instances[i];
+        matrix_multiplication(c.matrixTransform, clipped->matrixTransform, m_transform);
+        clipped->boundingSphere.centerWorld = mult_matrix_by_vec3(m_transform, clipped->boundingSphere.center);
 
-        // TODO: check by pointer, case clip triangle and not only whole instance, 
-        // malloc new instanace copying everything to new instance, 
-        // case multi malloc, free old pointer
-        char shouldRender = 0;
+        bool computeLocalToWorld = true;
+
+        clipped->model->trisClippedCount = 0;
         for (size_t j = 0; j < FRUSTUM_PLANES; j++) {
-            float d = signed_distance_to_point(c.frustum[j], v);
-            if ( d > scene.instances[i].boundingSphere.radius) {
-                shouldRender++;
+            float d = signed_distance_to_point(c.frustum[j], clipped->boundingSphere.centerWorld);
+            float r = clipped->boundingSphere.radius;
+            
+            if ( d > r ) {
+                if (computeLocalToWorld) {
+                    for (size_t i = 0; i < clipped->model->vertsCount; i++) {
+                        clipped->model->vertsWorld[i] = mult_matrix_by_vec3(m_transform, clipped->model->verts[i]);
+                    }
+                    computeLocalToWorld = false;
+                }
+                continue;
             }
+
+            if ( d < -r) {
+                clipped = NULL;
+                break;
+            };
+
+            if (computeLocalToWorld) {
+                for (size_t n = 0; n < clipped->model->vertsCount; n++) {
+                    clipped->model->vertsWorld[n] = mult_matrix_by_vec3(m_transform, clipped->model->verts[n]);
+                }
+                computeLocalToWorld = false;
+            }
+        
+            // TODO: clip triangle itself, pointer shenanigans I couldn't resolve now..
+
+            clipped->model->trisClippedCount = 0;
+            for (size_t n = 0; n < clipped->model->trisCount; n++) {
+                Triangle t = clipped->model->tris[n];
+            
+                float d1 = signed_distance_to_point(c.frustum[j], clipped->model->vertsWorld[t.v1]);
+                float d2 = signed_distance_to_point(c.frustum[j], clipped->model->vertsWorld[t.v2]);
+                float d3 = signed_distance_to_point(c.frustum[j], clipped->model->vertsWorld[t.v3]);
+
+                if (d1 > 0 && d2 > 0 && d3 > 0) {
+                    clipped->model->trisClipped[clipped->model->trisClippedCount] = t;
+                    clipped->model->trisClippedCount++;
+                }
+            }            
         }
 
-        if (shouldRender == FRUSTUM_PLANES) render_model(c, scene.instances[i]);
+        if (clipped != NULL) {
+            render_model(c, *clipped);
+        }
     }
 }
