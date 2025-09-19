@@ -178,6 +178,12 @@ void render_triangle(Cam c, Triangle tri, const Point *projected) {
         tri.color);
 }
 
+float signed_distance_to_point(ViewPlane plane, Vec3 vertex) {
+    float d = vec3_by_vec3_multiply(plane.normal, vertex);
+    d += plane.d;
+    return d;
+}
+
 // TODO: Clippe tris behind camera 
 void render_model(Cam c, Instance instance) {
     Point *points = malloc(sizeof(Point)*instance.model->vertsCount);
@@ -196,7 +202,23 @@ void render_model(Cam c, Instance instance) {
 }
 
 void render_scene(Cam c, Scene scene) {
+    float m_transform[M4X4];
+
     for(size_t i = 0; i < scene.objectCount; i++){
-        render_model(c, scene.instances[i]);
+        matrix_multiplication(c.matrixTransform, scene.instances[i].matrixTransform, m_transform);
+        Vec3 v = mult_matrix_by_vec3(m_transform, scene.instances[i].boundingSphere.center);
+
+        // TODO: check by pointer, case clip triangle and not only whole instance, 
+        // malloc new instanace copying everything to new instance, 
+        // case multi malloc, free old pointer
+        char shouldRender = 0;
+        for (size_t j = 0; j < FRUSTUM_PLANES; j++) {
+            float d = signed_distance_to_point(c.frustum[j], v);
+            if ( d > scene.instances[i].boundingSphere.radius) {
+                shouldRender++;
+            }
+        }
+
+        if (shouldRender == FRUSTUM_PLANES) render_model(c, scene.instances[i]);
     }
 }

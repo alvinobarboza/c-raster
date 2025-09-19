@@ -97,7 +97,7 @@ int main(void)
             .model = &cube,
             .position = (Vec3){.x = -1.5, .y = 0.0f, .z = 7.0f},
             .rotation = (Vec3){.x = 0.0f, .y = 0.0f, .z = 0.0f},
-            .scale = (Vec3){.x = .75f, .y = .75f, .z = .75f},
+            .scale = (Vec3){.x = .5f, .y = .5f, .z = .5f},
         },
         (Instance) {
             .model = &cube,
@@ -110,6 +110,7 @@ int main(void)
     for (size_t i = 0; i < 2; i++) {
         instances[i].matrixTransform = init_matrix();
         update_instance_transforms(&instances[i]);
+        printf("instance: %d radius: %02.02f\n", (int)i, instances[i].boundingSphere.radius);
     }
 
     Scene scene = (Scene) {

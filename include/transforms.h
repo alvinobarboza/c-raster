@@ -37,6 +37,7 @@ void print_mat(const char *name, float *mat);
 void print_vec3(const char *name, Vec3 v);
 
 // Vector Maths
+float vec3_by_vec3_multiply(Vec3 v1, Vec3 v2);
 float vec3_dot(Vec3 v);
 float vec3_length(Vec3 v);
 Vec3 vec3_normal(Vec3 v);
