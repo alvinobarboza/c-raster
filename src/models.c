@@ -37,9 +37,11 @@ void update_instance_transforms(Instance *instance) {
     instance->boundingSphere.center.z = instance->boundingSphere.center.z / instance->model->vertsCount;
 
     for (size_t i = 0; i < instance->model->vertsCount; i++) {
-        float x = instance->model->verts[i].x - instance->boundingSphere.center.x;
-        float y = instance->model->verts[i].y - instance->boundingSphere.center.y;
-        float z = instance->model->verts[i].z - instance->boundingSphere.center.z;
+        Vec3 scaled = mult_matrix_by_vec3(scale, instance->model->verts[i]);
+
+        float x = scaled.x - instance->boundingSphere.center.x;
+        float y = scaled.y - instance->boundingSphere.center.y;
+        float z = scaled.z - instance->boundingSphere.center.z;
         float r = sqrtf((x*x)+(y*y)+(z*z));
 
         if (instance->boundingSphere.radius < r) {
