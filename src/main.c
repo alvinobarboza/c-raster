@@ -13,42 +13,6 @@
 #define HEIGHT 1080
 #define TARGET_FPS 60
 
-// Cube Data =========
-Vec3 verts[]  = {
-    { 1.0f,  1.0f,  1.0f},
-    {-1.0f,  1.0f,  1.0f},
-    {-1.0f, -1.0f,  1.0f},
-    { 1.0f, -1.0f,  1.0f},
-    { 1.0f,  1.0f, -1.0f},
-    {-1.0f,  1.0f, -1.0f},
-    {-1.0f, -1.0f, -1.0f},
-    { 1.0f, -1.0f, -1.0f},
-};
-
-Triangle tris[] = {
-    {.v1 = 0, .v2 = 1, .v3 = 2, .color = RED},
-    {.v1 = 0, .v2 = 2, .v3 = 3, .color = RED},
-    {.v1 = 4, .v2 = 0, .v3 = 3, .color = GREEN},
-    {.v1 = 4, .v2 = 3, .v3 = 7, .color = GREEN},
-    {.v1 = 5, .v2 = 4, .v3 = 7, .color = BLUE},
-    {.v1 = 5, .v2 = 7, .v3 = 6, .color = BLUE},
-    {.v1 = 1, .v2 = 5, .v3 = 6, .color = YELLOW},
-    {.v1 = 1, .v2 = 6, .v3 = 2, .color = YELLOW},
-    {.v1 = 4, .v2 = 5, .v3 = 1, .color = PURPLE},
-    {.v1 = 4, .v2 = 1, .v3 = 0, .color = PURPLE},
-    {.v1 = 2, .v2 = 6, .v3 = 7, .color = (Color) {.a = OPAQUE, .r = 0, .g = OPAQUE, .b = OPAQUE} },
-    {.v1 = 2, .v2 = 7, .v3 = 3, .color = (Color) {.a = OPAQUE, .r = 0, .g = OPAQUE, .b = OPAQUE} },
-};
-
-static ModelData cube = (ModelData) {
-    .tris = tris,
-    .verts = verts,
-    .trisCount = 12,
-    .vertsCount = 8,
-};
-
-// Cube Data ========
-
 void move_cube(Instance *instance) {
     if (IsKeyDown(KEY_I)) {
         instance->position.z += .5f;
@@ -91,6 +55,8 @@ int main(void)
         (Vec3) {.x = -3.0f, .y = 1.0f, .z = 2.0f},
         (Vec3) {.x = 0.0f, .y = -30.0f, .z = 0.0f}
     );
+
+    ModelData cube = cube_model();
 
     Instance instances[2] = {
         (Instance) {
@@ -214,7 +180,7 @@ closeWindow:
     for (size_t i = 0; i < scene.objectCount; i++) {
         free(scene.instances[i].matrixTransform);
     }
-    
+    free_model(cube);
     free(camera.canvas);
     free(camera.matrixTransform);
     UnloadImage(img);
