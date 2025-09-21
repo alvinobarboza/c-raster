@@ -5,14 +5,14 @@
 #include "transforms.h"
 
 Vec3 verts[]  = {
-    { 1.0f,  1.0f,  1.0f},
-    {-1.0f,  1.0f,  1.0f},
-    {-1.0f, -1.0f,  1.0f},
-    { 1.0f, -1.0f,  1.0f},
-    { 1.0f,  1.0f, -1.0f},
-    {-1.0f,  1.0f, -1.0f},
-    {-1.0f, -1.0f, -1.0f},
-    { 1.0f, -1.0f, -1.0f},
+    { 1.0f,  1.0f,  1.0f}, // 0 front top right
+    {-1.0f,  1.0f,  1.0f}, // 1 front top left
+    {-1.0f, -1.0f,  1.0f}, // 2 front bottom left
+    { 1.0f, -1.0f,  1.0f}, // 3 front bottom rigth
+    { 1.0f,  1.0f, -1.0f}, // 4 back top right
+    {-1.0f,  1.0f, -1.0f}, // 5 back top left
+    {-1.0f, -1.0f, -1.0f}, // 6 back bottom left
+    { 1.0f, -1.0f, -1.0f}, // 7 back bottom right
 };
 
 Triangle tris[] = {

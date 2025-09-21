@@ -9,8 +9,8 @@
 #include "render.h"
 #include "scene.h"
 
-#define WIDTH  1080
-#define HEIGHT 1080
+#define WIDTH  1000
+#define HEIGHT 400
 #define TARGET_FPS 60
 
 void move_cube(Instance *instance) {
@@ -61,22 +61,21 @@ int main(void)
     Instance instances[2] = {
         (Instance) {
             .model = &cube,
-            .position = (Vec3){.x = -1.5, .y = 0.0f, .z = 7.0f},
+            .position = (Vec3){.x = -2.5, .y = 0.0f, .z = 10.0f},
             .rotation = (Vec3){.x = 0.0f, .y = 0.0f, .z = 0.0f},
-            .scale = (Vec3){.x = .5f, .y = .5f, .z = .5f},
+            .scale = (Vec3){.x = .7f, .y = .7f, .z = .7f},
         },
         (Instance) {
             .model = &cube,
-            .position = (Vec3){.x = 1.25, .y = 2.5f, .z = 7.5f},
+            .position = (Vec3){.x = 2.25, .y = 2.5f, .z = 9.5f},
             .rotation = (Vec3){.x = 0.0f, .y = 195.0f, .z = 0.0f},
-            .scale = (Vec3){.x = 1.0f, .y = 1.0f, .z = 1.0f},
+            .scale = (Vec3){.x = 2.0f, .y = 1.0f, .z = 2.0f},
         }
     };
 
     for (size_t i = 0; i < 2; i++) {
         instances[i].matrixTransform = init_matrix();
         update_instance_transforms(&instances[i]);
-        printf("instance: %d radius: %02.02f\n", (int)i, instances[i].boundingSphere.radius);
     }
 
     Scene scene = (Scene) {
