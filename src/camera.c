@@ -51,7 +51,7 @@ Cam init_camera(int w, int h, Vec3 position, Vec3 rotation) {
 
     ViewPlane near = (ViewPlane) {
         .normal = (Vec3){.x = 0, .y = 0, .z = 1.0f},
-        .d = 1.0f
+        .d = -1.0f
     };
     
     ViewPlane left = (ViewPlane) {
