@@ -79,7 +79,7 @@ Cam init_camera(int w, int h, Vec3 position, Vec3 rotation) {
         .canvas = malloc(sizeof(Color) * w * h),
         .width = w,
         .height = h,
-        .view = (Viewport) {.d = 1.0f, .height = 1.0f, .width =  (float)h / (float)w},
+        .view = (Viewport) {.d = 1.0f, .height = 1.0f, .width =  (float)w / (float)h},
         .scale = (Vec3) {.x = 1.0f, .y = 1.0f, .z = 1.0f},
         .position = position,
         .rotation = rotation,
