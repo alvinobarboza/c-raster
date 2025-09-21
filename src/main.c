@@ -56,8 +56,10 @@ int main(void)
         (Vec3) {.x = 0.0f, .y = -30.0f, .z = 0.0f}
     );
 
+    // TODO: proper model loading
     ModelData cube = cube_model();
 
+    // TODO: proper instance loading
     Instance instances[2] = {
         (Instance) {
             .model = &cube,
@@ -78,6 +80,7 @@ int main(void)
         update_instance_transforms(&instances[i]);
     }
 
+    // TODO: Proper scene builder
     Scene scene = (Scene) {
         .instances = instances,
         .objectCount = 2
