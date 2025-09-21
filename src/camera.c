@@ -173,10 +173,10 @@ void camera_turn_right(Cam *c, float unit){
 void camera_turn_up(Cam *c, float unit){
     c->rotation.x += unit;
 
-    if (c->rotation.x < -90.0f){
-        c->rotation.x = -90.0f;
-    } else if (c->rotation.x > 90.0f){
-        c->rotation.x = 90.0f;
+    if (c->rotation.x < -89.0f){
+        c->rotation.x = -89.0f;
+    } else if (c->rotation.x > 89.0f){
+        c->rotation.x = 89.0f;
     }
 
     update_camera_transforms(c);
