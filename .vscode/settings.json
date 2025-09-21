@@ -7,6 +7,7 @@
         "model3d.h": "c",
         "stdio.h": "c",
         "transforms.h": "c",
-        "scene.h": "c"
+        "scene.h": "c",
+        "float.h": "c"
     }
 }
