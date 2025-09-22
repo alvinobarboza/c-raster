@@ -44,5 +44,6 @@ Vec3 vec3_normal(Vec3 v);
 Vec3 vec3_cross(Vec3 v1, Vec3 v2);
 Vec3 vec3_multiply(Vec3 v, float n);
 Vec3 vec3_add(Vec3 v1, Vec3 v2);
+Vec3 vec3_sub(Vec3 v1, Vec3 v2);
 
 #endif

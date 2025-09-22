@@ -169,3 +169,11 @@ Vec3 vec3_add(Vec3 v1, Vec3 v2) {
         .z = v1.z + v2.z,
     };
 }
+
+Vec3 vec3_sub(Vec3 v1, Vec3 v2) {
+    return (Vec3) {
+        .x = v1.x - v2.x,
+        .y = v1.y - v2.y,
+        .z = v1.z - v2.z,
+    };
+}

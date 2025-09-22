@@ -185,7 +185,7 @@ float signed_distance_to_point(ViewPlane plane, Vec3 vertex) {
     return d;
 }
 
-// TODO: Clippe tris behind camera 
+// TODO: Get projected point brightness from triangle
 void render_model(Cam c, Instance instance) {
     Point *points = malloc(sizeof(Point)*instance.model->vertsCount);
 
@@ -226,6 +226,37 @@ bool is_inside_frustum(ViewPlane *planes, Instance instance) {
         };
     }
     return true;
+}
+
+// Formula: 
+// t = ( −D − dot(N,A) ) / dot(N,B−A)
+// t > Intersection ratio
+// D > plane offset value (only used in the front view as it is 1 unit infront of the camera)
+// N > Positive normal vector from plane
+// A > Vertex in front of the positive plane's normal vector
+// B > Vexter behind plane's normal vector 
+float ratio_ab_from_plane(ViewPlane plane, Vec3 inFrontA, Vec3 behindB) {
+    float normalDotA = vec3_by_vec3_multiply(plane.normal, inFrontA);
+    Vec3 bMinusA = vec3_sub(behindB,inFrontA);
+    float normalDotBminusA = vec3_by_vec3_multiply(plane.normal, bMinusA);
+    float t = (-plane.d - normalDotA) / normalDotBminusA;
+    return t;
+}
+
+// Formula: 
+// Q = A + t(B−A)
+// Q > Actual point on plane 
+// t > Intersection ratio
+// A > Vertex in front of the positive plane's normal vector
+// B > Vexter behind plane's normal vector 
+Vec3 point_on_plane_from_ab(Vec3 inFrontA, Vec3 behindB, float t) {
+    return vec3_add(inFrontA, vec3_multiply(vec3_sub(behindB, inFrontA),t));
+}
+
+Vec3 intersection_on_plane(ViewPlane plane, Vec3 inFrontA, Vec3 behindB) {
+    float t = ratio_ab_from_plane(plane, inFrontA, behindB);
+    Vec3 q = point_on_plane_from_ab(inFrontA, behindB, t);
+    return q;
 }
 
 void render_scene(Cam c, Scene scene) {
@@ -280,7 +311,58 @@ void render_scene(Cam c, Scene scene) {
                     // printf("d1: %g d2: %g d3: %g\n", d1, d2, d3),
                     clipped->model->trisClipped[clipped->model->trisClippedCount] = t;
                     clipped->model->trisClippedCount++;
+                    continue;
                 }
+                
+                // TODO: tris will potentially* have a value for brightness for each vertex
+                // "must" compute intermediate value from P1 to P2 in case of clipping tri
+                Vec3 pointA = clipped->model->vertsWorld[t.v1];
+                Vec3 pointB = clipped->model->vertsWorld[t.v2];
+                Vec3 pointC = clipped->model->vertsWorld[t.v3];
+
+                if (d1 > FLT_MIN && d2 < 0.0f && d3 < 0.0f) {
+                    // printf("Just A %lld tri n:%lld\n",t.v1, n);
+                    Vec3 pointBprime = intersection_on_plane(plane, pointA, pointB);
+                    Vec3 pointCprime = intersection_on_plane(plane, pointA, pointC);
+
+                    clipped->model->vertsWorld[t.v2] = pointBprime;
+                    clipped->model->vertsWorld[t.v3] = pointCprime;
+
+                    clipped->model->trisClipped[clipped->model->trisClippedCount] = t;
+                    clipped->model->trisClippedCount++;
+                }
+                if (d1 < 0.0f && d2 > FLT_MIN && d3 < 0.0f) {
+                    // printf("Just B %lld tri n:%lld\n",t.v2, n);
+                    Vec3 pointAprime = intersection_on_plane(plane, pointB, pointA);
+                    Vec3 pointCprime = intersection_on_plane(plane, pointB, pointC);
+
+                    clipped->model->vertsWorld[t.v1] = pointAprime;
+                    clipped->model->vertsWorld[t.v3] = pointCprime;
+
+                    clipped->model->trisClipped[clipped->model->trisClippedCount] = t;
+                    clipped->model->trisClippedCount++;
+                }
+                if (d1 < 0.0f && d2 < 0.0f && d3 > FLT_MIN) {
+                    // printf("Just C %lld tri n:%lld\n",t.v3, n);
+                    Vec3 pointAprime = intersection_on_plane(plane, pointC, pointA);
+                    Vec3 pointBprime = intersection_on_plane(plane, pointC, pointB);
+
+                    clipped->model->vertsWorld[t.v1] = pointAprime;
+                    clipped->model->vertsWorld[t.v2] = pointBprime;
+
+                    clipped->model->trisClipped[clipped->model->trisClippedCount] = t;
+                    clipped->model->trisClippedCount++;
+                }
+
+                // if (d1 < 0.0f && d2 > FLT_MIN && d3 > FLT_MIN) {
+                //     printf("Just A %lld tri n:%lld\n",t.v1, n);
+                // }
+                // if (d1 > FLT_MIN && d2 < 0.0f && d3 > FLT_MIN) {
+                //     printf("Just B %lld tri n:%lld\n",t.v2, n);
+                // }
+                // if (d1 > FLT_MIN && d2 > FLT_MIN && d3 < 0.0f) {
+                //     printf("Just C %lld tri n:%lld\n",t.v3, n);
+                // }
             }
             if (clipped->model->trisClippedCount == 0) {
                 clipped = NULL;
