@@ -9,6 +9,7 @@
         "transforms.h": "c",
         "scene.h": "c",
         "float.h": "c",
-        "models.h": "c"
+        "models.h": "c",
+        "shapes.h": "c"
     }
 }

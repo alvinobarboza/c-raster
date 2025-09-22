@@ -33,9 +33,9 @@ source_files = $(SRC)/*.c
 .PHONY: build
 build: 
 ifeq ($(OS),Windows_NT)
-	$(CC) $(source_files) $(CFLAGS) $(include_paths) $(lib_paths_win) $(dependencies_win) -o $(bin_win) 
+	$(CC) $(source_files) -g $(CFLAGS) $(include_paths) $(lib_paths_win) $(dependencies_win) -o $(bin_win) 
 else
-	$(CC) $(source_files) $(CFLAGS) $(include_paths) $(lib_paths_linux) $(dependencies_linux) -o $(bin_linux) 
+	$(CC) $(source_files) -g $(CFLAGS) $(include_paths) $(lib_paths_linux) $(dependencies_linux) -o $(bin_linux) 
 endif
 
 # Default target

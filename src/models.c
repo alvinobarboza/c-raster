@@ -11,22 +11,22 @@ ModelData init_model(Vec3 *vert, size_t vertsCount, Triangle *tri, size_t trisCo
     model.trisClippedCount = 0;
 
     model.vertsCount = vertsCount;
-    model.vertsClippedCount = 0;
+    model.vertsClippedCount = vertsCount;
 
     model.tris = malloc(sizeof(Triangle) * trisCount);
-    model.trisClipped = malloc(sizeof(Triangle) * (trisCount+trisCount/3));
+
+    // maybe impossible but if every triangle needs another triangle from clipping
+    model.trisClipped = malloc(sizeof(Triangle) * (trisCount*2)); 
 
     model.verts = malloc(sizeof(Vec3) * vertsCount);
-    model.vertsWorld = malloc(sizeof(Vec3) * (vertsCount+vertsCount/3));
-    model.vertsWorldClipped = malloc(sizeof(Vec3) * (vertsCount+vertsCount/3));
+
+    // maybe impossible but if every triangle needs another triangle from clipping
+    // One new vertice will be created
+    model.vertsWorld = malloc(sizeof(Vec3) * (vertsCount+trisCount));
 
     for ( size_t i = 0; i < vertsCount; i++) {
         model.verts[i] = vert[i];
         model.vertsWorld[i] = vert[i];
-    }
-    
-    for ( size_t i = 0; i < (vertsCount+vertsCount/3); i++) {
-        model.vertsWorldClipped[i] = (Vec3){0};
     }
 
     for ( size_t i = 0; i < trisCount; i++ ) {
@@ -43,7 +43,6 @@ ModelData init_model(Vec3 *vert, size_t vertsCount, Triangle *tri, size_t trisCo
 void free_model(ModelData model) {
     free(model.verts);
     free(model.vertsWorld);
-    free(model.vertsWorldClipped);
     free(model.tris);
     free(model.trisClipped);
 }

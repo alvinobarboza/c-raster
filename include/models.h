@@ -20,7 +20,6 @@ typedef struct ModelData {
     
     Vec3 *verts;
     Vec3 *vertsWorld;
-    Vec3 *vertsWorldClipped;
 
     Triangle *tris;
     Triangle *trisClipped;

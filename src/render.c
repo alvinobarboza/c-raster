@@ -192,7 +192,7 @@ void render_model(Cam c, Instance instance) {
     if (instance.model->trisClippedCount > 0) {
         for (size_t i = 0; i < instance.model->trisClippedCount; i++){
             Triangle t = instance.model->trisClipped[i];
-            // printf("tri render: v1: %ld v2: %ld v3: %ld\n", t.v1, t.v2, t.v3);
+            // printf("%lld:tri render: v1: %lld v2: %lld v3: %lld\n", i, t.v1, t.v2, t.v3);
             points[t.v1] = project_vertex(c, instance.model->vertsWorld[t.v1]);
             points[t.v2] = project_vertex(c, instance.model->vertsWorld[t.v2]);
             points[t.v3] = project_vertex(c, instance.model->vertsWorld[t.v3]);
@@ -269,7 +269,6 @@ void render_scene(Cam c, Scene scene) {
         clipped->boundingSphere.centerWorld = mult_matrix_by_vec3(m_transform, clipped->boundingSphere.center);
 
         if (!is_inside_frustum(c.frustum, *clipped)) {
-            // printf("no render: %ld\n", i);
             continue;
         }
 
@@ -300,6 +299,7 @@ void render_scene(Cam c, Scene scene) {
             }
 
             clipped->model->trisClippedCount = 0;
+            // clipped->model->vertsClippedCount = clipped->model->vertsCount;
             for (size_t n = 0; n < trisLength; n++) {
                 Triangle t = tris[n];
             
@@ -320,6 +320,7 @@ void render_scene(Cam c, Scene scene) {
                 Vec3 pointB = clipped->model->vertsWorld[t.v2];
                 Vec3 pointC = clipped->model->vertsWorld[t.v3];
 
+                // One vextex in front of view plane
                 if (d1 > FLT_MIN && d2 < 0.0f && d3 < 0.0f) {
                     // printf("Just A %lld tri n:%lld\n",t.v1, n);
                     Vec3 pointBprime = intersection_on_plane(plane, pointA, pointB);
@@ -330,6 +331,7 @@ void render_scene(Cam c, Scene scene) {
 
                     clipped->model->trisClipped[clipped->model->trisClippedCount] = t;
                     clipped->model->trisClippedCount++;
+                    continue;
                 }
                 if (d1 < 0.0f && d2 > FLT_MIN && d3 < 0.0f) {
                     // printf("Just B %lld tri n:%lld\n",t.v2, n);
@@ -341,6 +343,7 @@ void render_scene(Cam c, Scene scene) {
 
                     clipped->model->trisClipped[clipped->model->trisClippedCount] = t;
                     clipped->model->trisClippedCount++;
+                    continue;
                 }
                 if (d1 < 0.0f && d2 < 0.0f && d3 > FLT_MIN) {
                     // printf("Just C %lld tri n:%lld\n",t.v3, n);
@@ -352,17 +355,70 @@ void render_scene(Cam c, Scene scene) {
 
                     clipped->model->trisClipped[clipped->model->trisClippedCount] = t;
                     clipped->model->trisClippedCount++;
+                    continue;
                 }
 
+                // // Two vertices in front of view plane 
                 // if (d1 < 0.0f && d2 > FLT_MIN && d3 > FLT_MIN) {
-                //     printf("Just A %lld tri n:%lld\n",t.v1, n);
+                //     // printf("Just A %lld tri n:%lld\n",t.v1, n);
+                //     continue;
                 // }
                 // if (d1 > FLT_MIN && d2 < 0.0f && d3 > FLT_MIN) {
                 //     printf("Just B %lld tri n:%lld\n",t.v2, n);
                 // }
-                // if (d1 > FLT_MIN && d2 > FLT_MIN && d3 < 0.0f) {
-                //     printf("Just C %lld tri n:%lld\n",t.v3, n);
-                // }
+                if (d1 > FLT_MIN && d2 > FLT_MIN && d3 < 0.0f) {
+                    // [Triangle(A, B, A'), Triangle(A', B, B')]
+
+                    Triangle t1 = t;
+                    Triangle t2 = t;
+
+                    t1.v1 = t.v1;
+                    t1.v2 = t.v2;
+                    t1.v3 = t.v3;
+
+                    t2.v1 = t.v3;
+                    t2.v2 = t.v2;
+                    t2.v3 = 0; // new index;
+
+                    Vec3 pointAprime = intersection_on_plane(plane, pointA, pointC);
+                    Vec3 pointBprime = intersection_on_plane(plane, pointB, pointC);
+
+                    size_t pIndex = clipped->model->vertsClippedCount;
+                    clipped->model->vertsClippedCount++;
+                    for (size_t vI = 0; vI < clipped->model->vertsClippedCount; vI++) {
+                        bool isIndexAvaliable = true;
+                        for (size_t tI = 0; tI < trisLength; tI++) {
+                            if(vI == tris[tI].v1 || vI == tris[tI].v2 || vI == tris[tI].v3) {
+                                isIndexAvaliable = false;
+                            }
+                        }
+                        if (isIndexAvaliable) {
+                            pIndex = vI;
+                            if (pIndex < (clipped->model->vertsClippedCount - 1)) {
+                                clipped->model->vertsClippedCount--;
+                            }
+                            break;
+                        }
+                    }
+                    
+                    t2.v3 = pIndex;
+                    // printf("%lld\n", clipped->model->vertsClippedCount);
+
+                    t2.v1 = t1.v3;
+
+                    clipped->model->vertsWorld[t1.v3] = pointAprime;
+                    clipped->model->vertsWorld[t2.v3] = pointBprime;
+                    
+                    clipped->model->trisClipped[clipped->model->trisClippedCount] = t1;
+                    clipped->model->trisClippedCount++;
+                    
+                    clipped->model->trisClipped[clipped->model->trisClippedCount] = t2;
+                    clipped->model->trisClippedCount++;
+                    // printf("tri index:%lld new index %lld\n", clipped->model->trisClippedCount, pIndex);
+                    // print_vec3("A':", pointAprime);
+                    // print_vec3("B':", pointBprime);
+                    continue;
+                }
             }
             if (clipped->model->trisClippedCount == 0) {
                 clipped = NULL;
