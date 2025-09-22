@@ -8,6 +8,7 @@
         "stdio.h": "c",
         "transforms.h": "c",
         "scene.h": "c",
-        "float.h": "c"
+        "float.h": "c",
+        "models.h": "c"
     }
 }

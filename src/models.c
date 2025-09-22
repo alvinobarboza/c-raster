@@ -4,32 +4,6 @@
 #include "models.h"
 #include "transforms.h"
 
-Vec3 verts[]  = {
-    { 1.0f,  1.0f,  1.0f}, // 0 front top right
-    {-1.0f,  1.0f,  1.0f}, // 1 front top left
-    {-1.0f, -1.0f,  1.0f}, // 2 front bottom left
-    { 1.0f, -1.0f,  1.0f}, // 3 front bottom rigth
-    { 1.0f,  1.0f, -1.0f}, // 4 back top right
-    {-1.0f,  1.0f, -1.0f}, // 5 back top left
-    {-1.0f, -1.0f, -1.0f}, // 6 back bottom left
-    { 1.0f, -1.0f, -1.0f}, // 7 back bottom right
-};
-
-Triangle tris[] = {
-    {.v1 = 0, .v2 = 1, .v3 = 2, .color = RED},
-    {.v1 = 0, .v2 = 2, .v3 = 3, .color = RED},
-    {.v1 = 4, .v2 = 0, .v3 = 3, .color = GREEN},
-    {.v1 = 4, .v2 = 3, .v3 = 7, .color = GREEN},
-    {.v1 = 5, .v2 = 4, .v3 = 7, .color = BLUE},
-    {.v1 = 5, .v2 = 7, .v3 = 6, .color = BLUE},
-    {.v1 = 1, .v2 = 5, .v3 = 6, .color = YELLOW},
-    {.v1 = 1, .v2 = 6, .v3 = 2, .color = YELLOW},
-    {.v1 = 4, .v2 = 5, .v3 = 1, .color = PURPLE},
-    {.v1 = 4, .v2 = 1, .v3 = 0, .color = PURPLE},
-    {.v1 = 2, .v2 = 6, .v3 = 7, .color = (Color) {.a = 255, .r = 0, .g = 255, .b = 255} },
-    {.v1 = 2, .v2 = 7, .v3 = 3, .color = (Color) {.a = 255, .r = 0, .g = 255, .b = 255} },
-};
-
 ModelData init_model(Vec3 *vert, size_t vertsCount, Triangle *tri, size_t trisCount) {
     ModelData model;
 
@@ -72,10 +46,6 @@ void free_model(ModelData model) {
     free(model.vertsWorldClipped);
     free(model.tris);
     free(model.trisClipped);
-}
-
-ModelData cube_model() {
-    return init_model(verts, 8, tris, 12);
 }
 
 void update_instance_transforms(Instance *instance) {

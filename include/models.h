@@ -44,8 +44,6 @@ typedef struct Instance {
 ModelData init_model(Vec3 *verts, size_t vertsCount, Triangle *tris, size_t trisCount);
 void free_model(ModelData model);
 
-ModelData cube_model();
-
 void update_instance_transforms(Instance *instance);
 
 #endif
