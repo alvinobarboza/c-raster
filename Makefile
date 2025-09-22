@@ -3,6 +3,7 @@ SRC = ./src
 INCLUDE = ./include
 BIN = ./bin
 CFLAGS = -std=c99 -Wall -Wextra
+DEBUG = -fsanitize=address -g3
 CFLAGS_O = $(CFLAGS) -O2
 
 include_paths = -I./external/raylib/include/
@@ -33,9 +34,9 @@ source_files = $(SRC)/*.c
 .PHONY: build
 build: 
 ifeq ($(OS),Windows_NT)
-	$(CC) $(source_files) -g $(CFLAGS) $(include_paths) $(lib_paths_win) $(dependencies_win) -o $(bin_win) 
+	$(CC) $(source_files) $(CFLAGS) $(include_paths) $(lib_paths_win) $(dependencies_win) -o $(bin_win) 
 else
-	$(CC) $(source_files) -g $(CFLAGS) $(include_paths) $(lib_paths_linux) $(dependencies_linux) -o $(bin_linux) 
+	$(CC) $(DEBUG) $(source_files) $(CFLAGS) $(include_paths) $(lib_paths_linux) $(dependencies_linux) -o $(bin_linux) 
 endif
 
 # Default target
