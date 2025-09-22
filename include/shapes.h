@@ -7,5 +7,6 @@ ModelData cube_shape();
 ModelData icosahedron_shape();
 ModelData torus_shape();
 ModelData uv_sphere_shape();
+ModelData square_shape();
 
 #endif

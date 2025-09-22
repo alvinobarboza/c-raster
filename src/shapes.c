@@ -181,3 +181,18 @@ ModelData uv_sphere_shape() {
         sphere_tris, SPHERE_SEGMENTS * (SPHERE_RINGS - 1) * 2
     );
 }
+
+ModelData square_shape() {
+    Vec3 square_verts[] = {
+        { 1.0f,  1.0f,  0.0f}, // 0 front top right
+        {-1.0f,  1.0f,  0.0f}, // 1 front top left
+        {-1.0f, -1.0f,  0.0f}, // 2 front bottom left
+        { 1.0f, -1.0f,  0.0f}, // 3 front bottom rigth
+    };
+    Triangle square_tris[] = {
+        {.v1 = 0, .v2 = 1, .v3 = 2, .color = RED},
+        {.v1 = 0, .v2 = 2, .v3 = 3, .color = RED},
+    };
+
+    return init_model(square_verts, 4, square_tris, 2);
+}
