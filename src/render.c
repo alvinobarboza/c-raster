@@ -258,12 +258,19 @@ void render_scene(Cam c, Scene scene) {
                 continue;
             }
 
-            // TODO: clipp triangles properly, triangles are being clipped, but when there is a plane intersection
-            // they break
+            // TODO: generate intermediate tris
+
+            size_t trisLength = clipped->model->trisCount;
+            Triangle *tris = clipped->model->tris;
+
+            if (clipped->model->trisClippedCount > 0){
+                trisLength = clipped->model->trisClippedCount;
+                tris = clipped->model->trisClipped;
+            }
 
             clipped->model->trisClippedCount = 0;
-            for (size_t n = 0; n < clipped->model->trisCount; n++) {
-                Triangle t = clipped->model->tris[n];
+            for (size_t n = 0; n < trisLength; n++) {
+                Triangle t = tris[n];
             
                 float d1 = signed_distance_to_point(plane, clipped->model->vertsWorld[t.v1]);
                 float d2 = signed_distance_to_point(plane, clipped->model->vertsWorld[t.v2]);
