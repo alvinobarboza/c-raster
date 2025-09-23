@@ -58,10 +58,10 @@ int main(void)
     );
 
     // TODO: proper model loading
-    // ModelData cube = cube_shape();
-    // ModelData icosahedron = icosahedron_shape();
-    // ModelData torus = torus_shape();
-    // ModelData uvSphere = uv_sphere_shape();
+    ModelData cube = cube_shape();
+    ModelData icosahedron = icosahedron_shape();
+    ModelData torus = torus_shape();
+    ModelData uvSphere = uv_sphere_shape();
     ModelData square = square_shape();
 
     // TODO: proper instance loading
@@ -71,40 +71,40 @@ int main(void)
             .position = (Vec3){.x = 0.0f, .y = 0.0f, .z = 7.0f},
             .rotation = (Vec3){.x = 0.0f, .y = 0.0f, .z = 30.0f},
             .scale = (Vec3){.x = 1.0f, .y = 1.0f, .z = 1.0f},
+        },
+        (Instance) {
+            .model = &cube,
+            .position = (Vec3){.x = -2.5, .y = 0.0f, .z = 10.0f},
+            .rotation = (Vec3){.x = 0.0f, .y = 0.0f, .z = 0.0f},
+            .scale = (Vec3){.x = .7f, .y = .7f, .z = .7f},
+        },
+        (Instance) {
+            .model = &cube,
+            .position = (Vec3){.x = 2.25, .y = 2.5f, .z = 9.5f},
+            .rotation = (Vec3){.x = 0.0f, .y = 195.0f, .z = 0.0f},
+            .scale = (Vec3){.x = 2.0f, .y = 1.0f, .z = 2.0f},
+        },
+        (Instance) {
+            .model = &icosahedron,
+            .position = (Vec3){.x = 0.25, .y = 1.5f, .z = 20.0f},
+            .rotation = (Vec3){.x = 0.0f, .y = 95.0f, .z = 0.0f},
+            .scale = (Vec3){.x = 1.0f, .y = 1.0f, .z = 1.0f},
+        },
+        (Instance) {
+            .model = &torus,
+            .position = (Vec3){.x = 8.25, .y = -1.5f, .z = 15.0f},
+            .rotation = (Vec3){.x = 0.0f, .y = -45.0f, .z = 0.0f},
+            .scale = (Vec3){.x = 2.0f, .y = 2.0f, .z = 2.0f},
+        },
+        (Instance) {
+            .model = &uvSphere,
+            .position = (Vec3){.x = -0.25, .y = -1.5f, .z = 15.0f},
+            .rotation = (Vec3){.x = 0.0f, .y = 0.0f, .z = 0.0f},
+            .scale = (Vec3){.x = 2.0f, .y = 2.0f, .z = 2.0f},
         }
-        // (Instance) {
-        //     .model = &cube,
-        //     .position = (Vec3){.x = -2.5, .y = 0.0f, .z = 10.0f},
-        //     .rotation = (Vec3){.x = 0.0f, .y = 0.0f, .z = 0.0f},
-        //     .scale = (Vec3){.x = .7f, .y = .7f, .z = .7f},
-        // },
-        // (Instance) {
-        //     .model = &cube,
-        //     .position = (Vec3){.x = 2.25, .y = 2.5f, .z = 9.5f},
-        //     .rotation = (Vec3){.x = 0.0f, .y = 195.0f, .z = 0.0f},
-        //     .scale = (Vec3){.x = 2.0f, .y = 1.0f, .z = 2.0f},
-        // },
-        // (Instance) {
-        //     .model = &icosahedron,
-        //     .position = (Vec3){.x = 0.25, .y = 1.5f, .z = 20.0f},
-        //     .rotation = (Vec3){.x = 0.0f, .y = 95.0f, .z = 0.0f},
-        //     .scale = (Vec3){.x = 1.0f, .y = 1.0f, .z = 1.0f},
-        // },
-        // (Instance) {
-        //     .model = &torus,
-        //     .position = (Vec3){.x = 8.25, .y = -1.5f, .z = 15.0f},
-        //     .rotation = (Vec3){.x = 0.0f, .y = -45.0f, .z = 0.0f},
-        //     .scale = (Vec3){.x = 2.0f, .y = 2.0f, .z = 2.0f},
-        // },
-        // (Instance) {
-        //     .model = &uvSphere,
-        //     .position = (Vec3){.x = -0.25, .y = -1.5f, .z = 15.0f},
-        //     .rotation = (Vec3){.x = 0.0f, .y = 0.0f, .z = 0.0f},
-        //     .scale = (Vec3){.x = 2.0f, .y = 2.0f, .z = 2.0f},
-        // }
     };
 
-    for (size_t i = 0; i < 1; i++) {
+    for (size_t i = 0; i < 6; i++) {
         instances[i].matrixTransform = init_matrix();
         update_instance_transforms(&instances[i]);
     }
@@ -112,7 +112,7 @@ int main(void)
     // TODO: Proper scene builder
     Scene scene = (Scene) {
         .instances = instances,
-        .objectCount = 1
+        .objectCount = 6
     };
     
     SetConfigFlags(FLAG_WINDOW_RESIZABLE | FLAG_WINDOW_ALWAYS_RUN | FLAG_MSAA_4X_HINT);
@@ -210,7 +210,7 @@ int main(void)
 closeWindow:
     for (size_t i = 0; i < scene.objectCount; i++) {
         free(scene.instances[i].matrixTransform);
-        free_model(*scene.instances[i].model);
+        free_model(scene.instances[i].model);
     }
     free(camera.canvas);
     free(camera.matrixTransform);

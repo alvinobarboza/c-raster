@@ -40,11 +40,19 @@ ModelData init_model(Vec3 *vert, size_t vertsCount, Triangle *tri, size_t trisCo
     return model;
 }
 
-void free_model(ModelData model) {
-    free(model.verts);
-    free(model.vertsWorld);
-    free(model.tris);
-    free(model.trisClipped);
+void free_model(ModelData *model) {
+    if (model->verts == NULL){
+        return;
+    }
+
+    free(model->verts);
+    free(model->vertsWorld);
+    free(model->tris);
+    free(model->trisClipped);
+    model->verts = NULL;
+    model->vertsWorld = NULL;
+    model->tris = NULL;
+    model->trisClipped = NULL;
 }
 
 void update_instance_transforms(Instance *instance) {

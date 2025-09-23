@@ -41,7 +41,7 @@ typedef struct Instance {
 } Instance;
 
 ModelData init_model(Vec3 *verts, size_t vertsCount, Triangle *tris, size_t trisCount);
-void free_model(ModelData model);
+void free_model(ModelData *model);
 
 void update_instance_transforms(Instance *instance);
 
