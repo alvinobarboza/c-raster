@@ -349,16 +349,13 @@ void render_scene(Cam c, Scene scene) {
                     continue;
                 }
 
-                // // Two vertices in front of view plane 
-                // if (d1 < 0.0f && d2 > FLT_MIN && d3 > FLT_MIN) {
-                //     // printf("Just A %lld tri n:%lld\n",t.v1, n);
-                //     continue;
-                // }
-                // if (d1 > FLT_MIN && d2 < 0.0f && d3 > FLT_MIN) {
-                //     printf("Just B %lld tri n:%lld\n",t.v2, n);
-                // }
-                if (d1 > FLT_MIN && d2 > FLT_MIN && d3 < 0.0f) {
-                    // [Triangle(A, B, A'), Triangle(A', B, B')]
+                // Two vertices in front of view plane 
+
+                // TODO: Create new buffer to store clipped tris 
+                // or find a way to compute based on old value in case of tris sharing same vertice
+
+                // [Triangle(C', B, C), Triangle(C', B, B')]
+                if (d1 < 0.0f && d2 > FLT_MIN && d3 > FLT_MIN) {
 
                     Triangle t1 = t;
                     Triangle t2 = t;
@@ -367,13 +364,15 @@ void render_scene(Cam c, Scene scene) {
                     t1.v2 = t.v2;
                     t1.v3 = t.v3;
 
-                    t2.v1 = t.v3;
+                    t2.v1 = t.v1;
                     t2.v2 = t.v2;
-                    t2.v3 = 0; // new index;
+                    t2.v3 = 0; // new index
 
-                    Vec3 pointAprime = intersection_on_plane(plane, pointA, pointC);
-                    Vec3 pointBprime = intersection_on_plane(plane, pointB, pointC);
+                    Vec3 pointCprime = intersection_on_plane(plane, pointC, pointA);
+                    Vec3 pointBprime = intersection_on_plane(plane, pointB, pointA);
 
+                    // Checks if there is a vetice not used and can be replaced by new one
+                    // Otherwise increments verts count and store the new vertice there
                     size_t pIndex = clipped->model->vertsClippedCount;
                     clipped->model->vertsClippedCount++;
                     for (size_t vI = 0; vI < clipped->model->vertsClippedCount; vI++) {
@@ -393,9 +392,109 @@ void render_scene(Cam c, Scene scene) {
                     }
                     
                     t2.v3 = pIndex;
-                    // printf("%lld\n", clipped->model->vertsClippedCount);
+                    
+                    clipped->model->vertsWorld[t1.v1] = pointCprime;
+                    clipped->model->vertsWorld[t2.v3] = pointBprime;
+                    
+                    clipped->model->trisClipped[clipped->model->trisClippedCount] = t1;
+                    clipped->model->trisClippedCount++;
+                    
+                    clipped->model->trisClipped[clipped->model->trisClippedCount] = t2;
+                    clipped->model->trisClippedCount++;
 
-                    t2.v1 = t1.v3;
+                    printf("A < BC vc=%ld tc=%ld\n", clipped->model->vertsClippedCount,clipped->model->trisClippedCount);
+                    continue;
+                }
+
+                // [Triangle(A, A', C), Triangle(A', C', C)]
+                if (d1 > FLT_MIN && d2 < 0.0f && d3 > FLT_MIN) {
+                    Triangle t1 = t;
+                    Triangle t2 = t;
+
+                    t1.v1 = t.v1;
+                    t1.v2 = t.v2;
+                    t1.v3 = t.v3;
+
+                    t2.v1 = t.v2;
+                    t2.v2 = 0; // new index
+                    t2.v3 = t.v3; 
+
+                    Vec3 pointAprime = intersection_on_plane(plane, pointA, pointB);
+                    Vec3 pointCprime = intersection_on_plane(plane, pointC, pointB);
+
+                    // Checks if there is a vetice not used and can be replaced by new one
+                    // Otherwise increments verts count and store the new vertice there
+                    size_t pIndex = clipped->model->vertsClippedCount;
+                    clipped->model->vertsClippedCount++;
+                    for (size_t vI = 0; vI < clipped->model->vertsClippedCount; vI++) {
+                        bool isIndexAvaliable = true;
+                        for (size_t tI = 0; tI < trisLength; tI++) {
+                            if(vI == tris[tI].v1 || vI == tris[tI].v2 || vI == tris[tI].v3) {
+                                isIndexAvaliable = false;
+                            }
+                        }
+                        if (isIndexAvaliable) {
+                            pIndex = vI;
+                            if (pIndex < (clipped->model->vertsClippedCount - 1)) {
+                                clipped->model->vertsClippedCount--;
+                            }
+                            break;
+                        }
+                    }
+                    
+                    t2.v2 = pIndex;
+                    
+                    clipped->model->vertsWorld[t1.v2] = pointAprime;
+                    clipped->model->vertsWorld[t2.v2] = pointCprime;
+                    
+                    clipped->model->trisClipped[clipped->model->trisClippedCount] = t1;
+                    clipped->model->trisClippedCount++;
+                    
+                    clipped->model->trisClipped[clipped->model->trisClippedCount] = t2;
+                    clipped->model->trisClippedCount++;
+
+                    printf("B < AC vc=%ld tc=%ld\n", clipped->model->vertsClippedCount,clipped->model->trisClippedCount);
+                    continue;
+                }
+
+                // [Triangle(A, B, A'), Triangle(A', B, B')]
+                if (d1 > FLT_MIN && d2 > FLT_MIN && d3 < 0.0f) {
+
+                    Triangle t1 = t;
+                    Triangle t2 = t;
+
+                    t1.v1 = t.v1;
+                    t1.v2 = t.v2;
+                    t1.v3 = t.v3;
+
+                    t2.v1 = t.v3;
+                    t2.v2 = t.v2;
+                    t2.v3 = 0; // new index;
+
+                    Vec3 pointAprime = intersection_on_plane(plane, pointA, pointC);
+                    Vec3 pointBprime = intersection_on_plane(plane, pointB, pointC);
+
+                    // Checks if there is a vetice not used and can be replaced by new one
+                    // Otherwise increments verts count and store the new vertice there
+                    size_t pIndex = clipped->model->vertsClippedCount;
+                    clipped->model->vertsClippedCount++;
+                    for (size_t vI = 0; vI < clipped->model->vertsClippedCount; vI++) {
+                        bool isIndexAvaliable = true;
+                        for (size_t tI = 0; tI < trisLength; tI++) {
+                            if(vI == tris[tI].v1 || vI == tris[tI].v2 || vI == tris[tI].v3) {
+                                isIndexAvaliable = false;
+                            }
+                        }
+                        if (isIndexAvaliable) {
+                            pIndex = vI;
+                            if (pIndex < (clipped->model->vertsClippedCount - 1)) {
+                                clipped->model->vertsClippedCount--;
+                            }
+                            break;
+                        }
+                    }
+                    
+                    t2.v3 = pIndex;
 
                     clipped->model->vertsWorld[t1.v3] = pointAprime;
                     clipped->model->vertsWorld[t2.v3] = pointBprime;
@@ -405,12 +504,12 @@ void render_scene(Cam c, Scene scene) {
                     
                     clipped->model->trisClipped[clipped->model->trisClippedCount] = t2;
                     clipped->model->trisClippedCount++;
-                    // printf("tri index:%lld new index %lld\n", clipped->model->trisClippedCount, pIndex);
-                    // print_vec3("A':", pointAprime);
-                    // print_vec3("B':", pointBprime);
+
+                    printf("C < AB vc=%ld tc=%ld\n", clipped->model->vertsClippedCount,clipped->model->trisClippedCount);
                     continue;
                 }
             }
+            
             if (clipped->model->trisClippedCount == 0) {
                 clipped = NULL;
                 break;
