@@ -19,7 +19,7 @@ float * interpolate(int i0, float d0, int i1, float d1) {
     float dd = d1 - d0;
 
     // Last value included
-    values = malloc(sizeof(float) * abs(di) + 1);
+    values = malloc(sizeof(float) * (abs(di) + 1));
 
     float a = dd / (float)(di);
     float d = d0;
@@ -187,9 +187,10 @@ float signed_distance_to_point(ViewPlane plane, Vec3 vertex) {
 
 // TODO: Get projected point brightness from triangle
 void render_model(Cam c, Instance instance) {
-    Point *points = malloc(sizeof(Point)*instance.model->vertsCount);
+    Point *points = NULL;
 
     if (instance.model->trisClippedCount > 0) {
+        points =  malloc(sizeof(Point)*(instance.model->vertsCount + instance.model->trisCount));
         for (size_t i = 0; i < instance.model->trisClippedCount; i++){
             Triangle t = instance.model->trisClipped[i];
             // printf("%lld:tri render: v1: %lld v2: %lld v3: %lld\n", i, t.v1, t.v2, t.v3);
@@ -202,6 +203,7 @@ void render_model(Cam c, Instance instance) {
         }
     } else {
         // puts("full render");
+        points =  malloc(sizeof(Point)*instance.model->vertsCount);
         for (size_t i = 0; i < instance.model->vertsCount; i++){
             points[i] = project_vertex(c, instance.model->vertsWorld[i]);
         }

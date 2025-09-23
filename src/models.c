@@ -33,7 +33,7 @@ ModelData init_model(Vec3 *vert, size_t vertsCount, Triangle *tri, size_t trisCo
         model.tris[i] = tri[i];
     }
     
-    for ( size_t i = 0; i < (vertsCount+vertsCount/3); i++) {
+    for ( size_t i = 0; i < (trisCount*2); i++) {
         model.trisClipped[i] = (Triangle){0};
     }    
 
