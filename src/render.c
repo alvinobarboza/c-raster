@@ -261,6 +261,20 @@ Vec3 intersection_on_plane(ViewPlane plane, Vec3 inFrontA, Vec3 behindB) {
     return q;
 }
 
+void one_vectex_in_front(
+    ViewPlane plane, Instance *clipped,
+    Vec3 pA, Vec3 pB, Vec3 pC, 
+    Triangle t, size_t newV2, size_t newV3) {
+        Vec3 pointBprime = intersection_on_plane(plane, pA, pB);
+        Vec3 pointCprime = intersection_on_plane(plane, pA, pC);
+
+        clipped->model->vertsWorld[newV2] = pointBprime;
+        clipped->model->vertsWorld[newV3] = pointCprime;
+
+        clipped->model->trisClipped[clipped->model->trisClippedCount] = t;
+        clipped->model->trisClippedCount++;
+}
+
 void render_scene(Cam c, Scene scene) {
     float m_transform[M4X4];
 
@@ -322,41 +336,16 @@ void render_scene(Cam c, Scene scene) {
                 Vec3 pointB = clipped->model->vertsWorld[t.v2];
                 Vec3 pointC = clipped->model->vertsWorld[t.v3];
 
-                // One vextex in front of view plane
                 if (d1 > FLT_MIN && d2 < 0.0f && d3 < 0.0f) {
-                    // printf("Just A %lld tri n:%lld\n",t.v1, n);
-                    Vec3 pointBprime = intersection_on_plane(plane, pointA, pointB);
-                    Vec3 pointCprime = intersection_on_plane(plane, pointA, pointC);
-
-                    clipped->model->vertsWorld[t.v2] = pointBprime;
-                    clipped->model->vertsWorld[t.v3] = pointCprime;
-
-                    clipped->model->trisClipped[clipped->model->trisClippedCount] = t;
-                    clipped->model->trisClippedCount++;
+                    one_vectex_in_front(plane, clipped, pointA, pointB, pointC, t, t.v2, t.v3);
                     continue;
                 }
                 if (d1 < 0.0f && d2 > FLT_MIN && d3 < 0.0f) {
-                    // printf("Just B %lld tri n:%lld\n",t.v2, n);
-                    Vec3 pointAprime = intersection_on_plane(plane, pointB, pointA);
-                    Vec3 pointCprime = intersection_on_plane(plane, pointB, pointC);
-
-                    clipped->model->vertsWorld[t.v1] = pointAprime;
-                    clipped->model->vertsWorld[t.v3] = pointCprime;
-
-                    clipped->model->trisClipped[clipped->model->trisClippedCount] = t;
-                    clipped->model->trisClippedCount++;
+                    one_vectex_in_front(plane, clipped, pointB, pointA, pointC, t, t.v1, t.v3);
                     continue;
                 }
                 if (d1 < 0.0f && d2 < 0.0f && d3 > FLT_MIN) {
-                    // printf("Just C %lld tri n:%lld\n",t.v3, n);
-                    Vec3 pointAprime = intersection_on_plane(plane, pointC, pointA);
-                    Vec3 pointBprime = intersection_on_plane(plane, pointC, pointB);
-
-                    clipped->model->vertsWorld[t.v1] = pointAprime;
-                    clipped->model->vertsWorld[t.v2] = pointBprime;
-
-                    clipped->model->trisClipped[clipped->model->trisClippedCount] = t;
-                    clipped->model->trisClippedCount++;
+                    one_vectex_in_front(plane, clipped, pointC, pointA, pointB, t, t.v1, t.v2);
                     continue;
                 }
 
