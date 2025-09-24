@@ -176,7 +176,7 @@ int main(void)
                 goto closeWindow;
             }
 
-            camera.view.width = (float)camera.width / (float)camera.height;
+            camera.view.width = ((float)camera.width / (float)camera.height)* 3.0f;
 
             ImageResize(&img, camera.width, camera.height);
             UnloadTexture(renderTexture);            
