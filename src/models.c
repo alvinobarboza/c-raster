@@ -55,6 +55,39 @@ void free_model(ModelData *model) {
     model->trisClipped = NULL;
 }
 
+Instance init_instance(ModelData *model, Transforms transform){
+    transform.matrixTransform = init_matrix();
+
+    Instance i = (Instance) {
+        .model = model,
+        .transforms = transform,
+        .vertsWorld = malloc(sizeof(Vec3) * model->vertsCount),
+        .trisWorld = malloc(sizeof(FullTriangle) * model->trisCount),
+        .trisClipped = malloc(sizeof(FullTriangle) * model->trisCount * 2),
+        .trisClippedCount = 0,
+    };
+
+    update_instance_transforms(&i);
+
+    return i;
+}
+
+void free_instance(Instance *instance) {
+    if (instance->vertsWorld == NULL) {
+        return;
+    }
+
+    free(instance->vertsWorld);
+    free(instance->trisWorld);
+    free(instance->trisClipped);
+    free(instance->transforms.matrixTransform);
+
+    instance->vertsWorld = NULL;
+    instance->trisWorld = NULL;
+    instance->trisClipped = NULL;
+    instance->transforms.matrixTransform = NULL;
+}
+
 void update_instance_transforms(Instance *instance) {
     if (instance->transforms.matrixTransform == NULL) {
         return;

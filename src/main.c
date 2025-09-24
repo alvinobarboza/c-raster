@@ -64,50 +64,39 @@ int main(void)
     ModelData uvSphere = uv_sphere_shape();
     ModelData square = square_shape();
 
-    // TODO: proper instance loading
+    // TODO: better instance loading
     Instance instances[] = {
-        (Instance) {
-            .model = &square,
-            .transforms.position = (Vec3){.x = 0.0f, .y = 0.0f, .z = 7.0f},
-            .transforms.rotation = (Vec3){.x = 0.0f, .y = 0.0f, .z = 30.0f},
-            .transforms.scale = (Vec3){.x = 1.0f, .y = 1.0f, .z = 1.0f},
-        },
-        (Instance) {
-            .model = &cube,
-            .transforms.position = (Vec3){.x = -2.5, .y = 0.0f, .z = 10.0f},
-            .transforms.rotation = (Vec3){.x = 0.0f, .y = 0.0f, .z = 0.0f},
-            .transforms.scale = (Vec3){.x = .7f, .y = .7f, .z = .7f},
-        },
-        (Instance) {
-            .model = &cube,
-            .transforms.position = (Vec3){.x = 2.25, .y = 2.5f, .z = 9.5f},
-            .transforms.rotation = (Vec3){.x = 0.0f, .y = 195.0f, .z = 0.0f},
-            .transforms.scale = (Vec3){.x = 2.0f, .y = 1.0f, .z = 2.0f},
-        },
-        (Instance) {
-            .model = &icosahedron,
-            .transforms.position = (Vec3){.x = 0.25, .y = 1.5f, .z = 20.0f},
-            .transforms.rotation = (Vec3){.x = 0.0f, .y = 95.0f, .z = 0.0f},
-            .transforms.scale = (Vec3){.x = 1.0f, .y = 1.0f, .z = 1.0f},
-        },
-        (Instance) {
-            .model = &torus,
-            .transforms.position = (Vec3){.x = 8.25, .y = -1.5f, .z = 15.0f},
-            .transforms.rotation = (Vec3){.x = 0.0f, .y = -45.0f, .z = 0.0f},
-            .transforms.scale = (Vec3){.x = 2.0f, .y = 2.0f, .z = 2.0f},
-        },
-        (Instance) {
-            .model = &uvSphere,
-            .transforms.position = (Vec3){.x = -0.25, .y = -1.5f, .z = 15.0f},
-            .transforms.rotation = (Vec3){.x = 0.0f, .y = 0.0f, .z = 0.0f},
-            .transforms.scale = (Vec3){.x = 2.0f, .y = 2.0f, .z = 2.0f},
-        }
+        init_instance(&square, (Transforms){
+            .position = (Vec3){.x = 0.0f, .y = 0.0f, .z = 7.0f},
+            .rotation = (Vec3){.x = 0.0f, .y = 0.0f, .z = 30.0f},
+            .scale = (Vec3){.x = 1.0f, .y = 1.0f, .z = 1.0f}
+        }),
+        init_instance(&cube, (Transforms) {
+            .position = (Vec3){.x = -2.5, .y = 0.0f, .z = 10.0f},
+            .rotation = (Vec3){.x = 0.0f, .y = 0.0f, .z = 0.0f},
+            .scale = (Vec3){.x = .7f, .y = .7f, .z = .7f},
+        }),
+        init_instance(&cube, (Transforms) {
+            .position = (Vec3){.x = 2.25, .y = 2.5f, .z = 9.5f},
+            .rotation = (Vec3){.x = 0.0f, .y = 195.0f, .z = 0.0f},
+            .scale = (Vec3){.x = 2.0f, .y = 1.0f, .z = 2.0f},
+        }),
+        init_instance(&icosahedron, (Transforms) {
+            .position = (Vec3){.x = 0.25, .y = 1.5f, .z = 20.0f},
+            .rotation = (Vec3){.x = 0.0f, .y = 95.0f, .z = 0.0f},
+            .scale = (Vec3){.x = 1.0f, .y = 1.0f, .z = 1.0f},
+        }),
+        init_instance(&torus, (Transforms) {
+            .position = (Vec3){.x = 8.25, .y = -1.5f, .z = 15.0f},
+            .rotation = (Vec3){.x = 0.0f, .y = -45.0f, .z = 0.0f},
+            .scale = (Vec3){.x = 2.0f, .y = 2.0f, .z = 2.0f},
+        }),
+        init_instance(&uvSphere, (Transforms) {
+            .position = (Vec3){.x = -0.25, .y = -1.5f, .z = 15.0f},
+            .rotation = (Vec3){.x = 0.0f, .y = 0.0f, .z = 0.0f},
+            .scale = (Vec3){.x = 2.0f, .y = 2.0f, .z = 2.0f},
+        })
     };
-
-    for (size_t i = 0; i < 6; i++) {
-        instances[i].transforms.matrixTransform = init_matrix();
-        update_instance_transforms(&instances[i]);
-    }
 
     // TODO: Proper scene builder
     Scene scene = (Scene) {
@@ -209,8 +198,8 @@ int main(void)
 
 closeWindow:
     for (size_t i = 0; i < scene.objectCount; i++) {
-        free(scene.instances[i].transforms.matrixTransform);
         free_model(scene.instances[i].model);
+        free_instance(&scene.instances[i]);
     }
     free(camera.canvas);
     free(camera.matrixTransform);

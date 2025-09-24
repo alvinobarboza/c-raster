@@ -25,6 +25,11 @@ typedef struct ModelData {
     Triangle *trisClipped;
 } ModelData ;
 
+typedef struct FullTriangle {
+    Vec3 v1, v2, v3;
+    Color color;
+} FullTriangle;
+
 typedef struct Sphere {
     Vec3 center;
     Vec3 centerWorld;
@@ -35,10 +40,17 @@ typedef struct Instance {
     ModelData *model;
     Transforms transforms;
     Sphere boundingSphere;
+    Vec3 *vertsWorld;
+    FullTriangle *trisWorld;
+    FullTriangle *trisClipped;
+    size_t trisClippedCount;
 } Instance;
 
 ModelData init_model(Vec3 *verts, size_t vertsCount, Triangle *tris, size_t trisCount);
 void free_model(ModelData *model);
+
+Instance init_instance(ModelData *model, Transforms transform);
+void free_instance(Instance *instance);
 
 void update_instance_transforms(Instance *instance);
 
