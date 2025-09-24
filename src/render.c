@@ -281,7 +281,7 @@ void render_scene(Cam c, Scene scene) {
     for(size_t i = 0; i < scene.objectCount; i++){        
         Instance *clipped = &scene.instances[i];
 
-        matrix_multiplication(c.matrixTransform, clipped->matrixTransform, m_transform);
+        matrix_multiplication(c.matrixTransform, clipped->transforms.matrixTransform, m_transform);
         clipped->boundingSphere.centerWorld = mult_matrix_by_vec3(m_transform, clipped->boundingSphere.center);
 
         if (!is_inside_frustum(c.frustum, *clipped)) {

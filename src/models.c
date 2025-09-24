@@ -56,7 +56,7 @@ void free_model(ModelData *model) {
 }
 
 void update_instance_transforms(Instance *instance) {
-    if (instance->matrixTransform == NULL) {
+    if (instance->transforms.matrixTransform == NULL) {
         return;
     }
 
@@ -65,12 +65,12 @@ void update_instance_transforms(Instance *instance) {
     float translation[M4X4];
     float result[M4X4];
 
-    make_scale_matrix(scale, instance->scale);
-    make_rotation_matrix(rotation, instance->rotation);
-    make_translation_matrix(translation, instance->position);
+    make_scale_matrix(scale, instance->transforms.scale);
+    make_rotation_matrix(rotation, instance->transforms.rotation);
+    make_translation_matrix(translation, instance->transforms.position);
 
     matrix_multiplication(rotation, scale, result);
-    matrix_multiplication(translation, result, instance->matrixTransform);
+    matrix_multiplication(translation, result, instance->transforms.matrixTransform);
 
     instance->boundingSphere.center = (Vec3){0};
     instance->boundingSphere.radius = 0;

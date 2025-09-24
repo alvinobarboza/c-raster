@@ -33,11 +33,8 @@ typedef struct Sphere {
 
 typedef struct Instance {
     ModelData *model;
-    Vec3 rotation;
-    Vec3 scale;
-    Vec3 position;
+    Transforms transforms;
     Sphere boundingSphere;
-    float *matrixTransform;
 } Instance;
 
 ModelData init_model(Vec3 *verts, size_t vertsCount, Triangle *tris, size_t trisCount);

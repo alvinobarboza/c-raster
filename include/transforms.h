@@ -15,6 +15,11 @@ typedef struct Vec4 {
     float x, y, z, w;
 } Vec4;
 
+typedef struct Transforms {
+    Vec3 scale, rotation, position;
+    float *matrixTransform;
+} Transforms;
+
 // Must deallocate after use
 float *init_matrix(); 
 

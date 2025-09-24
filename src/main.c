@@ -16,32 +16,32 @@
 
 void move_cube(Instance *instance) {
     if (IsKeyDown(KEY_I)) {
-        instance->position.z += .5f;
+        instance->transforms.position.z += .5f;
         update_instance_transforms(instance);
     }
     
     if (IsKeyDown(KEY_K)) {
-        instance->position.z -= .5f;
+        instance->transforms.position.z -= .5f;
         update_instance_transforms(instance);
     }
 
     if (IsKeyDown(KEY_J)) {
-        instance->position.x -= .5f;
+        instance->transforms.position.x -= .5f;
         update_instance_transforms(instance);
     }
     
     if (IsKeyDown(KEY_L)) {
-        instance->position.x += .5f;
+        instance->transforms.position.x += .5f;
         update_instance_transforms(instance);
     }
     
     if (IsKeyDown(KEY_U)) {
-        instance->rotation.y += .5f;
+        instance->transforms.rotation.y += .5f;
         update_instance_transforms(instance);
     }
     
     if (IsKeyDown(KEY_O)) {
-        instance->rotation.y -= .5f;
+        instance->transforms.rotation.y -= .5f;
         update_instance_transforms(instance);
     }
 }
@@ -68,44 +68,44 @@ int main(void)
     Instance instances[] = {
         (Instance) {
             .model = &square,
-            .position = (Vec3){.x = 0.0f, .y = 0.0f, .z = 7.0f},
-            .rotation = (Vec3){.x = 0.0f, .y = 0.0f, .z = 30.0f},
-            .scale = (Vec3){.x = 1.0f, .y = 1.0f, .z = 1.0f},
+            .transforms.position = (Vec3){.x = 0.0f, .y = 0.0f, .z = 7.0f},
+            .transforms.rotation = (Vec3){.x = 0.0f, .y = 0.0f, .z = 30.0f},
+            .transforms.scale = (Vec3){.x = 1.0f, .y = 1.0f, .z = 1.0f},
         },
         (Instance) {
             .model = &cube,
-            .position = (Vec3){.x = -2.5, .y = 0.0f, .z = 10.0f},
-            .rotation = (Vec3){.x = 0.0f, .y = 0.0f, .z = 0.0f},
-            .scale = (Vec3){.x = .7f, .y = .7f, .z = .7f},
+            .transforms.position = (Vec3){.x = -2.5, .y = 0.0f, .z = 10.0f},
+            .transforms.rotation = (Vec3){.x = 0.0f, .y = 0.0f, .z = 0.0f},
+            .transforms.scale = (Vec3){.x = .7f, .y = .7f, .z = .7f},
         },
         (Instance) {
             .model = &cube,
-            .position = (Vec3){.x = 2.25, .y = 2.5f, .z = 9.5f},
-            .rotation = (Vec3){.x = 0.0f, .y = 195.0f, .z = 0.0f},
-            .scale = (Vec3){.x = 2.0f, .y = 1.0f, .z = 2.0f},
+            .transforms.position = (Vec3){.x = 2.25, .y = 2.5f, .z = 9.5f},
+            .transforms.rotation = (Vec3){.x = 0.0f, .y = 195.0f, .z = 0.0f},
+            .transforms.scale = (Vec3){.x = 2.0f, .y = 1.0f, .z = 2.0f},
         },
         (Instance) {
             .model = &icosahedron,
-            .position = (Vec3){.x = 0.25, .y = 1.5f, .z = 20.0f},
-            .rotation = (Vec3){.x = 0.0f, .y = 95.0f, .z = 0.0f},
-            .scale = (Vec3){.x = 1.0f, .y = 1.0f, .z = 1.0f},
+            .transforms.position = (Vec3){.x = 0.25, .y = 1.5f, .z = 20.0f},
+            .transforms.rotation = (Vec3){.x = 0.0f, .y = 95.0f, .z = 0.0f},
+            .transforms.scale = (Vec3){.x = 1.0f, .y = 1.0f, .z = 1.0f},
         },
         (Instance) {
             .model = &torus,
-            .position = (Vec3){.x = 8.25, .y = -1.5f, .z = 15.0f},
-            .rotation = (Vec3){.x = 0.0f, .y = -45.0f, .z = 0.0f},
-            .scale = (Vec3){.x = 2.0f, .y = 2.0f, .z = 2.0f},
+            .transforms.position = (Vec3){.x = 8.25, .y = -1.5f, .z = 15.0f},
+            .transforms.rotation = (Vec3){.x = 0.0f, .y = -45.0f, .z = 0.0f},
+            .transforms.scale = (Vec3){.x = 2.0f, .y = 2.0f, .z = 2.0f},
         },
         (Instance) {
             .model = &uvSphere,
-            .position = (Vec3){.x = -0.25, .y = -1.5f, .z = 15.0f},
-            .rotation = (Vec3){.x = 0.0f, .y = 0.0f, .z = 0.0f},
-            .scale = (Vec3){.x = 2.0f, .y = 2.0f, .z = 2.0f},
+            .transforms.position = (Vec3){.x = -0.25, .y = -1.5f, .z = 15.0f},
+            .transforms.rotation = (Vec3){.x = 0.0f, .y = 0.0f, .z = 0.0f},
+            .transforms.scale = (Vec3){.x = 2.0f, .y = 2.0f, .z = 2.0f},
         }
     };
 
     for (size_t i = 0; i < 6; i++) {
-        instances[i].matrixTransform = init_matrix();
+        instances[i].transforms.matrixTransform = init_matrix();
         update_instance_transforms(&instances[i]);
     }
 
@@ -209,7 +209,7 @@ int main(void)
 
 closeWindow:
     for (size_t i = 0; i < scene.objectCount; i++) {
-        free(scene.instances[i].matrixTransform);
+        free(scene.instances[i].transforms.matrixTransform);
         free_model(scene.instances[i].model);
     }
     free(camera.canvas);
