@@ -8,34 +8,18 @@ ModelData init_model(Vec3 *vert, size_t vertsCount, Triangle *tri, size_t trisCo
     ModelData model;
 
     model.trisCount = trisCount;
-    model.trisClippedCount = 0;
-
     model.vertsCount = vertsCount;
-    model.vertsClippedCount = vertsCount;
-
-    model.tris = malloc(sizeof(Triangle) * trisCount);
-
-    // maybe impossible but if every triangle needs another triangle from clipping
-    model.trisClipped = malloc(sizeof(Triangle) * (trisCount*2)); 
 
     model.verts = malloc(sizeof(Vec3) * vertsCount);
-
-    // maybe impossible but if every triangle needs another triangle from clipping
-    // One new vertice will be created
-    model.vertsWorld = malloc(sizeof(Vec3) * (vertsCount+trisCount));
+    model.tris = malloc(sizeof(Triangle) * trisCount);
 
     for ( size_t i = 0; i < vertsCount; i++) {
         model.verts[i] = vert[i];
-        model.vertsWorld[i] = vert[i];
     }
 
     for ( size_t i = 0; i < trisCount; i++ ) {
         model.tris[i] = tri[i];
     }
-    
-    for ( size_t i = 0; i < (trisCount*2); i++) {
-        model.trisClipped[i] = (Triangle){0};
-    }    
 
     return model;
 }
@@ -46,13 +30,10 @@ void free_model(ModelData *model) {
     }
 
     free(model->verts);
-    free(model->vertsWorld);
     free(model->tris);
-    free(model->trisClipped);
+
     model->verts = NULL;
-    model->vertsWorld = NULL;
     model->tris = NULL;
-    model->trisClipped = NULL;
 }
 
 Instance init_instance(ModelData *model, Transforms transform){
@@ -61,9 +42,8 @@ Instance init_instance(ModelData *model, Transforms transform){
     Instance i = (Instance) {
         .model = model,
         .transforms = transform,
-        .vertsWorld = malloc(sizeof(Vec3) * model->vertsCount),
         .trisWorld = malloc(sizeof(FullTriangle) * model->trisCount),
-        .trisClipped = malloc(sizeof(FullTriangle) * model->trisCount * 2),
+        .trisClipped = malloc(sizeof(FullTriangle) * model->trisCount * 8),
         .trisClippedCount = 0,
     };
 
@@ -73,16 +53,14 @@ Instance init_instance(ModelData *model, Transforms transform){
 }
 
 void free_instance(Instance *instance) {
-    if (instance->vertsWorld == NULL) {
+    if (instance->trisWorld == NULL) {
         return;
     }
 
-    free(instance->vertsWorld);
     free(instance->trisWorld);
     free(instance->trisClipped);
     free(instance->transforms.matrixTransform);
 
-    instance->vertsWorld = NULL;
     instance->trisWorld = NULL;
     instance->trisClipped = NULL;
     instance->transforms.matrixTransform = NULL;

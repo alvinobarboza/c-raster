@@ -6,27 +6,24 @@
 #include "transforms.h"
 #include "raylib.h"
 
+#define VERTEX_A 0
+#define VERTEX_B 1
+#define VERTEX_C 2
+
 typedef struct Triangle {
     size_t v1, v2, v3;
     Color color;
 } Triangle;
 
 typedef struct ModelData {
-    size_t vertsCount;
-    size_t vertsClippedCount;
-    
-    size_t trisCount;
-    size_t trisClippedCount;
-    
     Vec3 *verts;
-    Vec3 *vertsWorld;
-
     Triangle *tris;
-    Triangle *trisClipped;
+    size_t trisCount;
+    size_t vertsCount;    
 } ModelData ;
 
 typedef struct FullTriangle {
-    Vec3 v1, v2, v3;
+    Vec3 vertex[3];
     Color color;
 } FullTriangle;
 
@@ -40,7 +37,6 @@ typedef struct Instance {
     ModelData *model;
     Transforms transforms;
     Sphere boundingSphere;
-    Vec3 *vertsWorld;
     FullTriangle *trisWorld;
     FullTriangle *trisClipped;
     size_t trisClippedCount;
