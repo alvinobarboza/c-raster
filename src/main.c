@@ -79,7 +79,7 @@ int main(void)
         init_instance(&cube, (Transforms) {
             .position = (Vec3){.x = 2.25, .y = 2.5f, .z = 9.5f},
             .rotation = (Vec3){.x = 0.0f, .y = 195.0f, .z = 0.0f},
-            .scale = (Vec3){.x = 2.0f, .y = 1.0f, .z = 2.0f},
+            .scale = (Vec3){.x = 2.0f, .y = 2.0f, .z = 2.0f},
         }),
         init_instance(&icosahedron, (Transforms) {
             .position = (Vec3){.x = 0.25, .y = 1.5f, .z = 20.0f},
@@ -176,7 +176,7 @@ int main(void)
                 goto closeWindow;
             }
 
-            camera.view.width = ((float)camera.width / (float)camera.height)* 3.0f;
+            camera.view.width = ((float)camera.width / (float)camera.height)* 2.5f;
 
             ImageResize(&img, camera.width, camera.height);
             UnloadTexture(renderTexture);            

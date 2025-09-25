@@ -43,7 +43,7 @@ Instance init_instance(ModelData *model, Transforms transform){
         .model = model,
         .transforms = transform,
         .trisWorld = malloc(sizeof(FullTriangle) * model->trisCount),
-        .trisClipped = malloc(sizeof(FullTriangle) * model->trisCount * 8),
+        .trisClipped = malloc(sizeof(FullTriangle) * model->trisCount * 6),
         .trisClippedCount = 0,
     };
 

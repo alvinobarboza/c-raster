@@ -248,11 +248,11 @@ Vec3 intersection_on_plane(ViewPlane plane, Vec3 inFrontA, Vec3 behindB) {
     return q;
 }
 
-void one_vectex_in_front(
+void one_vertex_in_front(
     ViewPlane plane, Instance *clipped,
     Vec3 pA, Vec3 pB, Vec3 pC, 
-    FullTriangle t, unsigned char newB, unsigned char newC) {
-
+    FullTriangle t, unsigned char newB, unsigned char newC
+) {
     Vec3 pointBprime = intersection_on_plane(plane, pA, pB);
     Vec3 pointCprime = intersection_on_plane(plane, pA, pC);
 
@@ -261,12 +261,57 @@ void one_vectex_in_front(
 
     clipped->trisClipped[clipped->trisClippedCount] = t;
     clipped->trisClippedCount++;
+    printf(
+        "currtriLength=%ld bufLength=%ld tris total=%ld\n", 
+        clipped->trisClippedCount, clipped->model->trisCount*6, clipped->model->trisCount);
+            
+}
+
+void two_vertices_in_front(
+    ViewPlane plane, Instance *clipped,
+    Vec3 pA, Vec3 pB, Vec3 pC, 
+    FullTriangle t, unsigned char sharedIndex, unsigned char newIndex,
+    bool isClipped, size_t indexClipped, size_t lengthClipped
+) {
+    FullTriangle t1 = t;
+    FullTriangle t2 = t;
+
+    Vec3 pointAprime = intersection_on_plane(plane, pA, pC);
+    Vec3 pointBprime = intersection_on_plane(plane, pB, pC);
+    
+    t1.vertex[sharedIndex] = pointAprime;
+    t2.vertex[newIndex] = pointAprime;
+    t2.vertex[sharedIndex] = pointBprime;
+
+    if (isClipped) {
+        clipped->trisClipped[indexClipped] = t1;
+        clipped->trisClipped[indexClipped+lengthClipped] = t2;
+        clipped->trisClippedCount += 2;
+        printf(
+            "n=%ld currtriLength=%ld bufLength=%ld tris total=%ld\n", 
+            indexClipped, lengthClipped, clipped->model->trisCount*6, clipped->model->trisCount);
+            
+        return;
+    }
+
+    clipped->trisClipped[clipped->trisClippedCount] = t1;
+    clipped->trisClippedCount++;
+    
+    clipped->trisClipped[clipped->trisClippedCount] = t2;
+    clipped->trisClippedCount++;
+    printf(
+        "n=%ld currtriLength=%ld bufLength=%ld tris total=%ld\n", 
+        indexClipped, lengthClipped, clipped->model->trisCount*6, clipped->model->trisCount);
+            
 }
 
 void render_scene(Cam c, Scene scene) {
     float m_transform[M4X4];
 
     for(size_t i = 0; i < scene.objectCount; i++){   
+        if (i!=2){
+            continue;
+        }
         Instance *clipped = &scene.instances[i];
 
         matrix_multiplication(c.matrixTransform, clipped->transforms.matrixTransform, m_transform);
@@ -297,7 +342,7 @@ void render_scene(Cam c, Scene scene) {
                 continue;
             }
 
-            // TODO: generate intermediate tris
+            // TODO: multi plane intersection notworking properly
 
             size_t trisLength = clipped->model->trisCount;
             FullTriangle *tris = clipped->trisWorld;
@@ -314,7 +359,9 @@ void render_scene(Cam c, Scene scene) {
             
             for (size_t n = 0; n < trisLength; n++) {
                 FullTriangle tri = tris[n];
-                printf("n=%ld currtriLength=%ld bufLength=%ld\n", n, trisLength,clipped->model->trisCount*10);
+                printf(
+                    "n=%ld currtriLength=%ld bufLength=%ld tris total=%ld\n", 
+                    n, trisLength, clipped->model->trisCount*6, clipped->model->trisCount);
             
                 float d1 = signed_distance_to_point(plane, tri.vertex[VERTEX_A]);
                 float d2 = signed_distance_to_point(plane, tri.vertex[VERTEX_B]);
@@ -324,6 +371,10 @@ void render_scene(Cam c, Scene scene) {
                     // printf("d1: %g d2: %g d3: %g\n", d1, d2, d3),
                     clipped->trisClipped[clipped->trisClippedCount] = tri;
                     clipped->trisClippedCount++;
+                    printf(
+                    "n=%ld currtriLength=%ld bufLength=%ld tris total=%ld\n", 
+                    n, trisLength, clipped->model->trisCount*6, clipped->model->trisCount);
+            
                     continue;
                 }
                 
@@ -334,110 +385,42 @@ void render_scene(Cam c, Scene scene) {
                 Vec3 pointC = tri.vertex[VERTEX_C];
 
                 if (d1 > FLT_MIN && d2 < 0.0f && d3 < 0.0f) {
-                    one_vectex_in_front(plane, clipped, pointA, pointB, pointC, tri, VERTEX_B, VERTEX_C);
+                    one_vertex_in_front(plane, clipped, pointA, pointB, pointC, tri, VERTEX_B, VERTEX_C);
                     continue;
                 }
                 if (d1 < 0.0f && d2 > FLT_MIN && d3 < 0.0f) {
-                    one_vectex_in_front(plane, clipped, pointB, pointA, pointC, tri, VERTEX_A, VERTEX_C);
+                    one_vertex_in_front(plane, clipped, pointB, pointA, pointC, tri, VERTEX_A, VERTEX_C);
                     continue;
                 }
                 if (d1 < 0.0f && d2 < 0.0f && d3 > FLT_MIN) {
-                    one_vectex_in_front(plane, clipped, pointC, pointA, pointB, tri, VERTEX_A, VERTEX_B);
+                    one_vertex_in_front(plane, clipped, pointC, pointA, pointB, tri, VERTEX_A, VERTEX_B);
                     continue;
                 }
 
-                // Two vertices in front of view plane 
-
-                // TODO: Create new buffer to store clipped tris 
-                // or find a way to compute based on old value in case of tris sharing same vertice
-
-                 // // [Triangle(A, B, A'), Triangle(A', B, B')]
+                // [Triangle(A, B, A'), Triangle(A', B, B')]
                 if (d1 > FLT_MIN && d2 > FLT_MIN && d3 < 0.0f) {
-
-                    FullTriangle t1 = tri;
-                    FullTriangle t2 = tri;
-
-                    Vec3 pointAprime = intersection_on_plane(plane, pointA, pointC);
-                    Vec3 pointBprime = intersection_on_plane(plane, pointB, pointC);
-                    
-                    t1.vertex[VERTEX_C] = pointAprime;
-                    t2.vertex[VERTEX_A] = pointAprime;
-                    t2.vertex[VERTEX_C] = pointBprime;
-
-                    if (isClipped) {
-                        clipped->trisClipped[n] = t1;
-                        clipped->trisClipped[n+trisLength] = t2;
-                        clipped->trisClippedCount += 2;
-                        
-                        continue;
-                    }
-
-                    clipped->trisClipped[clipped->trisClippedCount] = t1;
-                    clipped->trisClippedCount++;
-                    
-                    clipped->trisClipped[clipped->trisClippedCount] = t2;
-                    clipped->trisClippedCount++;
-                    
+                    two_vertices_in_front(
+                        plane, clipped, pointA, pointB, pointC, tri,
+                        VERTEX_C, VERTEX_A, isClipped, n, trisLength
+                    );                    
                     continue;
                 }
 
-                // // [Triangle(A, A', C), Triangle(A', C', C)]
+                // [Triangle(A, A', C), Triangle(A', C', C)]
                 if (d1 > FLT_MIN && d2 < 0.0f && d3 > FLT_MIN) {
-
-                    FullTriangle t1 = tri;
-                    FullTriangle t2 = tri;
-
-                    Vec3 pointAprime = intersection_on_plane(plane, pointA, pointB);
-                    Vec3 pointCprime = intersection_on_plane(plane, pointC, pointB);
-                    
-                    t1.vertex[VERTEX_B] = pointAprime;
-                    t2.vertex[VERTEX_A] = pointAprime;
-                    t2.vertex[VERTEX_B] = pointCprime;
-
-                    if (isClipped) {
-                        clipped->trisClipped[n] = t1;
-                        clipped->trisClipped[n+trisLength] = t2;
-                        clipped->trisClippedCount += 2;
-                        
-                        continue;
-                    }
-
-                    clipped->trisClipped[clipped->trisClippedCount] = t1;
-                    clipped->trisClippedCount++;
-                    
-                    clipped->trisClipped[clipped->trisClippedCount] = t2;
-                    clipped->trisClippedCount++;
-                    
+                    two_vertices_in_front(
+                        plane, clipped, pointA, pointC, pointB, tri,
+                        VERTEX_B, VERTEX_A, isClipped, n, trisLength
+                    );                    
                     continue;
                 }
 
-                // [Triangle(C', B, C), Triangle(C', B, B')]
+                // [Triangle(C', B, C), Triangle(B', B, C')]
                 if (d1 < 0.0f && d2 > FLT_MIN && d3 > FLT_MIN) {
-                    
-                    FullTriangle t1 = tri;
-                    FullTriangle t2 = tri;
-
-                    Vec3 pointCprime = intersection_on_plane(plane, pointC, pointA);
-                    Vec3 pointBprime = intersection_on_plane(plane, pointB, pointA);
-                    
-                    t1.vertex[VERTEX_A] = pointCprime;
-                    t2.vertex[VERTEX_A] = pointCprime;
-                    t2.vertex[VERTEX_C] = pointBprime;
-
-                    if (isClipped) {
-                        clipped->trisClipped[n] = t1;
-                        clipped->trisClipped[n+trisLength] = t2;
-                        clipped->trisClippedCount += 2;
-                        
-                        continue;
-                    }
-
-                    clipped->trisClipped[clipped->trisClippedCount] = t1;
-                    clipped->trisClippedCount++;
-                    
-                    clipped->trisClipped[clipped->trisClippedCount] = t2;
-                    clipped->trisClippedCount++;
-
+                    two_vertices_in_front(
+                        plane, clipped, pointC, pointB, pointA, tri,
+                        VERTEX_A, VERTEX_C, isClipped, n, trisLength
+                    );
                     continue;
                 }               
             }
@@ -449,9 +432,6 @@ void render_scene(Cam c, Scene scene) {
         }
 
         if (clipped != NULL) {
-            printf("Render = currtriLength=%ld bufLength=%ld\n", 
-                clipped->trisClippedCount, clipped->model->trisCount*10);
-            
             render_model(c, *clipped);
         } 
     }
