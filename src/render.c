@@ -25,7 +25,6 @@ float * interpolate(int i0, float d0, int i1, float d1) {
     float d = d0;
 
     for (int i = i0; i <= i1; i++) {
-        // printf("d=%f index-d=%d size=%d\n", d , i-i0 , di);
         values[i-i0] = d;
         d = d + a;
     }
@@ -36,7 +35,6 @@ float * interpolate(int i0, float d0, int i1, float d1) {
 void draw_line(Cam c, Point pos0, Point pos1 , Color color){
     int dx = pos1.x - pos0.x;
     int dy = pos1.y - pos0.y;
-    // printf("--------dx: %d dy: %d---------\n", dx, dy);
 
     if (abs(dx) > abs(dy)) {
         if (dx < 0) {
@@ -46,8 +44,6 @@ void draw_line(Cam c, Point pos0, Point pos1 , Color color){
         float *ys = interpolate(pos0.x, pos0.y, pos1.x, pos1.y);
 
         for(int x = pos0.x; x <= pos1.x; x++) {
-            // printf("dx > dy - x=%d y=%f index-y=%d\n",x, ys[x - pos0.x], x - pos0.x);
-    
             put_pixel(c, color, x, ys[x - pos0.x]);
         }
 
@@ -62,8 +58,6 @@ void draw_line(Cam c, Point pos0, Point pos1 , Color color){
     float *xs = interpolate(pos0.y, pos0.x, pos1.y, pos1.x);
 
     for(int y = pos0.y; y <= pos1.y; y++) {
-        // printf("dx < dy - xs[%d]:%f y:%d\n", y - pos0.y, xs[y - pos0.y], y);
-        
         put_pixel(c, color, xs[y - pos0.y], y);
     }
 
@@ -71,8 +65,6 @@ void draw_line(Cam c, Point pos0, Point pos1 , Color color){
 }
 
 void draw_wireframe_triangle(Cam c, Point p0, Point p1, Point p2, Color color) {
-    // printf("p1: %dx%d -> p2: %dx%d -> p3: %dx%d Color: R%dG%dB%dA%d\n", 
-    //     p0.x, p0.y, p1.x, p1.y, p2.x, p2.y, color.r, color.g, color.b, color.a);
     draw_line(c, p0, p1, color);
     draw_line(c, p1, p2, color);
     draw_line(c, p2, p0, color);
@@ -142,12 +134,6 @@ void draw_filled_triangle(Cam c, Point p0, Point p1, Point p2, Color color) {
         for(int x = x_l; x <= x_r; x++){
             size_t index = x - x_l;
             float h = h_segment[index];
-            // printf(
-            //     "r:%d -> %d g:%d -> %d b:%d -> %d h:%f\n", 
-            //     color.r, (unsigned char)(color.r*h),
-            //     color.g, (unsigned char)(color.g*h),
-            //     color.b, (unsigned char)(color.b*h), 
-            //     h);
 
             Color shaded = {0};
             shaded.r = color.r * h;
@@ -183,12 +169,6 @@ void render_triangle(Cam c, FullTriangle tri) {
         tri.color);
 }
 
-float signed_distance_to_point(ViewPlane plane, Vec3 vertex) {
-    float d = vec3_by_vec3_multiply(plane.normal, vertex);
-    d += plane.d;
-    return d;
-}
-
 // TODO: Get projected point brightness from triangle
 void render_model(Cam c, Instance instance) {
     if (instance.trisClippedCount > 0) {
@@ -196,11 +176,16 @@ void render_model(Cam c, Instance instance) {
             render_triangle(c, instance.trisClipped[i]);
         }
     } else {
-        // puts("full render");
         for (size_t i = 0; i < instance.model->trisCount; i++) {
             render_triangle(c, instance.trisWorld[i]);
         }
     }
+}
+
+float signed_distance_to_point(ViewPlane plane, Vec3 vertex) {
+    float d = vec3_by_vec3_multiply(plane.normal, vertex);
+    d += plane.d;
+    return d;
 }
 
 bool is_inside_frustum(ViewPlane *planes, Instance instance) {
@@ -260,11 +245,9 @@ void one_vertex_in_front(
     t.vertex[newC] = pointCprime;
 
     clipped->trisClipped[clipped->trisClippedCount] = t;
+    printf("one   i:%ld\n", clipped->trisClippedCount);
+
     clipped->trisClippedCount++;
-    printf(
-        "currtriLength=%ld bufLength=%ld tris total=%ld\n", 
-        clipped->trisClippedCount, clipped->model->trisCount*6, clipped->model->trisCount);
-            
 }
 
 void two_vertices_in_front(
@@ -286,30 +269,27 @@ void two_vertices_in_front(
     if (isClipped) {
         clipped->trisClipped[indexClipped] = t1;
         clipped->trisClipped[indexClipped+lengthClipped] = t2;
+        size_t i = clipped->trisClippedCount;
         clipped->trisClippedCount += 2;
-        printf(
-            "n=%ld currtriLength=%ld bufLength=%ld tris total=%ld\n", 
-            indexClipped, lengthClipped, clipped->model->trisCount*6, clipped->model->trisCount);
-            
+        printf("two++ i:%ld i+:%ld old i:%ld new i:%ld\n", 
+            indexClipped, indexClipped+lengthClipped, i, clipped->trisClippedCount);
         return;
     }
 
     clipped->trisClipped[clipped->trisClippedCount] = t1;
+    printf("two+  i:%ld\n", clipped->trisClippedCount);
     clipped->trisClippedCount++;
-    
+
     clipped->trisClipped[clipped->trisClippedCount] = t2;
+    printf("two+  i+:%ld\n", clipped->trisClippedCount);
     clipped->trisClippedCount++;
-    printf(
-        "n=%ld currtriLength=%ld bufLength=%ld tris total=%ld\n", 
-        indexClipped, lengthClipped, clipped->model->trisCount*6, clipped->model->trisCount);
-            
 }
 
 void render_scene(Cam c, Scene scene) {
     float m_transform[M4X4];
 
     for(size_t i = 0; i < scene.objectCount; i++){   
-        if (i!=2){
+        if (i!=0){
             continue;
         }
         Instance *clipped = &scene.instances[i];
@@ -331,14 +311,15 @@ void render_scene(Cam c, Scene scene) {
         }
 
         clipped->trisClippedCount = 0;
+        puts("Frustum check -------------------------");
         for (size_t j = 0; j < FRUSTUM_PLANES; j++) {
             ViewPlane plane = c.frustum[j];
 
             float d = signed_distance_to_point(plane, clipped->boundingSphere.centerWorld);
             float r = clipped->boundingSphere.radius;
-           
 
             if ( d > r ) {
+                printf("full plane: %ld clip length: %ld\n", j, clipped->trisClippedCount);
                 continue;
             }
 
@@ -353,28 +334,29 @@ void render_scene(Cam c, Scene scene) {
                 tris = clipped->trisClipped;
                 isClipped = true;
             }
-            isClipped ? puts("clipped") : puts("first");
 
             clipped->trisClippedCount = 0;
+            size_t clippedInnerCounter = 0;
             
             for (size_t n = 0; n < trisLength; n++) {
                 FullTriangle tri = tris[n];
-                printf(
-                    "n=%ld currtriLength=%ld bufLength=%ld tris total=%ld\n", 
-                    n, trisLength, clipped->model->trisCount*6, clipped->model->trisCount);
-            
+                printf("i:%ld\n", n);
+                print_vec3("- A", tri.vertex[VERTEX_A]);
+                print_vec3("- B", tri.vertex[VERTEX_B]);
+                print_vec3("- C", tri.vertex[VERTEX_C]);
+
                 float d1 = signed_distance_to_point(plane, tri.vertex[VERTEX_A]);
                 float d2 = signed_distance_to_point(plane, tri.vertex[VERTEX_B]);
                 float d3 = signed_distance_to_point(plane, tri.vertex[VERTEX_C]);
 
                 if (d1 > FLT_MIN && d2 > FLT_MIN && d3 > FLT_MIN) {
-                    // printf("d1: %g d2: %g d3: %g\n", d1, d2, d3),
                     clipped->trisClipped[clipped->trisClippedCount] = tri;
+                    printf("front i:%ld\n", clipped->trisClippedCount);
                     clipped->trisClippedCount++;
-                    printf(
-                    "n=%ld currtriLength=%ld bufLength=%ld tris total=%ld\n", 
-                    n, trisLength, clipped->model->trisCount*6, clipped->model->trisCount);
-            
+                    
+                    print_vec3("+ A", clipped->trisClipped[clipped->trisClippedCount-1].vertex[VERTEX_A]);
+                    print_vec3("+ B", clipped->trisClipped[clipped->trisClippedCount-1].vertex[VERTEX_B]);
+                    print_vec3("+ C", clipped->trisClipped[clipped->trisClippedCount-1].vertex[VERTEX_C]);
                     continue;
                 }
                 
@@ -386,14 +368,26 @@ void render_scene(Cam c, Scene scene) {
 
                 if (d1 > FLT_MIN && d2 < 0.0f && d3 < 0.0f) {
                     one_vertex_in_front(plane, clipped, pointA, pointB, pointC, tri, VERTEX_B, VERTEX_C);
+                    
+                    print_vec3("+ A", clipped->trisClipped[clipped->trisClippedCount-1].vertex[VERTEX_A]);
+                    print_vec3("+ B", clipped->trisClipped[clipped->trisClippedCount-1].vertex[VERTEX_B]);
+                    print_vec3("+ C", clipped->trisClipped[clipped->trisClippedCount-1].vertex[VERTEX_C]);
                     continue;
                 }
                 if (d1 < 0.0f && d2 > FLT_MIN && d3 < 0.0f) {
                     one_vertex_in_front(plane, clipped, pointB, pointA, pointC, tri, VERTEX_A, VERTEX_C);
+                    
+                    print_vec3("+ A", clipped->trisClipped[clipped->trisClippedCount-1].vertex[VERTEX_A]);
+                    print_vec3("+ B", clipped->trisClipped[clipped->trisClippedCount-1].vertex[VERTEX_B]);
+                    print_vec3("+ C", clipped->trisClipped[clipped->trisClippedCount-1].vertex[VERTEX_C]);
                     continue;
                 }
                 if (d1 < 0.0f && d2 < 0.0f && d3 > FLT_MIN) {
                     one_vertex_in_front(plane, clipped, pointC, pointA, pointB, tri, VERTEX_A, VERTEX_B);
+                    
+                    print_vec3("+ A", clipped->trisClipped[clipped->trisClippedCount-1].vertex[VERTEX_A]);
+                    print_vec3("+ B", clipped->trisClipped[clipped->trisClippedCount-1].vertex[VERTEX_B]);
+                    print_vec3("+ C", clipped->trisClipped[clipped->trisClippedCount-1].vertex[VERTEX_C]);
                     continue;
                 }
 
@@ -401,8 +395,28 @@ void render_scene(Cam c, Scene scene) {
                 if (d1 > FLT_MIN && d2 > FLT_MIN && d3 < 0.0f) {
                     two_vertices_in_front(
                         plane, clipped, pointA, pointB, pointC, tri,
-                        VERTEX_C, VERTEX_A, isClipped, n, trisLength
-                    );                    
+                        VERTEX_C, VERTEX_A, isClipped, clippedInnerCounter, trisLength
+                    );
+                    clippedInnerCounter++;
+                    if(isClipped){  
+                        printf("i:%ld i+:%ld\n", clippedInnerCounter, clippedInnerCounter+trisLength-1);
+                        print_vec3("+ A", clipped->trisClipped[clippedInnerCounter].vertex[VERTEX_A]);
+                        print_vec3("+ B", clipped->trisClipped[clippedInnerCounter].vertex[VERTEX_B]);
+                        print_vec3("+ C", clipped->trisClipped[clippedInnerCounter].vertex[VERTEX_C]);
+                        
+                        print_vec3("++ A", clipped->trisClipped[clippedInnerCounter+trisLength].vertex[VERTEX_A]);
+                        print_vec3("++ B", clipped->trisClipped[clippedInnerCounter+trisLength].vertex[VERTEX_B]);
+                        print_vec3("++ C", clipped->trisClipped[clippedInnerCounter+trisLength].vertex[VERTEX_C]);
+                    } else {
+                        printf("i:%ld i+:%ld\n", clipped->trisClippedCount-2, clipped->trisClippedCount-1);
+                        print_vec3("+ A", clipped->trisClipped[clipped->trisClippedCount-2].vertex[VERTEX_A]);
+                        print_vec3("+ B", clipped->trisClipped[clipped->trisClippedCount-2].vertex[VERTEX_B]);
+                        print_vec3("+ C", clipped->trisClipped[clipped->trisClippedCount-2].vertex[VERTEX_C]);
+                        
+                        print_vec3("++ A", clipped->trisClipped[clipped->trisClippedCount-1].vertex[VERTEX_A]);
+                        print_vec3("++ B", clipped->trisClipped[clipped->trisClippedCount-1].vertex[VERTEX_B]);
+                        print_vec3("++ C", clipped->trisClipped[clipped->trisClippedCount-1].vertex[VERTEX_C]);
+                    }
                     continue;
                 }
 
@@ -410,8 +424,28 @@ void render_scene(Cam c, Scene scene) {
                 if (d1 > FLT_MIN && d2 < 0.0f && d3 > FLT_MIN) {
                     two_vertices_in_front(
                         plane, clipped, pointA, pointC, pointB, tri,
-                        VERTEX_B, VERTEX_A, isClipped, n, trisLength
-                    );                    
+                        VERTEX_B, VERTEX_A, isClipped, clippedInnerCounter, trisLength
+                    );
+                    clippedInnerCounter++;
+                    if(isClipped){  
+                        printf("i:%ld i+:%ld\n", clippedInnerCounter, clippedInnerCounter+trisLength-1);
+                        print_vec3("+ A", clipped->trisClipped[clippedInnerCounter].vertex[VERTEX_A]);
+                        print_vec3("+ B", clipped->trisClipped[clippedInnerCounter].vertex[VERTEX_B]);
+                        print_vec3("+ C", clipped->trisClipped[clippedInnerCounter].vertex[VERTEX_C]);
+                        
+                        print_vec3("++ A", clipped->trisClipped[clippedInnerCounter+trisLength].vertex[VERTEX_A]);
+                        print_vec3("++ B", clipped->trisClipped[clippedInnerCounter+trisLength].vertex[VERTEX_B]);
+                        print_vec3("++ C", clipped->trisClipped[clippedInnerCounter+trisLength].vertex[VERTEX_C]);
+                    } else {
+                        printf("i:%ld i+:%ld\n", clipped->trisClippedCount-2, clipped->trisClippedCount-1);
+                        print_vec3("+ A", clipped->trisClipped[clipped->trisClippedCount-2].vertex[VERTEX_A]);
+                        print_vec3("+ B", clipped->trisClipped[clipped->trisClippedCount-2].vertex[VERTEX_B]);
+                        print_vec3("+ C", clipped->trisClipped[clipped->trisClippedCount-2].vertex[VERTEX_C]);
+                        
+                        print_vec3("++ A", clipped->trisClipped[clipped->trisClippedCount-1].vertex[VERTEX_A]);
+                        print_vec3("++ B", clipped->trisClipped[clipped->trisClippedCount-1].vertex[VERTEX_B]);
+                        print_vec3("++ C", clipped->trisClipped[clipped->trisClippedCount-1].vertex[VERTEX_C]);
+                    }                
                     continue;
                 }
 
@@ -419,8 +453,28 @@ void render_scene(Cam c, Scene scene) {
                 if (d1 < 0.0f && d2 > FLT_MIN && d3 > FLT_MIN) {
                     two_vertices_in_front(
                         plane, clipped, pointC, pointB, pointA, tri,
-                        VERTEX_A, VERTEX_C, isClipped, n, trisLength
+                        VERTEX_A, VERTEX_C, isClipped, clippedInnerCounter, trisLength
                     );
+                    clippedInnerCounter++;
+                    if(isClipped){  
+                        printf("i:%ld i+:%ld\n", clippedInnerCounter, clippedInnerCounter+trisLength-1);
+                        print_vec3("+ A", clipped->trisClipped[clippedInnerCounter].vertex[VERTEX_A]);
+                        print_vec3("+ B", clipped->trisClipped[clippedInnerCounter].vertex[VERTEX_B]);
+                        print_vec3("+ C", clipped->trisClipped[clippedInnerCounter].vertex[VERTEX_C]);
+                        
+                        print_vec3("++ A", clipped->trisClipped[clippedInnerCounter+trisLength].vertex[VERTEX_A]);
+                        print_vec3("++ B", clipped->trisClipped[clippedInnerCounter+trisLength].vertex[VERTEX_B]);
+                        print_vec3("++ C", clipped->trisClipped[clippedInnerCounter+trisLength].vertex[VERTEX_C]);
+                    } else {
+                        printf("i:%ld i+:%ld\n", clipped->trisClippedCount-2, clipped->trisClippedCount-1);
+                        print_vec3("+ A", clipped->trisClipped[clipped->trisClippedCount-2].vertex[VERTEX_A]);
+                        print_vec3("+ B", clipped->trisClipped[clipped->trisClippedCount-2].vertex[VERTEX_B]);
+                        print_vec3("+ C", clipped->trisClipped[clipped->trisClippedCount-2].vertex[VERTEX_C]);
+                        
+                        print_vec3("++ A", clipped->trisClipped[clipped->trisClippedCount-1].vertex[VERTEX_A]);
+                        print_vec3("++ B", clipped->trisClipped[clipped->trisClippedCount-1].vertex[VERTEX_B]);
+                        print_vec3("++ C", clipped->trisClipped[clipped->trisClippedCount-1].vertex[VERTEX_C]);
+                    }
                     continue;
                 }               
             }
@@ -429,6 +483,9 @@ void render_scene(Cam c, Scene scene) {
                 clipped = NULL;
                 break;
             }
+            
+            printf("clip plane: %ld clip length: %ld clippedInnerCounter:%ld\n", 
+                j, clipped->trisClippedCount, clippedInnerCounter);
         }
 
         if (clipped != NULL) {

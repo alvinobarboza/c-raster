@@ -122,7 +122,7 @@ void print_mat(const char *name,float *mat) {
 }
 
 void print_vec3(const char *name, Vec3 v) {
-    printf("%s { .x: %+02.02f, .y: %+02.02f, z: %+02.02f }\n", name, v.x, v.y, v.z);
+    printf("%s ( %+02.02f, %+02.02f, %+02.02f )\n", name, v.x, v.y, v.z);
 }
 
 float vec3_by_vec3_multiply(Vec3 v1, Vec3 v2) {

@@ -10,8 +10,8 @@
 #include "scene.h"
 #include "shapes.h"
 
-#define WIDTH  1920
-#define HEIGHT 800
+#define WIDTH  1820
+#define HEIGHT 1080
 #define TARGET_FPS 60
 
 void move_cube(Instance *instance) {
@@ -48,13 +48,15 @@ void move_cube(Instance *instance) {
 
 int main(void)
 {
-    float moveSpeed = 15.0f;
-    float turnSpeed = 70.0f;
+    float moveSpeed = 5.0f;
+    float turnSpeed = 60.0f;
 
     Cam camera = init_camera(
         WIDTH, HEIGHT, 
-        (Vec3) {.x = -.87f, .y = 4.10f, .z = 9.94f},
-        (Vec3) {.x = -22.17f, .y = -103.54f, .z = 0.0f}
+        // (Vec3) {.x = 0.0f, .y = 0.0f, .z = 0.0f},
+        // (Vec3) {.x = 0.0f, .y = 0.0f, .z = 0.0f}
+        (Vec3) {.x = -3.34f, .y = 0.98f, .z = -1.11f},
+        (Vec3) {.x = -9.43f, .y = -27.71f, .z = 0.0f}
     );
 
     // TODO: proper model loading
@@ -63,18 +65,24 @@ int main(void)
     ModelData torus = torus_shape();
     ModelData uvSphere = uv_sphere_shape();
     ModelData square = square_shape();
+    ModelData triangle = triangle_shape();
 
     // TODO: better instance loading
     Instance instances[] = {
+        init_instance(&triangle, (Transforms){
+            .position = (Vec3){.x = 0.0f, .y = 0.0f, .z = 2.0f},
+            .rotation = (Vec3){.x = 90.0f, .y = 0.0f, .z = 0.0f},
+            .scale = (Vec3){.x = 3.0f, .y = 3.0f, .z = 3.0f}
+        }),
         init_instance(&square, (Transforms){
-            .position = (Vec3){.x = 0.0f, .y = 0.0f, .z = 7.0f},
-            .rotation = (Vec3){.x = 0.0f, .y = 0.0f, .z = 30.0f},
-            .scale = (Vec3){.x = 1.0f, .y = 1.0f, .z = 1.0f}
+            .position = (Vec3){.x = 0.0f, .y = 0.0f, .z = 2.0f},
+            .rotation = (Vec3){.x = 90.0f, .y = 0.0f, .z = 0.0f},
+            .scale = (Vec3){.x = 2.0f, .y = 2.0f, .z = 2.0f}
         }),
         init_instance(&cube, (Transforms) {
             .position = (Vec3){.x = -2.5, .y = 0.0f, .z = 10.0f},
             .rotation = (Vec3){.x = 0.0f, .y = 0.0f, .z = 0.0f},
-            .scale = (Vec3){.x = .7f, .y = .7f, .z = .7f},
+            .scale = (Vec3){.x = .3f, .y = .3f, .z = .3f},
         }),
         init_instance(&cube, (Transforms) {
             .position = (Vec3){.x = 2.25, .y = 2.5f, .z = 9.5f},
@@ -101,7 +109,7 @@ int main(void)
     // TODO: Proper scene builder
     Scene scene = (Scene) {
         .instances = instances,
-        .objectCount = 6
+        .objectCount = 7
     };
     
     SetConfigFlags(FLAG_WINDOW_RESIZABLE | FLAG_WINDOW_ALWAYS_RUN | FLAG_MSAA_4X_HINT);
@@ -203,7 +211,7 @@ int main(void)
                 15, 60, 20, RAYWHITE);
             DrawFPS(15,15);
         EndDrawing();
-        // break;
+        break;
     }
 
 closeWindow:

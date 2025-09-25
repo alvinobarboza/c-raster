@@ -196,3 +196,16 @@ ModelData square_shape() {
 
     return init_model(square_verts, 4, square_tris, 2);
 }
+
+ModelData triangle_shape() {
+    Vec3 tris_verts[] = {
+        { 1.0f,  1.0f,  0.0f}, // 0 front top right
+        {-1.0f,  1.0f,  0.0f}, // 1 front top left
+        {-1.0f, -1.0f,  0.0f}, // 2 front bottom left
+    };
+    Triangle tris_tris[] = {
+        {.v1 = 0, .v2 = 1, .v3 = 2, .color = RED},
+    };
+
+    return init_model(tris_verts, 3, tris_tris, 1);
+}
