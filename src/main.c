@@ -53,8 +53,8 @@ int main(void)
 
     Cam camera = init_camera(
         WIDTH, HEIGHT, 
-        (Vec3) {.x = -3.0f, .y = 1.0f, .z = 2.0f},
-        (Vec3) {.x = 0.0f, .y = -30.0f, .z = 0.0f}
+        (Vec3) {.x = -.87f, .y = 4.10f, .z = 9.94f},
+        (Vec3) {.x = -22.17f, .y = -103.54f, .z = 0.0f}
     );
 
     // TODO: proper model loading
@@ -191,6 +191,16 @@ int main(void)
             ClearBackground(RAYWHITE);
 
             DrawTexture(renderTexture, 0, 0, RAYWHITE);
+            DrawText(
+                TextFormat(
+                    "X: %.2f Y: %.2f Z: %.2f", 
+                    camera.position.x, camera.position.y, camera.position.z), 
+                15, 40, 20, RAYWHITE);
+            DrawText(
+                TextFormat(
+                    "X: °%.2f Y: °%.2f Z: °%.2f", 
+                    camera.rotation.x, camera.rotation.y, camera.rotation.z), 
+                15, 60, 20, RAYWHITE);
             DrawFPS(15,15);
         EndDrawing();
         // break;
