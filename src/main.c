@@ -36,12 +36,12 @@ void move_cube(Instance *instance) {
     }
     
     if (IsKeyDown(KEY_U)) {
-        instance->transforms.rotation.y += .5f;
+        instance->transforms.rotation.z += .5f;
         update_instance_transforms(instance);
     }
     
     if (IsKeyDown(KEY_O)) {
-        instance->transforms.rotation.y -= .5f;
+        instance->transforms.rotation.z -= .5f;
         update_instance_transforms(instance);
     }
 }
@@ -55,8 +55,8 @@ int main(void)
         WIDTH, HEIGHT, 
         // (Vec3) {.x = 0.0f, .y = 0.0f, .z = 0.0f},
         // (Vec3) {.x = 0.0f, .y = 0.0f, .z = 0.0f}
-        (Vec3) {.x = -3.34f, .y = 0.98f, .z = -1.11f},
-        (Vec3) {.x = -9.43f, .y = -27.71f, .z = 0.0f}
+        (Vec3) {.x = -3.0f, .y = 1.88f, .z = -3.43f},
+        (Vec3) {.x = 0, .y = 0, .z = 0}
     );
 
     // TODO: proper model loading
@@ -70,8 +70,8 @@ int main(void)
     // TODO: better instance loading
     Instance instances[] = {
         init_instance(&triangle, (Transforms){
-            .position = (Vec3){.x = 0.0f, .y = 0.0f, .z = 2.0f},
-            .rotation = (Vec3){.x = 90.0f, .y = 0.0f, .z = 0.0f},
+            .position = (Vec3){.x = 0.0f, .y = 0.0f, .z = 5.0f},
+            .rotation = (Vec3){.x = 0.0f, .y = 0.0f, .z = 0.0f},
             .scale = (Vec3){.x = 3.0f, .y = 3.0f, .z = 3.0f}
         }),
         init_instance(&square, (Transforms){
@@ -211,7 +211,7 @@ int main(void)
                 15, 60, 20, RAYWHITE);
             DrawFPS(15,15);
         EndDrawing();
-        break;
+        // break;
     }
 
 closeWindow:
