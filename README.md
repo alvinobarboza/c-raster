@@ -10,4 +10,8 @@ https://gabrielgambetta.com/computer-graphics-from-scratch/
 -   Draw Filled Triangle = Done
 -   Shaded Triangle = Done
 -   Perspective Projection = Done
--   Describing and rendering a scene - Done (With camera controls)
+-   Describing and rendering a scene = Done (With camera controls)
+-   Clipping = Done
+    -   Full frustum culling - Near, left, right, top and bottom planes.
+        -   Missing far plane and dynamic plane calculation on screen resize.
+    -   Dynamic mesh generation on clipping plane.
