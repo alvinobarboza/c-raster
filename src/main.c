@@ -10,8 +10,8 @@
 #include "scene.h"
 #include "shapes.h"
 
-#define WIDTH  1820
-#define HEIGHT 1080
+#define WIDTH  1280
+#define HEIGHT 720
 #define TARGET_FPS 60
 
 void move_cube(Instance *instance) {
@@ -176,20 +176,14 @@ int main(void)
         // printf("mouse x:%+03.02f y:%+03.02f\n",mouse.x, mouse.y);
 
         if (IsWindowResized()) {
-            camera.height = GetScreenHeight();
-            camera.width = GetScreenWidth();
-            
-            camera.canvas = realloc(camera.canvas, sizeof(Color) * camera.height * camera.width);
+            update_camera_frustum(&camera, GetScreenWidth(), GetScreenHeight());
             if (camera.canvas == NULL) {
                 goto closeWindow;
             }
-
-            camera.view.width = ((float)camera.width / (float)camera.height)* 2.5f;
-
+            
             ImageResize(&img, camera.width, camera.height);
             UnloadTexture(renderTexture);            
             renderTexture = LoadTextureFromImage(img);
-      
         }
 
         render_scene(camera, scene);

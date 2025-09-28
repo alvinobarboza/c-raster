@@ -5,7 +5,11 @@
 #include "transforms.h"
 
 #define OPAQUE 255
-#define FRUSTUM_PLANES 5
+#define DEFAULT_FOV 52.9 // TODO: make change here reflect View D or render FOV
+#define VIEW_PLANE_DISTANCE 1.0f
+#define FRUSTUM_PLANES 6
+#define NEAR_PLANE_DISTANCE .8f
+#define FAR_PLANE_DISTANCE 20.f
 
 // To be honest, this is actually aspect ratio related
 typedef struct Viewport {
@@ -49,6 +53,7 @@ Point project_vertex(Cam c, Vec3 v);
 Cam init_camera(int w, int h, Vec3 position, Vec3 rotation);
 
 void update_camera_transforms(Cam *c);
+void update_camera_frustum(Cam *c, int w, int h);
 
 void camera_move_forward(Cam *c, float unit);
 void camera_move_backward(Cam *c, float unit);

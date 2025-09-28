@@ -1,5 +1,6 @@
 #include <stddef.h>
 #include <stdlib.h>
+#include <math.h>
 #include "camera.h"
 
 void swap_point_values(Point *p1, Point *p2) {
@@ -32,8 +33,8 @@ void clear_canvas(Cam c) {
 Point viewport_to_canvas(Cam c, float x, float y) {
     return (Point) {
         .brightness = 1.0f,
-        .x = x * c.width/c.view.width,
-        .y = y * c.height/c.view.height
+        .x = x * (c.width/c.view.width),
+        .y = y * (c.height/c.view.height)
     };
 }
 
@@ -47,30 +48,53 @@ Point project_vertex(Cam c, Vec3 v) {
 
 Cam init_camera(int w, int h, Vec3 position, Vec3 rotation) {
 
-    // TODO: Calculate correct frustum for give aspect-ratio
+    // From "LearnOpenGl"
+    const float fov = DEFAULT_FOV/VIEW_PLANE_DISTANCE; // from book
+
+    const Vec3 front = (Vec3){.x=0,.y=0,.z=1.0f};
+    const Vec3 up = (Vec3){.x=0,.y=1.0f,.z=0};
+    const Vec3 leftDirection = (Vec3){.x=-1.0f,.y=0,.z=0};
+    const Vec3 rightDirection = (Vec3){.x=1.0f,.y=0,.z=0};
+    const Vec3 topDirection = (Vec3){.x=0,.y=1.0f,.z=0};
+    const Vec3 bottomDirection = (Vec3){.x=0,.y=-1.0f,.z=0};
+
+    const float aspectRatio = (float)w / (float)h;
+    const float halfVSide = FAR_PLANE_DISTANCE * tanf(fov * 0.5f * T_DEG2RAD);
+    const float halfHSide = halfVSide * aspectRatio;
+    const Vec3 frontMultFar = vec3_multiply( front, FAR_PLANE_DISTANCE );
+    Vec3 rightPlanePosition = vec3_add( frontMultFar, vec3_multiply(rightDirection, halfHSide) );
+    Vec3 leftPlanePosition = vec3_add( frontMultFar, vec3_multiply(leftDirection, halfHSide) );
+    Vec3 topPlanePosition = vec3_add( frontMultFar, vec3_multiply(topDirection, halfVSide) );
+    Vec3 bottomPlanePosition = vec3_add( frontMultFar, vec3_multiply(bottomDirection, halfVSide) );
+    
 
     ViewPlane near = (ViewPlane) {
         .normal = (Vec3){.x = 0, .y = 0, .z = 1.0f},
-        .d = -1.0f
+        .d = -NEAR_PLANE_DISTANCE
     };
-    
-    ViewPlane left = (ViewPlane) {
-        .normal = vec3_normal((Vec3){.x = 1.0f, .y = 0, .z = 1.0f}),
-        .d = 0
+
+    ViewPlane far = (ViewPlane) {
+        .normal = (Vec3){.x = 0, .y = 0, .z = -1.0f},
+        .d = FAR_PLANE_DISTANCE
     };
 
     ViewPlane right = (ViewPlane) {
-        .normal = vec3_normal((Vec3){.x = -1.0f, .y = 0, .z = 1.0f}),
+        .normal = vec3_normal(vec3_cross( rightPlanePosition, up )),
+        .d = 0
+    };
+    
+    ViewPlane left = (ViewPlane) {
+        .normal = vec3_normal(vec3_cross( up, leftPlanePosition )),
         .d = 0
     };
     
     ViewPlane top = (ViewPlane) {
-        .normal = vec3_normal((Vec3){.x = 0, .y = -1.0f, .z = 1.0f}),
+        .normal = vec3_normal(vec3_cross( rightDirection,topPlanePosition )),
         .d = 0
     };
     
     ViewPlane bottom = (ViewPlane) {
-        .normal = vec3_normal((Vec3){.x = 0, .y = 1.0f, .z = 1.0f}),
+        .normal = vec3_normal(vec3_cross(  bottomPlanePosition, rightDirection )),
         .d = 0
     };
 
@@ -79,12 +103,12 @@ Cam init_camera(int w, int h, Vec3 position, Vec3 rotation) {
         .canvas = malloc(sizeof(Color) * w * h),
         .width = w,
         .height = h,
-        .view = (Viewport) {.d = 1.0f, .height = 2.5f, .width =  ((float)w / (float)h) * 2.5f},
+        .view = (Viewport) {.d = VIEW_PLANE_DISTANCE, .height = 1.0f, .width =  aspectRatio },
         .scale = (Vec3) {.x = 1.0f, .y = 1.0f, .z = 1.0f},
         .position = position,
         .rotation = rotation,
         .forwardDirection = (Vec3) { .x = 0.0f, .y = 0.0f, .z = 1.0f},
-        .frustum = {near, left, right, top, bottom}
+        .frustum = {near, far, left, right, top, bottom}
     };
     
     camera.matrixTransform = init_matrix();
@@ -113,6 +137,42 @@ void update_camera_transforms(Cam *c){
 
     matrix_multiplication(scale, rotationTransposed, result);
     matrix_multiplication(result, translation,  c->matrixTransform);
+}
+
+void update_camera_frustum(Cam *c, int w, int h) {
+    c->height = h;
+    c->width = w;
+
+    c->canvas = realloc(c->canvas, sizeof(Color) * c->height * c->width);
+    if (c->canvas == NULL) {
+        return;
+    }
+
+    c->view.width = (float)c->width / (float)c->height;
+
+    const float fov = DEFAULT_FOV/VIEW_PLANE_DISTANCE; 
+
+    const Vec3 front = (Vec3){.x=0,.y=0,.z=1.0f};
+    const Vec3 up = (Vec3){.x=0,.y=1.0f,.z=0};
+    const Vec3 leftDirection = (Vec3){.x=-1.0f,.y=0,.z=0};
+    const Vec3 rightDirection = (Vec3){.x=1.0f,.y=0,.z=0};
+    const Vec3 topDirection = (Vec3){.x=0,.y=1.0f,.z=0};
+    const Vec3 bottomDirection = (Vec3){.x=0,.y=-1.0f,.z=0};
+    
+    const float aspectRatio = (float)w / (float)h;
+    const float halfVSide = FAR_PLANE_DISTANCE * tanf(fov * 0.5f * T_DEG2RAD);
+    const float halfHSide = halfVSide * aspectRatio;
+    const Vec3 frontMultFar = vec3_multiply( front, FAR_PLANE_DISTANCE );
+    Vec3 rightPlanePosition = vec3_add( frontMultFar, vec3_multiply(rightDirection, halfHSide) );
+    Vec3 leftPlanePosition = vec3_add( frontMultFar, vec3_multiply(leftDirection, halfHSide) );
+    Vec3 topPlanePosition = vec3_add( frontMultFar, vec3_multiply(topDirection, halfVSide) );
+    Vec3 bottomPlanePosition = vec3_add( frontMultFar, vec3_multiply(bottomDirection, halfVSide) );
+    
+
+    c->frustum[2].normal = vec3_normal(vec3_cross( up, leftPlanePosition ));
+    c->frustum[3].normal = vec3_normal(vec3_cross( rightPlanePosition, up ));
+    c->frustum[4].normal = vec3_normal(vec3_cross( rightDirection,topPlanePosition ));
+    c->frustum[5].normal = vec3_normal(vec3_cross(  bottomPlanePosition, rightDirection ));    
 }
 
 void camera_move_forward(Cam *c, float unit){
