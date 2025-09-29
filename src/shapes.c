@@ -31,41 +31,41 @@ Triangle tris_ico[] = {
     // Top cap
     {.v1 = 0, .v2 = 1, .v3 = 2, .color = RED},
     {.v1 = 0, .v2 = 2, .v3 = 3, .color = RED},
-    {.v1 = 0, .v2 = 3, .v3 = 4, .color = GREEN},
-    {.v1 = 0, .v2 = 4, .v3 = 5, .color = YELLOW},
-    {.v1 = 0, .v2 = 5, .v3 = 1, .color = YELLOW},
+    {.v1 = 0, .v2 = 3, .v3 = 4, .color = RED},
+    {.v1 = 0, .v2 = 4, .v3 = 5, .color = RED},
+    {.v1 = 0, .v2 = 5, .v3 = 1, .color = RED},
     
     // Middle band
-    {.v1 = 1, .v2 = 2, .v3 = 6, .color = MAGENTA},
-    {.v1 = 2, .v2 = 3, .v3 = 7, .color = MAGENTA},
-    {.v1 = 3, .v2 = 4, .v3 = 8, .color = ORANGE},
-    {.v1 = 4, .v2 = 5, .v3 = 9, .color = ORANGE},
-    {.v1 = 5, .v2 = 1, .v3 = 10, .color = LIME},
+    {.v1 = 6, .v2 = 2, .v3 = 1, .color = GREEN},
+    {.v1 = 7, .v2 = 3, .v3 = 2, .color = GREEN},
+    {.v1 = 8, .v2 = 4, .v3 = 3, .color = GREEN},
+    {.v1 = 9, .v2 = 5, .v3 = 4, .color = GREEN},
+    {.v1 = 10, .v2 = 1, .v3 = 5, .color = GREEN},
     
-    {.v1 = 2, .v2 = 7, .v3 = 6, .color = MAROON},
-    {.v1 = 3, .v2 = 8, .v3 = 7, .color = MAROON},
-    {.v1 = 4, .v2 = 9, .v3 = 8, .color = GREEN},
-    {.v1 = 5, .v2 = 10, .v3 = 9, .color = GREEN},
-    {.v1 = 1, .v2 = 6, .v3 = 10, .color = GOLD},
+    {.v1 = 6, .v2 = 7, .v3 = 2, .color = GREEN},
+    {.v1 = 7, .v2 = 8, .v3 = 3, .color = GREEN},
+    {.v1 = 8, .v2 = 9, .v3 = 4, .color = GREEN},
+    {.v1 = 9, .v2 = 10, .v3 = 5, .color = GREEN},
+    {.v1 = 10, .v2 = 6, .v3 = 1, .color = GREEN},
     
     // Bottom cap
-    {.v1 = 11, .v2 = 7, .v3 = 6, .color = GOLD},
+    {.v1 = 11, .v2 = 7, .v3 = 6, .color = BLUE},
     {.v1 = 11, .v2 = 8, .v3 = 7, .color = BLUE},
     {.v1 = 11, .v2 = 9, .v3 = 8, .color = BLUE},
-    {.v1 = 11, .v2 = 10, .v3 = 9, .color = PURPLE},
-    {.v1 = 11, .v2 = 6, .v3 = 10, .color = PURPLE}
+    {.v1 = 11, .v2 = 10, .v3 = 9, .color = BLUE},
+    {.v1 = 11, .v2 = 6, .v3 = 10, .color = BLUE}
 };
 
 // CUBE === begging
 Vec3 verts[]  = {
-    { 1.0f,  1.0f,  1.0f}, // 0 front top right
-    {-1.0f,  1.0f,  1.0f}, // 1 front top left
-    {-1.0f, -1.0f,  1.0f}, // 2 front bottom left
-    { 1.0f, -1.0f,  1.0f}, // 3 front bottom rigth
-    { 1.0f,  1.0f, -1.0f}, // 4 back top right
-    {-1.0f,  1.0f, -1.0f}, // 5 back top left
-    {-1.0f, -1.0f, -1.0f}, // 6 back bottom left
-    { 1.0f, -1.0f, -1.0f}, // 7 back bottom right
+    { 1.0f,  1.0f, -1.0f}, // 0 front top right
+    {-1.0f,  1.0f, -1.0f}, // 1 front top left
+    {-1.0f, -1.0f, -1.0f}, // 2 front bottom left
+    { 1.0f, -1.0f, -1.0f}, // 3 front bottom rigth
+    { 1.0f,  1.0f,  1.0f}, // 4 back top right
+    {-1.0f,  1.0f,  1.0f}, // 5 back top left
+    {-1.0f, -1.0f,  1.0f}, // 6 back bottom left
+    { 1.0f, -1.0f,  1.0f}, // 7 back bottom right
 };
 
 Triangle tris[] = {
