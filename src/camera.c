@@ -98,9 +98,9 @@ Cam init_camera(int w, int h, Vec3 position, Vec3 rotation) {
         .d = 0
     };
 
-
     Cam camera = (Cam) {
         .canvas = malloc(sizeof(Color) * w * h),
+        .depthBuffer = malloc(sizeof(float) * w * h),
         .width = w,
         .height = h,
         .view = (Viewport) {.d = VIEW_PLANE_DISTANCE, .height = 1.0f, .width =  aspectRatio },
@@ -115,6 +115,18 @@ Cam init_camera(int w, int h, Vec3 position, Vec3 rotation) {
     update_camera_transforms(&camera);
 
     return camera;
+}
+
+void free_camera(Cam c){
+    if(c.canvas != NULL){
+        free(c.canvas);
+    }
+    if(c.depthBuffer != NULL){
+        free(c.depthBuffer);
+    }
+    if(c.matrixTransform != NULL){
+        free(c.matrixTransform);
+    }
 }
 
 void update_camera_transforms(Cam *c){
@@ -147,6 +159,14 @@ void update_camera_frustum(Cam *c, int w, int h) {
     if (c->canvas == NULL) {
         return;
     }
+    
+    c->depthBuffer = realloc(c->depthBuffer, sizeof(float) * c->height * c->width);
+    if (c->depthBuffer == NULL) {
+        free(c->canvas);
+        c->canvas = NULL;
+        return;
+    }
+
 
     c->view.width = (float)c->width / (float)c->height;
 
@@ -167,7 +187,6 @@ void update_camera_frustum(Cam *c, int w, int h) {
     Vec3 leftPlanePosition = vec3_add( frontMultFar, vec3_multiply(leftDirection, halfHSide) );
     Vec3 topPlanePosition = vec3_add( frontMultFar, vec3_multiply(topDirection, halfVSide) );
     Vec3 bottomPlanePosition = vec3_add( frontMultFar, vec3_multiply(bottomDirection, halfVSide) );
-    
 
     c->frustum[2].normal = vec3_normal(vec3_cross( up, leftPlanePosition ));
     c->frustum[3].normal = vec3_normal(vec3_cross( rightPlanePosition, up ));

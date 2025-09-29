@@ -213,8 +213,7 @@ closeWindow:
         free_model(scene.instances[i].model);
         free_instance(&scene.instances[i]);
     }
-    free(camera.canvas);
-    free(camera.matrixTransform);
+    free_camera(camera);
     UnloadImage(img);
     UnloadTexture(renderTexture);
 

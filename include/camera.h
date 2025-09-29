@@ -26,6 +26,7 @@ typedef struct ViewPlane {
 // "Cam" to avoid conflict with raylib "Camera"
 typedef struct Cam {
     Color *canvas;
+    float *depthBuffer;
     float *matrixTransform;
     Viewport view;
     int width;
@@ -51,6 +52,7 @@ Point viewport_to_canvas(Cam c, float x, float y);
 Point project_vertex(Cam c, Vec3 v);
 
 Cam init_camera(int w, int h, Vec3 position, Vec3 rotation);
+void free_camera(Cam c);
 
 void update_camera_transforms(Cam *c);
 void update_camera_frustum(Cam *c, int w, int h);
