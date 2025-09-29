@@ -55,8 +55,8 @@ int main(void)
         WIDTH, HEIGHT, 
         // (Vec3) {.x = 0.0f, .y = 0.0f, .z = 0.0f},
         // (Vec3) {.x = 0.0f, .y = 0.0f, .z = 0.0f}
-        (Vec3) {.x = -3.0f, .y = 1.88f, .z = -3.43f},
-        (Vec3) {.x = 0, .y = 0, .z = 0}
+        (Vec3) {.x = -1.80f, .y = 1.59f, .z = -2.69f},
+        (Vec3) {.x = 0, .y = -16.98, .z = 0}
     );
 
     // TODO: proper model loading
