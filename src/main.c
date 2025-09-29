@@ -76,7 +76,7 @@ int main(void)
         }),
         init_instance(&square, (Transforms){
             .position = (Vec3){.x = 0.0f, .y = 0.0f, .z = 2.0f},
-            .rotation = (Vec3){.x = 90.0f, .y = 0.0f, .z = 0.0f},
+            .rotation = (Vec3){.x = -90.0f, .y = 0.0f, .z = 0.0f},
             .scale = (Vec3){.x = 2.0f, .y = 2.0f, .z = 2.0f}
         }),
         init_instance(&cube, (Transforms) {

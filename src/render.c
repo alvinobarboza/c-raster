@@ -169,6 +169,18 @@ void render_triangle(Cam c, FullTriangle tri) {
         tri.color);
 }
 
+bool back_face_culling(FullTriangle tri) {
+    Vec3 v1 = vec3_sub(tri.vertex[VERTEX_B], tri.vertex[VERTEX_A]);
+    Vec3 v2 = vec3_sub(tri.vertex[VERTEX_C], tri.vertex[VERTEX_A]);
+    Vec3 n1 = vec3_cross(v1, v2);
+    
+    float angleA = vec3_by_vec3_multiply(n1, tri.vertex[VERTEX_A]);
+    float angleB = vec3_by_vec3_multiply(n1, tri.vertex[VERTEX_B]);
+    float angleC = vec3_by_vec3_multiply(n1, tri.vertex[VERTEX_C]);
+
+    return angleA > 0 || angleB > 0 || angleC > 0;
+}
+
 // TODO: Get projected point brightness from triangle
 void render_model(Cam c, Instance instance) {
     if (instance.trisClippedCount > 0) {
@@ -177,6 +189,9 @@ void render_model(Cam c, Instance instance) {
         }
     } else {
         for (size_t i = 0; i < instance.model->trisCount; i++) {
+            if ( !back_face_culling(instance.trisWorld[i]) ) {
+                continue;
+            }
             render_triangle(c, instance.trisWorld[i]);
         }
     }
@@ -274,7 +289,10 @@ void two_vertices_in_front(
 void render_scene(Cam c, Scene scene) {
     float m_transform[M4X4];
 
-    for(size_t i = 0; i < scene.objectCount; i++){   
+    for(size_t i = 0; i < scene.objectCount; i++){
+        // if ( i != 0) {
+        //     continue;
+        // }
         Instance *clipped = &scene.instances[i];
 
         matrix_multiplication(c.matrixTransform, clipped->transforms.matrixTransform, m_transform);
@@ -317,6 +335,10 @@ void render_scene(Cam c, Scene scene) {
             
             for (size_t n = 0; n < trisLength; n++) {
                 FullTriangle tri = tris[n];
+
+                if ( !back_face_culling(tri) ){
+                    continue;
+                }
 
                 float d1 = signed_distance_to_point(plane, tri.vertex[VERTEX_A]);
                 float d2 = signed_distance_to_point(plane, tri.vertex[VERTEX_B]);
