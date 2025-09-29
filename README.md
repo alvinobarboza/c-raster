@@ -6,15 +6,19 @@ Rasterizer implementation inspired on this book;
 
 https://gabrielgambetta.com/computer-graphics-from-scratch/
 
--   Draw Lines = Done
--   Draw Filled Triangle = Done
--   Shaded Triangle = Done
--   Perspective Projection = Done
--   Describing and rendering a scene = Done (With camera controls)
--   Clipping = Done
+- [x]   Draw Lines
+- [x]  Draw Filled Triangle
+- [x]  Shaded Triangle
+- [x]  Perspective Projection
+- [x]  Describing and rendering a scene (With camera controls)
+- [x]  Clipping
     -   Full frustum culling - Near, far, left, right, top and bottom planes.
     -   Automatically calculate frustum on screen resize.
     -   Dynamic mesh generation on clipping plane.
+- [ ]  Backface culling
+- [ ]  Shading
+- [ ]  Texture
+- [ ]  More...
 
 # Showcase
 
