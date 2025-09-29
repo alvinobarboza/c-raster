@@ -304,8 +304,6 @@ void render_scene(Cam c, Scene scene) {
                 continue;
             }
 
-            // TODO: multi plane intersection notworking properly
-
             size_t trisLength = clipped->model->trisCount;
             FullTriangle *tris = clipped->trisWorld;
 
