@@ -15,3 +15,9 @@ https://gabrielgambetta.com/computer-graphics-from-scratch/
     -   Full frustum culling - Near, far, left, right, top and bottom planes.
     -   Automatically calculate frustum on screen resize.
     -   Dynamic mesh generation on clipping plane.
+
+# Showcase
+
+## Frustum culling and clipping planes
+
+![Bottom and far plane clipping on view](./frustum_culling.png)
