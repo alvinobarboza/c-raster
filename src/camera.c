@@ -9,15 +9,27 @@ void swap_point_values(Point *p1, Point *p2) {
     *p2 = temp;
 }
 
-void put_pixel(Cam c, Color color, int x, int y) {
+void put_pixel(Cam c, Color color, int x, int y, float h, float depth) {
     x = c.width/2 + x;
 	y = c.height/2 - y - 1;
+    float z = 1 / depth;
 
 	if (x < 0 || x >= c.width || y < 0 || y >= c.height) {
 		return;
 	}
 
-	c.canvas[y*c.width+x] = color;
+    if (c.depthBuffer[y*c.width+x] > z) {
+        return;
+    }
+
+    Color shaded = {0};
+    shaded.r = color.r * h;
+    shaded.g = color.g * h;
+    shaded.b = color.b * h;
+    shaded.a = OPAQUE;
+
+	c.canvas[y*c.width+x] = shaded;
+    c.depthBuffer[y*c.width+x] = z;
 }
 
 void clear_canvas(Cam c) { 
@@ -27,14 +39,16 @@ void clear_canvas(Cam c) {
         c.canvas[i].g = 50;
         c.canvas[i].b = 50;
         c.canvas[i].a = OPAQUE;
+        c.depthBuffer[i] = 0;
     }
 }
 
-Point viewport_to_canvas(Cam c, float x, float y) {
+Point viewport_to_canvas(Cam c, float x, float y, float z) {
     return (Point) {
         .brightness = 1.0f,
         .x = x * (c.width/c.view.width),
-        .y = y * (c.height/c.view.height)
+        .y = y * (c.height/c.view.height),
+        .zDepth = z
     };
 }
 
@@ -42,7 +56,8 @@ Point project_vertex(Cam c, Vec3 v) {
     return viewport_to_canvas(
         c, 
         v.x * c.view.d / v.z,
-        v.y * c.view.d / v.z
+        v.y * c.view.d / v.z,
+        v.z
     );
 }
 
@@ -110,6 +125,10 @@ Cam init_camera(int w, int h, Vec3 position, Vec3 rotation) {
         .forwardDirection = (Vec3) { .x = 0.0f, .y = 0.0f, .z = 1.0f},
         .frustum = {near, far, left, right, top, bottom}
     };
+
+    for (size_t i = 0; i < (size_t)(w * h); i++){
+        camera.depthBuffer[i] = 0;
+    }
     
     camera.matrixTransform = init_matrix();
     update_camera_transforms(&camera);

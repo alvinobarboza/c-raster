@@ -16,7 +16,7 @@ https://gabrielgambetta.com/computer-graphics-from-scratch/
     -   Automatically calculate frustum on screen resize.
     -   Dynamic mesh generation on clipping plane.
 -   [x] Back face culling
--   [ ] Depth buffer
+-   [x] Depth buffer
 -   [ ] Shading
 -   [ ] Texture
 -   [ ] More...

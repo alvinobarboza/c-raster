@@ -19,7 +19,7 @@ float * interpolate(int i0, float d0, int i1, float d1) {
     float dd = d1 - d0;
 
     // Last value included
-    values = malloc(sizeof(float) * (abs(di) + 1));
+    values = malloc(sizeof(float) * (abs(di) + 2));
 
     float a = dd / (float)(di);
     float d = d0;
@@ -42,12 +42,14 @@ void draw_line(Cam c, Point pos0, Point pos1 , Color color){
         }
 
         float *ys = interpolate(pos0.x, pos0.y, pos1.x, pos1.y);
+        float *zs = interpolate(pos0.x, pos0.zDepth, pos1.x, pos1.zDepth);
 
         for(int x = pos0.x; x <= pos1.x; x++) {
-            put_pixel(c, color, x, ys[x - pos0.x]);
+            put_pixel(c, color, x, ys[x - pos0.x], 1, zs[x - pos0.x]);
         }
 
         free(ys);
+        free(zs);
         return;
     }
 
@@ -56,12 +58,14 @@ void draw_line(Cam c, Point pos0, Point pos1 , Color color){
     }
 
     float *xs = interpolate(pos0.y, pos0.x, pos1.y, pos1.x);
+    float *zs = interpolate(pos0.y, pos0.zDepth, pos1.y, pos1.zDepth);
 
     for(int y = pos0.y; y <= pos1.y; y++) {
-        put_pixel(c, color, xs[y - pos0.y], y);
+        put_pixel(c, color, xs[y - pos0.y], y, 1, zs[y - pos0.y]);
     }
 
     free(xs);
+    free(zs);
 }
 
 void draw_wireframe_triangle(Cam c, Point p0, Point p1, Point p2, Color color) {
@@ -79,12 +83,15 @@ void draw_filled_triangle(Cam c, Point p0, Point p1, Point p2, Color color) {
     // Compute the x coordinates and h values of the triangle edges
     float *x01 = interpolate(p0.y, p0.x, p1.y, p1.x); // values from p0.x to p1.x included
     float *h01 = interpolate(p0.y, p0.brightness, p1.y, p1.brightness); // values from p0.brightness to p1.brightness included
+    float *z01 = interpolate(p0.y, p0.zDepth, p1.y, p1.zDepth); // values from p0.zDepth to p1.zDepth included
     
     float *x12 = interpolate(p1.y, p1.x, p2.y, p2.x); // values from p1.x to p2.x included 
     float *h12 = interpolate(p1.y, p1.brightness, p2.y, p2.brightness); // values from p1.brightness to p2.brightness included
+    float *z12 = interpolate(p1.y, p1.zDepth, p2.y, p2.zDepth); // values from p1.zDepth to p2.zDepth included
     
     float *x02 = interpolate(p0.y, p0.x, p2.y, p2.x); // values from p0.x to p2.x included
     float *h02 = interpolate(p0.y, p0.brightness, p2.y, p2.brightness); // values from p0.brightness to p2.brightness included
+    float *z02 = interpolate(p0.y, p0.zDepth, p2.y, p2.zDepth); // values from p0.zDepth to p2.zDepth included
 
     // => Concatenate the short sides
     // remove_last(x01) -> length trick below
@@ -103,26 +110,37 @@ void draw_filled_triangle(Cam c, Point p0, Point p1, Point p2, Color color) {
     memcpy(h012, h01, sizeof(float) * len_x01);
     memcpy(h012+len_x01, h12, sizeof(float) * len_x12);
 
+    // z012 = z01 + z12
+    float *z012 = malloc(sizeof(float) * len_x012);
+    memcpy(z012, z01, sizeof(float) * len_x01);
+    memcpy(z012+len_x01, z12, sizeof(float) * len_x12);
+
     float *x_left = NULL;
     float *h_left = NULL;
+    float *z_left = NULL;
     
     float *x_right = NULL;
     float *h_right = NULL;
+    float *z_right = NULL;
 
     // => Determine which is left and which is right
     size_t m = len_x012 / 2;
     if (x02[m] < x012[m]) {
         x_left = x02;
         h_left = h02;
+        z_left = z02;
 
         x_right = x012;
         h_right = h012;
+        z_right = z012;
     } else {
         x_left = x012;
         h_left = h012;
+        z_left = z012;
         
         x_right = x02;
         h_right = h02;
+        z_right = z02;
     }
 
     for (int y = p0.y; y <= p2.y; y++){
@@ -130,20 +148,16 @@ void draw_filled_triangle(Cam c, Point p0, Point p1, Point p2, Color color) {
         float x_r = x_right[y-p0.y];
 
         float *h_segment = interpolate(x_l, h_left[y-p0.y], x_r, h_right[y - p0.y]);
-
+        float *z_segment = interpolate(x_l, z_left[y-p0.y], x_r, z_right[y - p0.y]);
         for(int x = x_l; x <= x_r; x++){
             size_t index = x - x_l;
             float h = h_segment[index];
-
-            Color shaded = {0};
-            shaded.r = color.r * h;
-            shaded.g = color.g * h;
-            shaded.b = color.b * h;
-            shaded.a = OPAQUE;
-            put_pixel(c, shaded, x, y);
+            float depth = z_segment[index];
+            put_pixel(c, color, x, y, h, depth);
         }
 
         free(h_segment);
+        free(z_segment);
     }
 
     free(x01);
@@ -152,8 +166,12 @@ void draw_filled_triangle(Cam c, Point p0, Point p1, Point p2, Color color) {
     free(h01);
     free(h12);
     free(h02);
+    free(z01);
+    free(z12);
+    free(z02);
     free(x012);
     free(h012);
+    free(z012);
 }
 
 void render_triangle(Cam c, FullTriangle tri) {
@@ -161,12 +179,19 @@ void render_triangle(Cam c, FullTriangle tri) {
     Point pointB = project_vertex(c, tri.vertex[VERTEX_B]);
     Point pointC = project_vertex(c, tri.vertex[VERTEX_C]);
 
-    draw_wireframe_triangle(
+    draw_filled_triangle(
         c, 
         pointA,
         pointB,
         pointC, 
         tri.color);
+    
+    draw_wireframe_triangle(
+        c, 
+        pointA,
+        pointB,
+        pointC, 
+        BLACK);
 }
 
 bool back_face_culling(FullTriangle tri) {

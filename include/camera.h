@@ -9,7 +9,7 @@
 #define VIEW_PLANE_DISTANCE 1.0f
 #define FRUSTUM_PLANES 6
 #define NEAR_PLANE_DISTANCE .8f
-#define FAR_PLANE_DISTANCE 20.f
+#define FAR_PLANE_DISTANCE 40.f
 
 // To be honest, this is actually aspect ratio related
 typedef struct Viewport {
@@ -41,14 +41,14 @@ typedef struct Cam {
 // Point in the screen(screen coord), whole number (int)
 typedef struct Point {
     int x, y;
-    float brightness;
+    float brightness, zDepth;
 } Point;
 
 void swap_point_values(Point *p1, Point *p2);
-void put_pixel(Cam c, Color color, int x, int y);
+void put_pixel(Cam c, Color color, int x, int y, float h, float depth);
 void clear_canvas(Cam c);
 
-Point viewport_to_canvas(Cam c, float x, float y);
+Point viewport_to_canvas(Cam c, float x, float y, float z);
 Point project_vertex(Cam c, Vec3 v);
 
 Cam init_camera(int w, int h, Vec3 position, Vec3 rotation);
