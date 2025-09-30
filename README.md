@@ -23,6 +23,10 @@ https://gabrielgambetta.com/computer-graphics-from-scratch/
 
 # Showcase
 
+## Back face culling and depth pass
+
+![Back face culling and depth buffer](./depth_pass_and_back_face_culling.png)
+
 ## Frustum culling and clipping planes
 
 ![Bottom and far plane clipping on view](./frustum_culling.png)
