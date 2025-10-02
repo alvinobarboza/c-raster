@@ -7,6 +7,10 @@
 #define T_DEG2RAD (T_PI/180.0f)
 #define T_RAD2DEG (180.0f/T_PI)
 
+typedef struct Vec2 {
+    float x, y;
+} Vec2;
+
 typedef struct Vec3 {
     float x, y, z;
 } Vec3;
