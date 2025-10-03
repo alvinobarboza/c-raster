@@ -60,6 +60,8 @@ int main(void)
     );
 
     // TODO: proper model loading
+    ModelData ammoBox = load_model_from_path("./assets/ammo_box_1_1.obj", "./assets/ammo_mp_1.png");
+
     ModelData cube = cube_shape();
     ModelData icosahedron = icosahedron_shape();
     ModelData torus = torus_shape();

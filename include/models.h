@@ -53,6 +53,8 @@ typedef struct Instance {
     size_t trisClippedCount;
 } Instance;
 
+// Not full OBJ parser, just v, vn, vt and f data - 
+// That's not the point of this project
 ModelData load_model_from_path(const char *pathModel, const char *pathTexture);
 
 ModelData init_model(Vec3 *verts, size_t vertsCount, Triangle *tris, size_t trisCount);

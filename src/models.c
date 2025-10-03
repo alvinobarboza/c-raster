@@ -1,8 +1,56 @@
 #include <math.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "models.h"
 #include "transforms.h"
+#include "shapes.h"
+
+ModelData load_model_from_path(const char *pathModel, const char *pathTexture) {
+    ModelData model = {0};
+
+    FILE *fp = fopen(pathModel, "r");
+    if (fp == NULL){
+        return cube_shape();
+    }
+
+    char buffer[1024];
+    size_t trisCount = 0;
+    size_t vertsCount = 0;
+
+    while(fgets(buffer, 1024, fp) != NULL) {
+        if (buffer[0] == 'v' && buffer[1] == ' ') {
+            vertsCount++;
+        }
+        if (buffer[0] == 'f' && buffer[1] == ' ') {
+            trisCount++;
+
+            int triCheck = 0;
+            for (int i = 2; i < 1024; i++) {
+                if ( buffer[i] == '\0' || buffer[i] == '\n') break;
+
+                if ( buffer[i] == ' ' ) triCheck++;
+
+                if ( triCheck > 2 && buffer[i] == ' ' ) trisCount++;
+            }
+            printf("->%ld\n", trisCount);
+        }
+    }
+
+    printf("tris: %ld verts: %ld\n", trisCount, vertsCount);
+
+    rewind(fp);
+
+    while(fgets(buffer, 1024, fp) != NULL) {
+        if (buffer[0] == 'f' && buffer[1] == ' ') {
+            // printf(buffer);
+        }
+    }
+
+    fclose(fp);
+
+    return model;
+}
 
 ModelData init_model(Vec3 *vert, size_t vertsCount, Triangle *tri, size_t trisCount) {
     ModelData model;
