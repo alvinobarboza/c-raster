@@ -17,6 +17,7 @@ https://gabrielgambetta.com/computer-graphics-from-scratch/
     -   Dynamic mesh generation on clipping plane.
 -   [x] Back face culling
 -   [x] Depth buffer
+-   [ ] Simple OBJ parser
 -   [ ] Shading
 -   [ ] Texture
 -   [ ] More...
