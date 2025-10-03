@@ -9,6 +9,7 @@
 #define VERTEX_A 0
 #define VERTEX_B 1
 #define VERTEX_C 2
+#define BUFFER_SIZE 1024
 
 typedef struct Triangle {
     size_t v1, v2, v3;
@@ -55,7 +56,7 @@ typedef struct Instance {
 
 // Not full OBJ parser, just v, vn, vt and f data - 
 // That's not the point of this project
-ModelData load_model_from_path(const char *pathModel, const char *pathTexture);
+ModelData load_model_from_path(const char *pathModel, const char *pathTexture, bool reorder);
 
 ModelData init_model(Vec3 *verts, size_t vertsCount, Triangle *tris, size_t trisCount);
 void free_model(ModelData *model);

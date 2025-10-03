@@ -60,7 +60,7 @@ int main(void)
     );
 
     // TODO: proper model loading
-    ModelData ammoBox = load_model_from_path("./assets/ammo_box_1_1.obj", "./assets/ammo_mp_1.png");
+    ModelData ammoBox = load_model_from_path("./assets/ammo_box_1_1.obj", "./assets/ammo_mp_1.png", true);
 
     ModelData cube = cube_shape();
     ModelData icosahedron = icosahedron_shape();
@@ -81,10 +81,10 @@ int main(void)
             .rotation = (Vec3){.x = -90.0f, .y = 0.0f, .z = 0.0f},
             .scale = (Vec3){.x = 2.0f, .y = 2.0f, .z = 2.0f}
         }),
-        init_instance(&cube, (Transforms) {
-            .position = (Vec3){.x = -2.5, .y = 0.0f, .z = 10.0f},
-            .rotation = (Vec3){.x = 0.0f, .y = 0.0f, .z = 0.0f},
-            .scale = (Vec3){.x = .3f, .y = .3f, .z = .3f},
+        init_instance(&ammoBox, (Transforms) {
+            .position = (Vec3){.x = -2.5, .y = 0.0f, .z = 5.0f},
+            .rotation = (Vec3){.x = 0.0f, .y = -45.0f, .z = 0.0f},
+            .scale = (Vec3){.x = 20.0f, .y = 20.0f, .z = 20.0f},
         }),
         init_instance(&cube, (Transforms) {
             .position = (Vec3){.x = 2.25, .y = 2.5f, .z = 9.5f},

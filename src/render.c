@@ -315,9 +315,9 @@ void render_scene(Cam c, Scene scene) {
     float m_transform[M4X4];
 
     for(size_t i = 0; i < scene.objectCount; i++){
-        // if ( i != 0) {
-        //     continue;
-        // }
+        if ( i != 2) {
+            continue;
+        }
         Instance *clipped = &scene.instances[i];
 
         matrix_multiplication(c.matrixTransform, clipped->transforms.matrixTransform, m_transform);

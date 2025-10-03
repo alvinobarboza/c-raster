@@ -6,7 +6,47 @@
 #include "transforms.h"
 #include "shapes.h"
 
-ModelData load_model_from_path(const char *pathModel, const char *pathTexture) {
+Vec3 load_verts(const char *buffer) {
+
+    Vec3 tempVert = {0};
+    char floatBuf[BUFFER_SIZE - 1];
+    unsigned char floatLength = 0;
+    unsigned char vertexPos = 0;
+
+    for(int i = 2; i < BUFFER_SIZE; i++) {
+        if (buffer[i] == ' ') {
+
+            floatBuf[floatLength] = '\0';
+
+            float temp = strtof(floatBuf, NULL);
+            if (vertexPos == 0) {
+                tempVert.x = temp;
+            } else {
+                tempVert.y = temp;
+            }
+            vertexPos++;
+            floatLength = 0;
+
+            continue;
+        }
+        if ( buffer[i] == '\0') {
+            floatBuf[floatLength+1] = '\0';
+
+            float temp = strtof(floatBuf, NULL);
+            tempVert.z = temp;
+            floatLength = 0;
+            break;
+        }
+        floatBuf[floatLength] = buffer[i];
+        floatLength++;
+    }
+
+    return tempVert;
+}
+
+ModelData load_model_from_path(const char *pathModel, const char *pathTexture, bool reorder) {
+    printf("Loading %s\n", pathModel);
+
     ModelData model = {0};
 
     FILE *fp = fopen(pathModel, "r");
@@ -14,40 +54,141 @@ ModelData load_model_from_path(const char *pathModel, const char *pathTexture) {
         return cube_shape();
     }
 
-    char buffer[1024];
+    char buffer[BUFFER_SIZE];
     size_t trisCount = 0;
     size_t vertsCount = 0;
+    size_t normalCount = 0;
 
-    while(fgets(buffer, 1024, fp) != NULL) {
+    while(fgets(buffer, BUFFER_SIZE, fp) != NULL) {
         if (buffer[0] == 'v' && buffer[1] == ' ') {
             vertsCount++;
         }
+
+        if (buffer[0] == 'v' && buffer[1] == 'n' && buffer[2] == ' ') {
+            normalCount++;
+        }
+
         if (buffer[0] == 'f' && buffer[1] == ' ') {
             trisCount++;
 
             int triCheck = 0;
-            for (int i = 2; i < 1024; i++) {
+            for (int i = 2; i < BUFFER_SIZE; i++) {
                 if ( buffer[i] == '\0' || buffer[i] == '\n') break;
 
                 if ( buffer[i] == ' ' ) triCheck++;
 
                 if ( triCheck > 2 && buffer[i] == ' ' ) trisCount++;
             }
-            printf("->%ld\n", trisCount);
         }
     }
 
-    printf("tris: %ld verts: %ld\n", trisCount, vertsCount);
+    printf("tris: %ld verts: %ld normals: %ld\n", trisCount, vertsCount, normalCount);
+
+    Triangle *tris = malloc(sizeof(Triangle) * trisCount);
+    Vec3 *verts = malloc(sizeof(Vec3) * vertsCount);
+    float *normals = malloc(sizeof(float) * normalCount);
 
     rewind(fp);
 
-    while(fgets(buffer, 1024, fp) != NULL) {
+    size_t vertsIndex = 0;
+
+    Triangle tempTri = {0};
+    tempTri.color = GRAY;
+    size_t trisIndex = 0;
+
+    char indexBuf[BUFFER_SIZE - 1];
+    unsigned char indexLength = 0;
+
+    char normalBuf[BUFFER_SIZE - 1];
+    unsigned char normalLength = 0;
+
+    while( fgets(buffer, BUFFER_SIZE, fp) != NULL ) {
+        if (buffer[0] == 'v' && buffer[1] == ' ') {
+            if (vertsIndex < vertsCount) {
+                verts[vertsIndex] = load_verts(buffer);
+                vertsIndex++;
+            }
+        }
+
         if (buffer[0] == 'f' && buffer[1] == ' ') {
-            // printf(buffer);
+            bool isVertexI = true;
+            unsigned char indexPos = 0;
+            for(int i = 2; i < BUFFER_SIZE; i++) {
+                if (buffer[i] == ' ') {
+                    isVertexI = true;
+                    continue;
+                }
+
+                if ( buffer[i] == '\0') {
+                    break;
+                }
+
+                if ( isVertexI && buffer[i] == '/' ) {
+                    normalLength = 0;
+
+                    isVertexI = false;
+                    indexBuf[indexLength] = '\0';
+                    
+                    switch(indexPos) {
+                    case 0:
+                        tempTri.v1 = atol(indexBuf);
+                        tempTri.v1 += -1;
+                        break;
+                    case 1:
+                        tempTri.v2 = atol(indexBuf);
+                        tempTri.v2 += -1;
+                        break;
+                    case 2:
+                        tempTri.v3 = atol(indexBuf);
+                        tempTri.v3 += -1;
+                        if (trisIndex < trisCount) {
+                            tris[trisIndex] = tempTri;
+                            trisIndex++;
+                        }
+                        break;
+                    }
+
+                    if ( indexPos > 2 ){
+                        tempTri.v2 = tempTri.v3;
+                        tempTri.v3 = atol(indexBuf);
+                        tempTri.v3 += -1;
+                        if (trisIndex < trisCount) {
+                            tris[trisIndex] = tempTri;
+                            trisIndex++;
+                        }
+                    }
+
+                    indexPos++;
+                    indexLength = 0;
+                }
+
+                if (isVertexI) {
+                    indexBuf[indexLength] = buffer[i];
+                    indexLength++;                    
+                }
+
+                normalBuf[normalLength] = buffer[i];
+                normalLength++;
+            }
+
+            printf("%s", &buffer[0]);
         }
     }
 
+    if (reorder) {
+        for(size_t i = 0; i < trisCount; i++) {
+            size_t temp = tris[i].v1;
+            tris[i].v1 = tris[i].v3;
+            tris[i].v3 = temp;
+        }
+    }
+
+    model = init_model(verts, vertsCount, tris, trisCount);
+
     fclose(fp);
+    free(tris);
+    free(verts);
+    free(normals);
 
     return model;
 }
