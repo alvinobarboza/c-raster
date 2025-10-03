@@ -6,14 +6,14 @@
 #include "transforms.h"
 #include "shapes.h"
 
-Vec3 load_verts(const char *buffer) {
+Vec3 load_vec3(const char *buffer, const int index) {
 
     Vec3 tempVert = {0};
     char floatBuf[BUFFER_SIZE - 1];
     unsigned char floatLength = 0;
     unsigned char vertexPos = 0;
 
-    for(int i = 2; i < BUFFER_SIZE; i++) {
+    for(int i = index; i < BUFFER_SIZE; i++) {
         if (buffer[i] == ' ') {
 
             floatBuf[floatLength] = '\0';
@@ -86,11 +86,12 @@ ModelData load_model_from_path(const char *pathModel, const char *pathTexture, b
 
     Triangle *tris = malloc(sizeof(Triangle) * trisCount);
     Vec3 *verts = malloc(sizeof(Vec3) * vertsCount);
-    float *normals = malloc(sizeof(float) * normalCount);
+    Vec3 *normals = malloc(sizeof(Vec3) * normalCount);
 
     rewind(fp);
 
     size_t vertsIndex = 0;
+    size_t normalIndex = 0;
 
     Triangle tempTri = {0};
     tempTri.color = GRAY;
@@ -99,14 +100,18 @@ ModelData load_model_from_path(const char *pathModel, const char *pathTexture, b
     char indexBuf[BUFFER_SIZE - 1];
     unsigned char indexLength = 0;
 
-    char normalBuf[BUFFER_SIZE - 1];
-    unsigned char normalLength = 0;
-
     while( fgets(buffer, BUFFER_SIZE, fp) != NULL ) {
         if (buffer[0] == 'v' && buffer[1] == ' ') {
             if (vertsIndex < vertsCount) {
-                verts[vertsIndex] = load_verts(buffer);
+                verts[vertsIndex] = load_vec3(buffer, 2);
                 vertsIndex++;
+            }
+        }
+
+        if (buffer[0] == 'v' && buffer[1] == 'n' && buffer[2] == ' ') {
+            if (normalIndex < normalCount) {
+                normals[normalIndex] = load_vec3(buffer, 3);
+                normalIndex++;
             }
         }
 
@@ -124,8 +129,6 @@ ModelData load_model_from_path(const char *pathModel, const char *pathTexture, b
                 }
 
                 if ( isVertexI && buffer[i] == '/' ) {
-                    normalLength = 0;
-
                     isVertexI = false;
                     indexBuf[indexLength] = '\0';
                     
@@ -166,9 +169,6 @@ ModelData load_model_from_path(const char *pathModel, const char *pathTexture, b
                     indexBuf[indexLength] = buffer[i];
                     indexLength++;                    
                 }
-
-                normalBuf[normalLength] = buffer[i];
-                normalLength++;
             }
 
             printf("%s", &buffer[0]);
