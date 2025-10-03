@@ -1,5 +1,6 @@
 CC = gcc
 SRC = ./src
+TEST = ./test
 INCLUDE = ./include
 BIN = ./bin
 CFLAGS = -std=c99 -Wall -Wextra
@@ -28,7 +29,15 @@ dependencies_win += -lopengl32
 bin_linux = $(BIN)/c_raster
 bin_win = $(BIN)/c_raster.exe
 
+bin_linux_test = $(BIN)/c_raster_test
+bin_win_test = $(BIN)/c_raster_test.exe
+
 source_files = $(SRC)/*.c
+
+src_test_files = $(TEST)/*.c
+src_test_files += $(SRC)/models.c
+src_test_files += $(SRC)/transforms.c
+src_test_files += $(SRC)/shapes.c
 
 # Target for building the project
 .PHONY: build
@@ -57,7 +66,21 @@ endif
 .PHONY: clean
 clean:
 ifeq ($(OS),Windows_NT)
-	rm $(bin_win)
+	rm $(bin_win) $(bin_win_test)
 else
-	rm $(bin_linux)
+	rm $(bin_linux) $(bin_linux_test)
 endif
+
+# Simple tests
+.PHONY: tbuild
+tbuild: 
+ifeq ($(OS),Windows_NT)
+	$(CC) $(src_test_files) $(CFLAGS) $(include_paths) $(lib_paths_win) $(dependencies_win) -o $(bin_win_test) 
+else
+	$(CC) $(DEBUG) $(src_test_files) $(CFLAGS) $(include_paths) $(lib_paths_linux) $(dependencies_linux) -o $(bin_linux_test) 
+endif
+
+# Run tests
+.PHONY: test
+test: tbuild
+	$(bin_linux_test)
