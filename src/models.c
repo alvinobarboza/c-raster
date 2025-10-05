@@ -149,9 +149,7 @@ ModelData load_model_from_path(const char *pathModel, const char *pathTexture, b
                             trisIndex++;
                         }
                         break;
-                    }
-
-                    if ( indexPos > 2 ){
+                    default:
                         tempTri.v2 = tempTri.v3;
                         tempTri.v3 = atol(indexBuf);
                         tempTri.v3 += -1;
@@ -159,6 +157,7 @@ ModelData load_model_from_path(const char *pathModel, const char *pathTexture, b
                             tris[trisIndex] = tempTri;
                             trisIndex++;
                         }
+                        break;
                     }
 
                     indexPos++;
