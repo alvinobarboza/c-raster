@@ -62,8 +62,8 @@ int main(void)
     ModelData teapot = load_model_from_path("./assets/newell_teaset/teapot.obj", NULL, true);
     ModelData teacup = load_model_from_path("./assets/newell_teaset/teacup.obj", NULL, true);
     ModelData spoon = load_model_from_path("./assets/newell_teaset/spoon.obj", NULL, true);
+    ModelData cube = load_model_from_path("./assets/newell_teaset/cube.obj", NULL, false);;
 
-    ModelData cube = cube_shape();
     ModelData icosahedron = icosahedron_shape();
     ModelData torus = torus_shape();
     ModelData uvSphere = uv_sphere_shape();
