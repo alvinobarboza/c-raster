@@ -53,16 +53,16 @@ int main(void)
 
     Cam camera = init_camera(
         WIDTH, HEIGHT, 
-        // (Vec3) {.x = 0.0f, .y = 0.0f, .z = 0.0f},
-        // (Vec3) {.x = 0.0f, .y = 0.0f, .z = 0.0f}
-        (Vec3) {.x = 4.93f, .y = 3.09f, .z = 2.35f},
-        (Vec3) {.x = -15.87, .y = 72.68, .z = 0}
+        (Vec3) {.x = 0.0f, .y = 0.0f, .z = 0.0f},
+        (Vec3) {.x = 0.0f, .y = 0.0f, .z = 0.0f}
+        // (Vec3) {.x = 4.93f, .y = 3.09f, .z = 2.35f},
+        // (Vec3) {.x = -15.87, .y = 72.68, .z = 0}
     );
 
-    ModelData teapot = load_model_from_path("./assets/newell_teaset/teapot.obj", NULL, true);
-    ModelData teacup = load_model_from_path("./assets/newell_teaset/teacup.obj", NULL, true);
-    ModelData spoon = load_model_from_path("./assets/newell_teaset/spoon.obj", NULL, true);
-    ModelData cube = load_model_from_path("./assets/newell_teaset/cube.obj", NULL, false);;
+    ModelData teapot = load_model_from_path("./assets/newell_teaset/teapot.obj", NULL, false, true);
+    ModelData teacup = load_model_from_path("./assets/newell_teaset/teacup.obj", NULL, false, true);
+    ModelData spoon = load_model_from_path("./assets/newell_teaset/spoon.obj", NULL, false, true);
+    ModelData cube = load_model_from_path("./assets/cube.obj", NULL, false, true);
 
     ModelData icosahedron = icosahedron_shape();
     ModelData torus = torus_shape();
@@ -86,9 +86,9 @@ int main(void)
             .scale = (Vec3){.x = 1.0f, .y = 1.0f, .z = 1.0f},
         }),
         init_instance(&cube, (Transforms) {
-            .position = (Vec3){.x = 2.25, .y = 2.5f, .z = 9.5f},
-            .rotation = (Vec3){.x = 0.0f, .y = 195.0f, .z = 0.0f},
-            .scale = (Vec3){.x = 2.0f, .y = 2.0f, .z = 2.0f},
+            .position = (Vec3){.x = 0.0f, .y = 0.0f, .z = 4.5f},
+            .rotation = (Vec3){.x = 0.0f, .y = 0.0f, .z = 0.0f},
+            .scale = (Vec3){.x = 1.0f, .y = 1.0f, .z = 1.0f},
         }),
         init_instance(&icosahedron, (Transforms) {
             .position = (Vec3){.x = 0.25, .y = 1.5f, .z = 20.0f},
@@ -110,7 +110,7 @@ int main(void)
     // TODO: Proper scene builder
     Scene scene = (Scene) {
         .instances = instances,
-        .objectCount = 7
+        .objectCount = sizeof(instances) / sizeof(instances[0])
     };
     
     SetConfigFlags(FLAG_WINDOW_RESIZABLE | FLAG_WINDOW_ALWAYS_RUN | FLAG_MSAA_4X_HINT);

@@ -35,7 +35,7 @@ typedef struct ModelData {
 typedef struct FullTriangle {
     Vec3 vertex[3];
     Vec3 normal[3];
-    Vec2 uv[2];
+    Vec2 uv[3];
     Color color;
 } FullTriangle;
 
@@ -52,11 +52,12 @@ typedef struct Instance {
     FullTriangle *trisWorld;
     FullTriangle *trisClipped;
     size_t trisClippedCount;
+    bool fromObj;
 } Instance;
 
 // Not full OBJ parser, just v, vn, vt and f data - 
 // That's not the point of this project
-ModelData load_model_from_path(const char *pathModel, const char *pathTexture, bool reorder);
+ModelData load_model_from_path(const char *pathModel, const char *pathTexture, bool reorder, bool flipNormals);
 
 ModelData init_model(
     Vec3 *verts, size_t vertsCount, Triangle *tris, size_t trisCount, Vec3 *normals, size_t normalsCount);

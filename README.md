@@ -20,6 +20,7 @@ https://gabrielgambetta.com/computer-graphics-from-scratch/
 -   [x] Simple OBJ parser
     -   [x] Vertex data
     -   [x] Normal data
+        -   [x] Render using normal data
     -   [ ] UV data
 -   [ ] Shading
 -   [ ] Texture

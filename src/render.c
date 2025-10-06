@@ -195,15 +195,10 @@ void render_triangle(Cam c, FullTriangle tri) {
 }
 
 bool back_face_culling(FullTriangle tri) {
-    Vec3 v1 = vec3_sub(tri.vertex[VERTEX_B], tri.vertex[VERTEX_A]);
-    Vec3 v2 = vec3_sub(tri.vertex[VERTEX_C], tri.vertex[VERTEX_A]);
-    Vec3 n1 = vec3_cross(v1, v2);
-    
-    float angleA = vec3_by_vec3_multiply(n1, tri.vertex[VERTEX_A]);
-    float angleB = vec3_by_vec3_multiply(n1, tri.vertex[VERTEX_B]);
-    float angleC = vec3_by_vec3_multiply(n1, tri.vertex[VERTEX_C]);
-
-    return angleA > 0 || angleB > 0 || angleC > 0;
+    float angleA = vec3_by_vec3_multiply(tri.normal[VERTEX_A],  tri.vertex[VERTEX_A]);
+    float angleB = vec3_by_vec3_multiply(tri.normal[VERTEX_B],  tri.vertex[VERTEX_B]);
+    float angleC = vec3_by_vec3_multiply(tri.normal[VERTEX_C],  tri.vertex[VERTEX_C]);
+    return angleA >= 0 || angleB >= 0 || angleC >= 0;
 }
 
 // TODO: Get projected point brightness from triangle
@@ -313,11 +308,16 @@ void two_vertices_in_front(
 
 void render_scene(Cam c, Scene scene) {
     float m_transform[M4X4];
+    float normalRotation[M4X4];
+    float normalRotationTransposed[M4X4];
+
+    make_rotation_matrix(normalRotation, c.rotation);
+    matrix_transpose(normalRotation, normalRotationTransposed);
 
     for(size_t i = 0; i < scene.objectCount; i++){
-        if ( i > 2) {
-            continue;
-        }
+        // if ( i != 3) {
+        //     continue;
+        // }
         Instance *clipped = &scene.instances[i];
 
         matrix_multiplication(c.matrixTransform, clipped->transforms.matrixTransform, m_transform);
@@ -334,6 +334,21 @@ void render_scene(Cam c, Scene scene) {
             clipped->trisWorld[n].vertex[VERTEX_A] = mult_matrix_by_vec3(m_transform, clipped->model->verts[tp.v1]);
             clipped->trisWorld[n].vertex[VERTEX_B] = mult_matrix_by_vec3(m_transform, clipped->model->verts[tp.v2]);
             clipped->trisWorld[n].vertex[VERTEX_C] = mult_matrix_by_vec3(m_transform, clipped->model->verts[tp.v3]);
+
+            if (clipped->fromObj) {
+                clipped->trisWorld[n].normal[VERTEX_A] = mult_matrix_by_vec3(normalRotationTransposed, clipped->model->normals[tp.n1]);
+                clipped->trisWorld[n].normal[VERTEX_B] = mult_matrix_by_vec3(normalRotationTransposed, clipped->model->normals[tp.n2]);
+                clipped->trisWorld[n].normal[VERTEX_C] = mult_matrix_by_vec3(normalRotationTransposed, clipped->model->normals[tp.n3]);
+                continue;
+            } 
+
+            Vec3 v1 = vec3_sub(clipped->trisWorld[n].vertex[VERTEX_B], clipped->trisWorld[n].vertex[VERTEX_A]);
+            Vec3 v2 = vec3_sub(clipped->trisWorld[n].vertex[VERTEX_C], clipped->trisWorld[n].vertex[VERTEX_A]);
+            Vec3 n1 = vec3_cross(v1, v2);
+
+            clipped->trisWorld[n].normal[VERTEX_A] = n1;
+            clipped->trisWorld[n].normal[VERTEX_B] = n1;
+            clipped->trisWorld[n].normal[VERTEX_C] = n1;            
         }
 
         clipped->trisClippedCount = 0;

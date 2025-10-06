@@ -51,7 +51,7 @@ Vec3 load_vec3(const char *buffer, const int index) {
     return tempVert;
 }
 
-ModelData load_model_from_path(const char *pathModel, const char *pathTexture, bool reorder) {
+ModelData load_model_from_path(const char *pathModel, const char *pathTexture, bool reorder, bool flipNormals) {
     if (pathModel == NULL) {
         return cube_shape();
     }
@@ -127,6 +127,7 @@ ModelData load_model_from_path(const char *pathModel, const char *pathTexture, b
         if (buffer[0] == 'v' && buffer[1] == 'n' && buffer[2] == ' ') {
             if (normalIndex < normalCount) {
                 normals[normalIndex] = load_vec3(buffer, 3);
+                if (flipNormals) normals[normalIndex] = vec3_multiply(normals[normalIndex], -1);
                 normalIndex++;
             }
         }
@@ -293,6 +294,7 @@ Instance init_instance(ModelData *model, Transforms transform){
         .trisWorld = malloc(sizeof(FullTriangle) * model->trisCount),
         .trisClipped = malloc(sizeof(FullTriangle) * model->trisCount * 20),
         .trisClippedCount = 0,
+        .fromObj = model->normals != NULL
     };
 
     update_instance_transforms(&i);
