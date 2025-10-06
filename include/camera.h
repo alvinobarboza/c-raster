@@ -8,7 +8,7 @@
 #define DEFAULT_FOV 52.9 // TODO: make change here reflect View D or render FOV
 #define VIEW_PLANE_DISTANCE 1.0f
 #define FRUSTUM_PLANES 6
-#define NEAR_PLANE_DISTANCE .8f
+#define NEAR_PLANE_DISTANCE .2f
 #define FAR_PLANE_DISTANCE 40.f
 
 // To be honest, this is actually aspect ratio related
