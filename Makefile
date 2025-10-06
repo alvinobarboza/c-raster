@@ -5,6 +5,16 @@ INCLUDE = ./include
 BIN = ./bin
 CFLAGS = -std=c99 -Wall -Wextra
 DEBUG = -fsanitize=address -g3
+DEBUG += -fsanitize=undefined
+DEBUG += -fsanitize=bounds
+DEBUG += -fsanitize=vptr
+DEBUG += -fsanitize=enum
+DEBUG += -fsanitize=signed-integer-overflow
+DEBUG += -fsanitize=null
+DEBUG += -fsanitize=return
+DEBUG += -fsanitize=integer-divide-by-zero
+DEBUG += -fsanitize=unreachable
+DEBUG += -fsanitize=alignment
 CFLAGS_O = $(CFLAGS) -O2
 
 include_paths = -I./external/raylib/include/
