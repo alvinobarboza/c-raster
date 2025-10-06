@@ -193,7 +193,6 @@ ModelData load_model_from_path(const char *pathModel, const char *pathTexture, b
                         buffer[i+1] == '\0' || 
                         buffer[i] == '\n' || 
                         buffer[i] == '\0') {
-                        puts(" ");
                         break;
                     }
 
