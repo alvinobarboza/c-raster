@@ -14,29 +14,36 @@ Vec3 load_vec3(const char *buffer, const int index) {
     unsigned char vertexPos = 0;
 
     for(int i = index; i < BUFFER_SIZE; i++) {
-        if (buffer[i] == ' ') {
+        if (buffer[i] == ' ' || buffer[i] == '\n' || buffer[i] == '\0') {
 
             floatBuf[floatLength] = '\0';
 
             float temp = strtof(floatBuf, NULL);
-            if (vertexPos == 0) {
+            switch(vertexPos){
+            case 0:
                 tempVert.x = temp;
-            } else {
+                break;
+            case 1:
                 tempVert.y = temp;
+                break;
+            case 2:
+                tempVert.z = temp;
+                break;
             }
+
+            if (buffer[i+1] == '\r' || 
+                buffer[i+1] == '\n' || 
+                buffer[i+1] == '\0' || 
+                buffer[i] == '\n' || 
+                buffer[i] == '\0') {
+                break;
+            }
+
             vertexPos++;
             floatLength = 0;
-
             continue;
         }
-        if ( buffer[i] == '\0') {
-            floatBuf[floatLength+1] = '\0';
 
-            float temp = strtof(floatBuf, NULL);
-            tempVert.z = temp;
-            floatLength = 0;
-            break;
-        }
         floatBuf[floatLength] = buffer[i];
         floatLength++;
     }
