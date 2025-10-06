@@ -12,9 +12,9 @@ https://gabrielgambetta.com/computer-graphics-from-scratch/
 -   [x] Perspective Projection
 -   [x] Describing and rendering a scene (With camera controls)
 -   [x] Clipping
-    -   Full frustum culling - Near, far, left, right, top and bottom planes.
-    -   Automatically calculate frustum on screen resize.
-    -   Dynamic mesh generation on clipping plane.
+    -   [x] Full frustum culling - Near, far, left, right, top and bottom planes.
+    -   [x] Automatically calculate frustum on screen resize.
+    -   [x] Dynamic mesh generation on clipping plane.
 -   [x] Back face culling
 -   [x] Depth buffer
 -   [x] Simple OBJ parser
