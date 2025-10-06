@@ -84,7 +84,13 @@ ModelData load_model_from_path(const char *pathModel, const char *pathTexture, b
 
             int triCheck = 0;
             for (int i = 2; i < BUFFER_SIZE; i++) {
-                if ( buffer[i] == '\0' || buffer[i] == '\n') break;
+                if (buffer[i+1] == '\r' || 
+                    buffer[i+1] == '\n' || 
+                    buffer[i+1] == '\0' || 
+                    buffer[i] == '\n' || 
+                    buffer[i] == '\0') {
+                    break;
+                }
 
                 if ( buffer[i] == ' ' ) triCheck++;
 
