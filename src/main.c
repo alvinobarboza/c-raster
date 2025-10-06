@@ -55,36 +55,35 @@ int main(void)
         WIDTH, HEIGHT, 
         // (Vec3) {.x = 0.0f, .y = 0.0f, .z = 0.0f},
         // (Vec3) {.x = 0.0f, .y = 0.0f, .z = 0.0f}
-        (Vec3) {.x = -1.80f, .y = 1.59f, .z = -2.69f},
-        (Vec3) {.x = 0, .y = -16.98, .z = 0}
+        (Vec3) {.x = 4.93f, .y = 3.09f, .z = 2.35f},
+        (Vec3) {.x = -15.87, .y = 72.68, .z = 0}
     );
 
-    // TODO: proper model loading
-    ModelData ammoBox = load_model_from_path("./assets/ammo_box_1_1.obj", "./assets/ammo_mp_1.png", true);
+    ModelData teapot = load_model_from_path("./assets/newell_teaset/teapot.obj", NULL, true);
+    ModelData teacup = load_model_from_path("./assets/newell_teaset/teacup.obj", NULL, true);
+    ModelData spoon = load_model_from_path("./assets/newell_teaset/spoon.obj", NULL, true);
 
     ModelData cube = cube_shape();
     ModelData icosahedron = icosahedron_shape();
     ModelData torus = torus_shape();
     ModelData uvSphere = uv_sphere_shape();
-    ModelData square = square_shape();
-    ModelData triangle = triangle_shape();
 
     // TODO: better instance loading
     Instance instances[] = {
-        init_instance(&triangle, (Transforms){
+        init_instance(&spoon, (Transforms){
             .position = (Vec3){.x = 0.0f, .y = 0.0f, .z = 5.0f},
             .rotation = (Vec3){.x = 0.0f, .y = 0.0f, .z = 0.0f},
-            .scale = (Vec3){.x = 3.0f, .y = 3.0f, .z = 3.0f}
+            .scale = (Vec3){.x = 1.0f, .y = 1.0f, .z = 1.0f}
         }),
-        init_instance(&square, (Transforms){
+        init_instance(&teacup, (Transforms){
             .position = (Vec3){.x = 0.0f, .y = 0.0f, .z = 2.0f},
-            .rotation = (Vec3){.x = -90.0f, .y = 0.0f, .z = 0.0f},
-            .scale = (Vec3){.x = 2.0f, .y = 2.0f, .z = 2.0f}
+            .rotation = (Vec3){.x = 0.0f, .y = 0.0f, .z = 0.0f},
+            .scale = (Vec3){.x = 1.0f, .y = 1.0f, .z = 1.0f}
         }),
-        init_instance(&ammoBox, (Transforms) {
+        init_instance(&teapot, (Transforms) {
             .position = (Vec3){.x = -2.5, .y = 0.0f, .z = 5.0f},
-            .rotation = (Vec3){.x = 0.0f, .y = -45.0f, .z = 0.0f},
-            .scale = (Vec3){.x = 20.0f, .y = 20.0f, .z = 20.0f},
+            .rotation = (Vec3){.x = 0.0f, .y = 0.0f, .z = 0.0f},
+            .scale = (Vec3){.x = 1.0f, .y = 1.0f, .z = 1.0f},
         }),
         init_instance(&cube, (Transforms) {
             .position = (Vec3){.x = 2.25, .y = 2.5f, .z = 9.5f},
@@ -188,6 +187,8 @@ int main(void)
             renderTexture = LoadTextureFromImage(img);
         }
 
+        // TODO: On release compile mode, massive memory leak, 
+        // with ASAN everything normal...
         render_scene(camera, scene);
         UpdateTexture(renderTexture, camera.canvas);
         

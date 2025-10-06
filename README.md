@@ -17,12 +17,19 @@ https://gabrielgambetta.com/computer-graphics-from-scratch/
     -   Dynamic mesh generation on clipping plane.
 -   [x] Back face culling
 -   [x] Depth buffer
--   [ ] Simple OBJ parser
+-   [x] Simple OBJ parser
+    -   [x] Vertex data
+    -   [x] Normal data
+    -   [ ] UV data
 -   [ ] Shading
 -   [ ] Texture
 -   [ ] More...
 
 # Showcase
+
+## Utah teapot/set from OBJ file
+
+![Utah teapot/set from OBJ file](./obj_loading.png)
 
 ## Back face culling and depth pass
 

@@ -14,7 +14,7 @@
 typedef struct Triangle {
     size_t v1, v2, v3;
     size_t n1, n2, n3;
-    size_t t1, t2;
+    size_t t1, t2, t3;
     Color color;
 } Triangle;
 
@@ -58,7 +58,8 @@ typedef struct Instance {
 // That's not the point of this project
 ModelData load_model_from_path(const char *pathModel, const char *pathTexture, bool reorder);
 
-ModelData init_model(Vec3 *verts, size_t vertsCount, Triangle *tris, size_t trisCount);
+ModelData init_model(
+    Vec3 *verts, size_t vertsCount, Triangle *tris, size_t trisCount, Vec3 *normals, size_t normalsCount);
 void free_model(ModelData *model);
 
 Instance init_instance(ModelData *model, Transforms transform);

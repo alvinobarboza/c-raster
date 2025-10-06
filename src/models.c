@@ -45,6 +45,10 @@ Vec3 load_vec3(const char *buffer, const int index) {
 }
 
 ModelData load_model_from_path(const char *pathModel, const char *pathTexture, bool reorder) {
+    if (pathModel == NULL) {
+        return cube_shape();
+    }
+
     printf("Loading %s\n", pathModel);
 
     ModelData model = {0};
@@ -90,15 +94,14 @@ ModelData load_model_from_path(const char *pathModel, const char *pathTexture, b
 
     rewind(fp);
 
-    size_t vertsIndex = 0;
-    size_t normalIndex = 0;
-
     Triangle tempTri = {0};
     tempTri.color = GRAY;
+
+    size_t vertsIndex = 0;
+    size_t normalIndex = 0;
     size_t trisIndex = 0;
 
-    char indexBuf[BUFFER_SIZE - 1];
-    unsigned char indexLength = 0;
+    char buf[BUFFER_SIZE*3];
 
     while( fgets(buffer, BUFFER_SIZE, fp) != NULL ) {
         if (buffer[0] == 'v' && buffer[1] == ' ') {
@@ -116,34 +119,38 @@ ModelData load_model_from_path(const char *pathModel, const char *pathTexture, b
         }
 
         if (buffer[0] == 'f' && buffer[1] == ' ') {
-            bool isVertexI = true;
-            unsigned char indexPos = 0;
+            int cursor = 0;
+            int bufIndex = 0;
+            int indexPos = 0;
             for(int i = 2; i < BUFFER_SIZE; i++) {
-                if (buffer[i] == ' ') {
-                    isVertexI = true;
-                    continue;
-                }
+                if (buffer[i] == ' ' || buffer[i] == '\n' || buffer[i] == '\0') {
+                    buf[(cursor % 3) * BUFFER_SIZE + bufIndex ] = '\0';
 
-                if ( buffer[i] == '\0') {
-                    break;
-                }
-
-                if ( isVertexI && buffer[i] == '/' ) {
-                    isVertexI = false;
-                    indexBuf[indexLength] = '\0';
-                    
+                    // TODO: Load UV coordinates
                     switch(indexPos) {
                     case 0:
-                        tempTri.v1 = atol(indexBuf);
+                        tempTri.v1 = atol(&buf[0]);
+                        tempTri.t1 = atol(&buf[1*BUFFER_SIZE]);
+                        tempTri.n1 = atol(&buf[2*BUFFER_SIZE]);
                         tempTri.v1 += -1;
+                        tempTri.t1 += -1;
+                        tempTri.n1 += -1;
                         break;
                     case 1:
-                        tempTri.v2 = atol(indexBuf);
+                        tempTri.v2 = atol(&buf[0]);
+                        tempTri.t2 = atol(&buf[1*BUFFER_SIZE]);
+                        tempTri.n2 = atol(&buf[2*BUFFER_SIZE]);
                         tempTri.v2 += -1;
+                        tempTri.t2 += -1;
+                        tempTri.n2 += -1;
                         break;
                     case 2:
-                        tempTri.v3 = atol(indexBuf);
+                        tempTri.v3 = atol(&buf[0]);
+                        tempTri.t3 = atol(&buf[1*BUFFER_SIZE]);
+                        tempTri.n3 = atol(&buf[2*BUFFER_SIZE]);
                         tempTri.v3 += -1;
+                        tempTri.t3 += -1;
+                        tempTri.n3 += -1;
                         if (trisIndex < trisCount) {
                             tris[trisIndex] = tempTri;
                             trisIndex++;
@@ -151,8 +158,16 @@ ModelData load_model_from_path(const char *pathModel, const char *pathTexture, b
                         break;
                     default:
                         tempTri.v2 = tempTri.v3;
-                        tempTri.v3 = atol(indexBuf);
+                        tempTri.t2 = tempTri.t3;
+                        tempTri.n2 = tempTri.n3;
+
+                        tempTri.v3 = atol(&buf[0]);
+                        tempTri.t3 = atol(&buf[1*BUFFER_SIZE]);
+                        tempTri.n3 = atol(&buf[2*BUFFER_SIZE]);
                         tempTri.v3 += -1;
+                        tempTri.t3 += -1;
+                        tempTri.n3 += -1;
+
                         if (trisIndex < trisCount) {
                             tris[trisIndex] = tempTri;
                             trisIndex++;
@@ -160,29 +175,48 @@ ModelData load_model_from_path(const char *pathModel, const char *pathTexture, b
                         break;
                     }
 
+                    if (buffer[i+1] == '\r' || 
+                        buffer[i+1] == '\n' || 
+                        buffer[i+1] == '\0' || 
+                        buffer[i] == '\n' || 
+                        buffer[i] == '\0') {
+                        puts(" ");
+                        break;
+                    }
+
+                    cursor++;
+                    bufIndex = 0;
                     indexPos++;
-                    indexLength = 0;
+                    continue;
                 }
 
-                if (isVertexI) {
-                    indexBuf[indexLength] = buffer[i];
-                    indexLength++;                    
+                if (buffer[i] == '/') {
+                    buf[(cursor % 3) * BUFFER_SIZE + bufIndex ] = '\0';
+                    bufIndex = 0;
+                    cursor++;
+                    continue;
                 }
+                buf[(cursor % 3) * BUFFER_SIZE + bufIndex ] = buffer[i];
+                bufIndex++;
             }
-
-            printf("%s", &buffer[0]);
         }
     }
 
     if (reorder) {
         for(size_t i = 0; i < trisCount; i++) {
-            size_t temp = tris[i].v1;
+            size_t tempV = tris[i].v1;
+            size_t tempT = tris[i].t1;
+            size_t tempN = tris[i].n1;
             tris[i].v1 = tris[i].v3;
-            tris[i].v3 = temp;
+            tris[i].t1 = tris[i].t3;
+            tris[i].n1 = tris[i].n3;
+            tris[i].v3 = tempV;
+            tris[i].t3 = tempT;
+            tris[i].n3 = tempN;
         }
     }
 
-    model = init_model(verts, vertsCount, tris, trisCount);
+    model = init_model(verts, vertsCount, tris, trisCount, normals, normalCount);
 
     fclose(fp);
     free(tris);
@@ -192,14 +226,24 @@ ModelData load_model_from_path(const char *pathModel, const char *pathTexture, b
     return model;
 }
 
-ModelData init_model(Vec3 *vert, size_t vertsCount, Triangle *tri, size_t trisCount) {
+ModelData init_model(
+    Vec3 *vert, size_t vertsCount, Triangle *tri, size_t trisCount, Vec3 *normals, size_t normalsCount) {
     ModelData model;
 
     model.trisCount = trisCount;
     model.vertsCount = vertsCount;
+    model.normalsCount = normalsCount;
 
     model.verts = malloc(sizeof(Vec3) * vertsCount);
     model.tris = malloc(sizeof(Triangle) * trisCount);
+    model.normals = NULL;
+
+    if (normals != NULL) {
+        model.normals = malloc(sizeof(Vec3) * normalsCount);
+        for ( size_t i = 0; i < normalsCount; i++) {
+            model.normals[i] = normals[i];
+        }
+    }
 
     for ( size_t i = 0; i < vertsCount; i++) {
         model.verts[i] = vert[i];
@@ -215,6 +259,10 @@ ModelData init_model(Vec3 *vert, size_t vertsCount, Triangle *tri, size_t trisCo
 void free_model(ModelData *model) {
     if (model->verts == NULL){
         return;
+    }
+
+    if (model->normals != NULL) {
+        free(model->normals);
     }
 
     free(model->verts);
