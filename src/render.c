@@ -335,6 +335,8 @@ void render_scene(Cam c, Scene scene) {
             clipped->trisWorld[n].vertex[VERTEX_B] = mult_matrix_by_vec3(m_transform, clipped->model->verts[tp.v2]);
             clipped->trisWorld[n].vertex[VERTEX_C] = mult_matrix_by_vec3(m_transform, clipped->model->verts[tp.v3]);
 
+            // If model was loaded from file, it can have their own normals
+            // Otherwise, calculate based on vertex position
             if (clipped->fromObj) {
                 clipped->trisWorld[n].normal[VERTEX_A] = mult_matrix_by_vec3(normalRotationTransposed, clipped->model->normals[tp.n1]);
                 clipped->trisWorld[n].normal[VERTEX_B] = mult_matrix_by_vec3(normalRotationTransposed, clipped->model->normals[tp.n2]);
@@ -391,8 +393,8 @@ void render_scene(Cam c, Scene scene) {
                     continue;
                 }
                 
-                // TODO: tris will potentially* have a value for brightness for each vertex
-                // "must" compute intermediate value from P1 to P2 in case of clipping tri
+                // TODO: Now there is normals and uvs to worry about,
+                // when clipped they must have the intermediate values
                 Vec3 pointA = tri.vertex[VERTEX_A];
                 Vec3 pointB = tri.vertex[VERTEX_B];
                 Vec3 pointC = tri.vertex[VERTEX_C];
