@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <float.h>
+#include <stdint.h>
 #include "render.h"
 
 // Must deallocate after use
@@ -231,7 +232,7 @@ float signed_distance_to_point(ViewPlane plane, Vec3 vertex) {
 }
 
 bool is_inside_frustum(ViewPlane *planes, Instance instance) {
-    for (unsigned char j = 0; j < FRUSTUM_PLANES; j++) {
+    for (uint8_t j = 0; j < FRUSTUM_PLANES; j++) {
         ViewPlane plane = planes[j];
 
         float d = signed_distance_to_point(plane, instance.boundingSphere.centerWorld);
@@ -269,40 +270,53 @@ Vec3 point_on_plane_from_ab(Vec3 inFrontA, Vec3 behindB, float t) {
     return vec3_add(inFrontA, vec3_multiply(vec3_sub(behindB, inFrontA),t));
 }
 
-Vec3 intersection_on_plane(ViewPlane plane, Vec3 inFrontA, Vec3 behindB) {
-    float t = ratio_ab_from_plane(plane, inFrontA, behindB);
-    Vec3 q = point_on_plane_from_ab(inFrontA, behindB, t);
-    return q;
-}
+void one_vertex_in_front( 
+    ViewPlane plane, Instance *clipped, FullTriangle t, 
+    uint8_t inFrontA, uint8_t newB, uint8_t newC ) {
 
-void one_vertex_in_front(
-    ViewPlane plane, Instance *clipped, Vec3 pA, Vec3 pB, Vec3 pC, 
-    FullTriangle t, unsigned char newB, unsigned char newC ) {
+    float ratioAB = ratio_ab_from_plane(plane, t.vertex[inFrontA], t.vertex[newB]);
+    float ratioAC = ratio_ab_from_plane(plane, t.vertex[inFrontA], t.vertex[newC]);
 
-    Vec3 pointBprime = intersection_on_plane(plane, pA, pB);
-    Vec3 pointCprime = intersection_on_plane(plane, pA, pC);
+    Vec3 pointBprime = point_on_plane_from_ab(t.vertex[inFrontA], t.vertex[newB], ratioAB);
+    Vec3 normalBprime = point_on_plane_from_ab(t.normal[inFrontA], t.normal[newB], ratioAB);
+
+    Vec3 pointCprime = point_on_plane_from_ab(t.vertex[inFrontA], t.vertex[newC], ratioAC);
+    Vec3 normalCprime = point_on_plane_from_ab(t.normal[inFrontA], t.normal[newC], ratioAC);
 
     t.vertex[newB] = pointBprime;
+    t.normal[newB] = vec3_normal(normalBprime);
+
     t.vertex[newC] = pointCprime;
+    t.normal[newC] = vec3_normal(normalCprime);
 
     clipped->trisClipped[clipped->trisClippedCount] = t;
-
     clipped->trisClippedCount++;
 }
 
 void two_vertices_in_front(
-    ViewPlane plane, Instance *clipped, Vec3 pA, Vec3 pB, Vec3 pC, FullTriangle t, 
-    unsigned char sharedIndex, unsigned char newIndex, size_t indexAhead ) {
+    ViewPlane plane, Instance *clipped, uint8_t vA, uint8_t vB, uint8_t vC, FullTriangle t, 
+    uint8_t sharedIndex, uint8_t newIndex, size_t indexAhead ) {
     
     FullTriangle t1 = t;
     FullTriangle t2 = t;
 
-    Vec3 pointAprime = intersection_on_plane(plane, pA, pC);
-    Vec3 pointBprime = intersection_on_plane(plane, pB, pC);
+    float ratioAC = ratio_ab_from_plane(plane, t.vertex[vA], t.vertex[vC]);
+    float ratioBC = ratio_ab_from_plane(plane, t.vertex[vB], t.vertex[vC]);
+
+    Vec3 pointAprime = point_on_plane_from_ab(t.vertex[vA], t.vertex[vC], ratioAC);
+    Vec3 normalAprime = point_on_plane_from_ab(t.normal[vA], t.normal[vC], ratioAC);
+
+    Vec3 pointBprime = point_on_plane_from_ab(t.vertex[vB], t.vertex[vC], ratioBC);
+    Vec3 normalBprime = point_on_plane_from_ab(t.normal[vB], t.normal[vC], ratioBC);
     
     t1.vertex[sharedIndex] = pointAprime;
+    t1.normal[sharedIndex] = vec3_normal(normalAprime);
+
     t2.vertex[newIndex] = pointAprime;
+    t2.normal[newIndex] = vec3_normal(normalAprime);
+
     t2.vertex[sharedIndex] = pointBprime;
+    t2.normal[sharedIndex] = vec3_normal(normalBprime);
 
     clipped->trisClipped[clipped->trisClippedCount] = t1;
     clipped->trisClipped[indexAhead] = t2;
@@ -400,29 +414,25 @@ void render_scene(Cam c, Scene scene) {
                     continue;
                 }
                 
-                // TODO: Now there is normals and uvs to worry about,
-                // when clipped they must have the intermediate values
-                Vec3 pointA = tri.vertex[VERTEX_A];
-                Vec3 pointB = tri.vertex[VERTEX_B];
-                Vec3 pointC = tri.vertex[VERTEX_C];
+                // TODO: UVs
 
                 if (d1 > FLT_MIN && d2 < 0.0f && d3 < 0.0f) {
-                    one_vertex_in_front(plane, clipped, pointA, pointB, pointC, tri, VERTEX_B, VERTEX_C);
+                    one_vertex_in_front(plane, clipped, tri, VERTEX_A, VERTEX_B, VERTEX_C);
                     continue;
                 }
                 if (d1 < 0.0f && d2 > FLT_MIN && d3 < 0.0f) {
-                    one_vertex_in_front(plane, clipped, pointB, pointA, pointC, tri, VERTEX_A, VERTEX_C);
+                    one_vertex_in_front(plane, clipped, tri, VERTEX_B, VERTEX_A, VERTEX_C);
                     continue;
                 }
                 if (d1 < 0.0f && d2 < 0.0f && d3 > FLT_MIN) {
-                    one_vertex_in_front(plane, clipped, pointC, pointA, pointB, tri, VERTEX_A, VERTEX_B);
+                    one_vertex_in_front(plane, clipped, tri, VERTEX_C, VERTEX_A, VERTEX_B);
                     continue;
                 }
 
                 // [Triangle(A, B, A'), Triangle(A', B, B')]
                 if (d1 > FLT_MIN && d2 > FLT_MIN && d3 < 0.0f) {
                     two_vertices_in_front(
-                        plane, clipped, pointA, pointB, pointC, tri,
+                        plane, clipped, VERTEX_A, VERTEX_B, VERTEX_C, tri,
                         VERTEX_C, VERTEX_A, endBufferIndex + trisLength
                     );
                     endBufferIndex++;
@@ -432,7 +442,7 @@ void render_scene(Cam c, Scene scene) {
                 // [Triangle(A, A', C), Triangle(A', C', C)]
                 if (d1 > FLT_MIN && d2 < 0.0f && d3 > FLT_MIN) {
                     two_vertices_in_front(
-                        plane, clipped, pointA, pointC, pointB, tri,
+                        plane, clipped, VERTEX_A, VERTEX_C, VERTEX_B, tri,
                         VERTEX_B, VERTEX_A, endBufferIndex + trisLength
                     );   
                     endBufferIndex++;
@@ -442,7 +452,7 @@ void render_scene(Cam c, Scene scene) {
                 // [Triangle(C', B, C), Triangle(B', B, C')]
                 if (d1 < 0.0f && d2 > FLT_MIN && d3 > FLT_MIN) {
                     two_vertices_in_front(
-                        plane, clipped, pointC, pointB, pointA, tri,
+                        plane, clipped, VERTEX_C, VERTEX_B, VERTEX_A, tri,
                         VERTEX_A, VERTEX_C, endBufferIndex + trisLength
                     );
                     endBufferIndex++;
