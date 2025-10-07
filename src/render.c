@@ -194,10 +194,17 @@ void render_triangle(Cam c, FullTriangle tri) {
         BLACK);
 }
 
+// Book treats each vertex as the normal vector from the camera, but the calculation should be 
+// from tri's nomal vector to camera's direction, that's why it does the cross product that way
+// If I want to maintain compatibility with actual normal vector loaded from OBJ I can flip the normals
+// or flip vertex orientation to match the model "angle from normal vector to camera's normal vector position"
+// Figure 12-9 has the correct model relation, but the caculation is done considering the vector 
+// is from C to the normal angle, in another words, backwards
+// I'm doing this way for now, maybe flipping will be bad for shading later
 bool back_face_culling(FullTriangle tri) {
-    float angleA = vec3_by_vec3_multiply(tri.normal[VERTEX_A],  tri.vertex[VERTEX_A]);
-    float angleB = vec3_by_vec3_multiply(tri.normal[VERTEX_B],  tri.vertex[VERTEX_B]);
-    float angleC = vec3_by_vec3_multiply(tri.normal[VERTEX_C],  tri.vertex[VERTEX_C]);
+    float angleA = vec3_by_vec3_multiply(tri.normal[VERTEX_A],  vec3_multiply(tri.vertex[VERTEX_A], -1));
+    float angleB = vec3_by_vec3_multiply(tri.normal[VERTEX_B],  vec3_multiply(tri.vertex[VERTEX_B], -1));
+    float angleC = vec3_by_vec3_multiply(tri.normal[VERTEX_C],  vec3_multiply(tri.vertex[VERTEX_C], -1));
     return angleA >= 0 || angleB >= 0 || angleC >= 0;
 }
 
@@ -346,7 +353,10 @@ void render_scene(Cam c, Scene scene) {
 
             Vec3 v1 = vec3_sub(clipped->trisWorld[n].vertex[VERTEX_B], clipped->trisWorld[n].vertex[VERTEX_A]);
             Vec3 v2 = vec3_sub(clipped->trisWorld[n].vertex[VERTEX_C], clipped->trisWorld[n].vertex[VERTEX_A]);
-            Vec3 n1 = vec3_cross(v1, v2);
+
+            // Cross product here is flipped in relation to the book
+            // Backface culling method "back_face_culling" explains this divergence from the book
+            Vec3 n1 = vec3_cross(v2, v1);
 
             clipped->trisWorld[n].normal[VERTEX_A] = n1;
             clipped->trisWorld[n].normal[VERTEX_B] = n1;

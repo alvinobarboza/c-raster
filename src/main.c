@@ -59,10 +59,10 @@ int main(void)
         // (Vec3) {.x = -15.87, .y = 72.68, .z = 0}
     );
 
-    ModelData teapot = load_model_from_path("./assets/newell_teaset/teapot.obj", NULL, false, true);
-    ModelData teacup = load_model_from_path("./assets/newell_teaset/teacup.obj", NULL, false, true);
-    ModelData spoon = load_model_from_path("./assets/newell_teaset/spoon.obj", NULL, false, true);
-    ModelData cube = load_model_from_path("./assets/cube.obj", NULL, false, true);
+    ModelData teapot = load_model_from_path("./assets/newell_teaset/teapot.obj", NULL, false, false);
+    ModelData teacup = load_model_from_path("./assets/newell_teaset/teacup.obj", NULL, false, false);
+    ModelData spoon = load_model_from_path("./assets/newell_teaset/spoon.obj", NULL, false, false);
+    ModelData cube = load_model_from_path("./assets/cube.obj", NULL, false, false);
 
     ModelData icosahedron = icosahedron_shape();
     ModelData torus = torus_shape();
