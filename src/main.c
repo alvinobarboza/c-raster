@@ -187,8 +187,6 @@ int main(void)
             renderTexture = LoadTextureFromImage(img);
         }
 
-        // TODO: On release compile mode, massive memory leak, 
-        // with ASAN everything normal...
         render_scene(camera, scene);
         UpdateTexture(renderTexture, camera.canvas);
         

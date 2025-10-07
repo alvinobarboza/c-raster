@@ -85,11 +85,11 @@ Triangle tris[] = {
 // CUBE === end
 
 ModelData cube_shape() {
-    return init_model(verts, 8, tris, 12, NULL, 0);
+    return init_model(verts, 8, tris, 12, NULL, 0, NULL, 0);
 }
 
 ModelData icosahedron_shape() {
-    return init_model(verts_ico, 12, tris_ico, 20, NULL, 0);
+    return init_model(verts_ico, 12, tris_ico, 20, NULL, 0, NULL, 0);
 }
 
 ModelData torus_shape() {
@@ -136,7 +136,7 @@ ModelData torus_shape() {
         TORUS_MAJOR_SEGMENTS * TORUS_MINOR_SEGMENTS, 
         torus_tris, 
         TORUS_MAJOR_SEGMENTS * TORUS_MINOR_SEGMENTS * 2,
-        NULL, 0);
+        NULL, 0, NULL, 0);
 }
 
 ModelData uv_sphere_shape() {
@@ -180,7 +180,7 @@ ModelData uv_sphere_shape() {
         sphere_verts, 
         SPHERE_SEGMENTS * SPHERE_RINGS,
         sphere_tris, SPHERE_SEGMENTS * (SPHERE_RINGS - 1) * 2,
-        NULL, 0
+        NULL, 0, NULL, 0
     );
 }
 
@@ -196,7 +196,7 @@ ModelData square_shape() {
         {.v1 = 0, .v2 = 2, .v3 = 3, .color = RED},
     };
 
-    return init_model(square_verts, 4, square_tris, 2, NULL, 0);
+    return init_model(square_verts, 4, square_tris, 2, NULL, 0, NULL, 0);
 }
 
 ModelData triangle_shape() {
@@ -209,5 +209,5 @@ ModelData triangle_shape() {
         {.v1 = 0, .v2 = 1, .v3 = 2, .color = RED},
     };
 
-    return init_model(tris_verts, 3, tris_tris, 1, NULL, 0);
+    return init_model(tris_verts, 3, tris_tris, 1, NULL, 0, NULL, 0);
 }

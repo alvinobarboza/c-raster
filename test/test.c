@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "models.h"
 
 int main() {
@@ -9,9 +10,16 @@ int main() {
     // ModelData spoon = load_model_from_path("./assets/newell_teaset/spoon.obj", NULL, true);
     ModelData cube = load_model_from_path("./assets/cube.obj", NULL, false, false);
 
+    printf("%ld %ld %ld %ld \n", cube.vertsCount, cube.trisCount, cube.normalsCount, cube.uvsCount);
+
+    for(size_t i = 0; i < cube.uvsCount; i++) {
+        print_vec3("uvs:", cube.uvs[i]);
+    }
+
     // free_model(&teapot);
     // free_model(&teacup);
     // free_model(&spoon);
     free_model(&cube);
+
 	return 0;
 }

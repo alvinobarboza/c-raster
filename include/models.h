@@ -25,7 +25,7 @@ typedef struct ModelData {
     Vec3 *normals;
     size_t normalsCount;
 
-    Vec2 *uvs;
+    Vec3 *uvs;
     size_t uvsCount;
 
     Triangle *tris;
@@ -35,7 +35,7 @@ typedef struct ModelData {
 typedef struct FullTriangle {
     Vec3 vertex[3];
     Vec3 normal[3];
-    Vec2 uv[3];
+    Vec3 uv[3];
     Color color;
 } FullTriangle;
 
@@ -60,7 +60,11 @@ typedef struct Instance {
 ModelData load_model_from_path(const char *pathModel, const char *pathTexture, bool reorder, bool flipNormals);
 
 ModelData init_model(
-    Vec3 *verts, size_t vertsCount, Triangle *tris, size_t trisCount, Vec3 *normals, size_t normalsCount);
+    Vec3 *verts, size_t vertsCount, 
+    Triangle *tris, size_t trisCount, 
+    Vec3 *normals, size_t normalsCount,
+    Vec3 *uvs, size_t uvsCount
+);
 void free_model(ModelData *model);
 
 Instance init_instance(ModelData *model, Transforms transform);

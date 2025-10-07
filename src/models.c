@@ -69,6 +69,7 @@ ModelData load_model_from_path(const char *pathModel, const char *pathTexture, b
     size_t trisCount = 0;
     size_t vertsCount = 0;
     size_t normalCount = 0;
+    size_t uvsCount = 0;
 
     while(fgets(buffer, BUFFER_SIZE, fp) != NULL) {
         if (buffer[0] == 'v' && buffer[1] == ' ') {
@@ -77,6 +78,10 @@ ModelData load_model_from_path(const char *pathModel, const char *pathTexture, b
 
         if (buffer[0] == 'v' && buffer[1] == 'n' && buffer[2] == ' ') {
             normalCount++;
+        }
+
+        if (buffer[0] == 'v' && buffer[1] == 't' && buffer[2] == ' ') {
+            uvsCount++;
         }
 
         if (buffer[0] == 'f' && buffer[1] == ' ') {
@@ -99,11 +104,12 @@ ModelData load_model_from_path(const char *pathModel, const char *pathTexture, b
         }
     }
 
-    printf("tris: %ld verts: %ld normals: %ld\n", trisCount, vertsCount, normalCount);
+    printf("tris: %ld verts: %ld normals: %ld uvs: %ld \n", trisCount, vertsCount, normalCount, uvsCount);
 
     Triangle *tris = malloc(sizeof(Triangle) * trisCount);
     Vec3 *verts = malloc(sizeof(Vec3) * vertsCount);
     Vec3 *normals = malloc(sizeof(Vec3) * normalCount);
+    Vec3 *uvs = malloc(sizeof(Vec3) * uvsCount);
 
     rewind(fp);
 
@@ -112,11 +118,11 @@ ModelData load_model_from_path(const char *pathModel, const char *pathTexture, b
 
     size_t vertsIndex = 0;
     size_t normalIndex = 0;
+    size_t uvsIndex = 0;
     size_t trisIndex = 0;
 
     char buf[BUFFER_SIZE*3];
 
-    // TODO: Load UV coordinates    
     while( fgets(buffer, BUFFER_SIZE, fp) != NULL ) {
         if (buffer[0] == 'v' && buffer[1] == ' ') {
             if (vertsIndex < vertsCount) {
@@ -130,6 +136,13 @@ ModelData load_model_from_path(const char *pathModel, const char *pathTexture, b
                 normals[normalIndex] = load_vec3(buffer, 3);
                 if (flipNormals) normals[normalIndex] = vec3_multiply(normals[normalIndex], -1);
                 normalIndex++;
+            }
+        }
+
+        if (buffer[0] == 'v' && buffer[1] == 't' && buffer[2] == ' ') {
+            if (uvsIndex < uvsCount) {
+                uvs[uvsIndex] = load_vec3(buffer, 3);
+                uvsIndex++;
             }
         }
 
@@ -229,32 +242,51 @@ ModelData load_model_from_path(const char *pathModel, const char *pathTexture, b
         }
     }
 
-    model = init_model(verts, vertsCount, tris, trisCount, normals, normalCount);
+    model = init_model(
+        verts, vertsCount, 
+        tris, trisCount, 
+        normals, normalCount,
+        uvs, uvsCount
+    );
 
     fclose(fp);
     free(tris);
     free(verts);
     free(normals);
+    free(uvs);
 
     return model;
 }
 
 ModelData init_model(
-    Vec3 *vert, size_t vertsCount, Triangle *tri, size_t trisCount, Vec3 *normals, size_t normalsCount) {
+    Vec3 *vert, size_t vertsCount, 
+    Triangle *tri, size_t trisCount, 
+    Vec3 *normals, size_t normalsCount,
+    Vec3 *uvs, size_t uvsCount
+) {
     ModelData model;
 
     model.trisCount = trisCount;
     model.vertsCount = vertsCount;
     model.normalsCount = normalsCount;
+    model.uvsCount = uvsCount;
 
     model.verts = malloc(sizeof(Vec3) * vertsCount);
     model.tris = malloc(sizeof(Triangle) * trisCount);
     model.normals = NULL;
+    model.uvs = NULL;
 
     if (normals != NULL) {
         model.normals = malloc(sizeof(Vec3) * normalsCount);
         for ( size_t i = 0; i < normalsCount; i++) {
             model.normals[i] = normals[i];
+        }
+    }
+
+    if (uvs != NULL) {
+        model.uvs = malloc(sizeof(Vec3) * uvsCount);
+        for ( size_t i = 0; i < uvsCount; i++) {
+            model.uvs[i] = uvs[i];
         }
     }
 
@@ -278,11 +310,17 @@ void free_model(ModelData *model) {
         free(model->normals);
     }
 
+    if (model->uvs != NULL) {
+        free(model->uvs);
+    }
+
     free(model->verts);
     free(model->tris);
 
     model->verts = NULL;
     model->tris = NULL;
+    model->normals = NULL;
+    model->uvs = NULL;
 }
 
 Instance init_instance(ModelData *model, Transforms transform){
