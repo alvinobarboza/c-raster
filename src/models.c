@@ -116,6 +116,7 @@ ModelData load_model_from_path(const char *pathModel, const char *pathTexture, b
 
     char buf[BUFFER_SIZE*3];
 
+    // TODO: Load UV coordinates    
     while( fgets(buffer, BUFFER_SIZE, fp) != NULL ) {
         if (buffer[0] == 'v' && buffer[1] == ' ') {
             if (vertsIndex < vertsCount) {
@@ -140,7 +141,6 @@ ModelData load_model_from_path(const char *pathModel, const char *pathTexture, b
                 if (buffer[i] == ' ' || buffer[i] == '\n' || buffer[i] == '\0') {
                     buf[(cursor % 3) * BUFFER_SIZE + bufIndex ] = '\0';
 
-                    // TODO: Load UV coordinates
                     switch(indexPos) {
                     case 0:
                         tempTri.v1 = atol(&buf[0]);

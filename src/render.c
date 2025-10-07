@@ -276,10 +276,9 @@ Vec3 intersection_on_plane(ViewPlane plane, Vec3 inFrontA, Vec3 behindB) {
 }
 
 void one_vertex_in_front(
-    ViewPlane plane, Instance *clipped, 
-    Vec3 pA, Vec3 pB, Vec3 pC, 
-    FullTriangle t, unsigned char newB, unsigned char newC
-) {
+    ViewPlane plane, Instance *clipped, Vec3 pA, Vec3 pB, Vec3 pC, 
+    FullTriangle t, unsigned char newB, unsigned char newC ) {
+
     Vec3 pointBprime = intersection_on_plane(plane, pA, pB);
     Vec3 pointCprime = intersection_on_plane(plane, pA, pC);
 
@@ -292,10 +291,9 @@ void one_vertex_in_front(
 }
 
 void two_vertices_in_front(
-    ViewPlane plane, Instance *clipped,
-    Vec3 pA, Vec3 pB, Vec3 pC, FullTriangle t, 
-    unsigned char sharedIndex, unsigned char newIndex, size_t indexAhead
-) {
+    ViewPlane plane, Instance *clipped, Vec3 pA, Vec3 pB, Vec3 pC, FullTriangle t, 
+    unsigned char sharedIndex, unsigned char newIndex, size_t indexAhead ) {
+    
     FullTriangle t1 = t;
     FullTriangle t2 = t;
 
