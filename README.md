@@ -28,6 +28,10 @@ https://gabrielgambetta.com/computer-graphics-from-scratch/
 
 # Showcase
 
+## Mix of objects loaded from file and generated from code
+
+![From OBJ file and code](./obj_loading-1.png)
+
 ## Utah teapot/set from OBJ file
 
 ![Utah teapot/set from OBJ file](./obj_loading.png)

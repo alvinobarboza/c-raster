@@ -53,10 +53,10 @@ int main(void)
 
     Cam camera = init_camera(
         WIDTH, HEIGHT, 
-        (Vec3) {.x = 0.0f, .y = 0.0f, .z = 0.0f},
-        (Vec3) {.x = 0.0f, .y = 0.0f, .z = 0.0f}
-        // (Vec3) {.x = 4.93f, .y = 3.09f, .z = 2.35f},
-        // (Vec3) {.x = -15.87, .y = 72.68, .z = 0}
+        // (Vec3) {.x = 0.0f, .y = 0.0f, .z = 0.0f},
+        // (Vec3) {.x = 0.0f, .y = 0.0f, .z = 0.0f}
+        (Vec3) {.x = 6.54f, .y = 4.09f, .z = -2.35f},
+        (Vec3) {.x = -18.87, .y = 26.68, .z = 0}
     );
 
     ModelData teapot = load_model_from_path("./assets/newell_teaset/teapot.obj", NULL, false, false);
@@ -71,7 +71,7 @@ int main(void)
     // TODO: better instance loading
     Instance instances[] = {
         init_instance(&spoon, (Transforms){
-            .position = (Vec3){.x = 0.0f, .y = 0.0f, .z = 5.0f},
+            .position = (Vec3){.x = 0.0f, .y = 0.0f, .z = 4.0f},
             .rotation = (Vec3){.x = 0.0f, .y = 0.0f, .z = 0.0f},
             .scale = (Vec3){.x = 1.0f, .y = 1.0f, .z = 1.0f}
         }),
@@ -86,7 +86,7 @@ int main(void)
             .scale = (Vec3){.x = 1.0f, .y = 1.0f, .z = 1.0f},
         }),
         init_instance(&cube, (Transforms) {
-            .position = (Vec3){.x = 0.0f, .y = 0.0f, .z = 4.5f},
+            .position = (Vec3){.x = 3.0f, .y = 0.0f, .z = 4.5f},
             .rotation = (Vec3){.x = 0.0f, .y = 0.0f, .z = 0.0f},
             .scale = (Vec3){.x = 1.0f, .y = 1.0f, .z = 1.0f},
         }),
