@@ -2,6 +2,7 @@
 #define _MODELS_H
 
 #include <stddef.h>
+#include <stdint.h>
 
 #include "transforms.h"
 #include "raylib.h"
@@ -18,6 +19,11 @@ typedef struct Triangle {
     Color color;
 } Triangle;
 
+typedef struct TextureData {
+    uint16_t width, height;
+    Color *colors;
+} TextureData;
+
 typedef struct ModelData {
     Vec3 *verts;
     size_t vertsCount;
@@ -30,6 +36,8 @@ typedef struct ModelData {
 
     Triangle *tris;
     size_t trisCount;
+
+    TextureData *texture;
 } ModelData ;
 
 typedef struct FullTriangle {
@@ -63,9 +71,11 @@ ModelData init_model(
     Vec3 *verts, size_t vertsCount, 
     Triangle *tris, size_t trisCount, 
     Vec3 *normals, size_t normalsCount,
-    Vec3 *uvs, size_t uvsCount
+    Vec3 *uvs, size_t uvsCount,
+    TextureData *texture
 );
 void free_model(ModelData *model);
+void free_texture(TextureData *texture);
 
 Instance init_instance(ModelData *model, Transforms transform);
 void free_instance(Instance *instance);

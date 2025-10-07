@@ -51,6 +51,25 @@ Vec3 load_vec3(const char *buffer, const int index) {
     return tempVert;
 }
 
+TextureData *load_default_texture() {
+    uint16_t w = 1000;
+    uint16_t h = 1000;
+    TextureData *texture = malloc(sizeof(TextureData));
+    texture->colors = malloc(sizeof(Color) * w * h);
+    texture->width = w;
+    texture->height = h;
+
+    for(uint16_t y = 0; y < h; y++) {
+        for(uint16_t x = 0; x < w; x++) {
+            texture->colors[y*w+x].r = y % 255;
+            texture->colors[y*w+x].g = y % 255;
+            texture->colors[y*w+x].b = y % 255;
+            texture->colors[y*w+x].a = 255;
+        }   
+    }
+    return texture;
+}
+
 ModelData load_model_from_path(const char *pathModel, const char *pathTexture, bool reorder, bool flipNormals) {
     if (pathModel == NULL) {
         return cube_shape();
@@ -59,6 +78,14 @@ ModelData load_model_from_path(const char *pathModel, const char *pathTexture, b
     printf("Loading %s\n", pathModel);
 
     ModelData model = {0};
+    TextureData *texture = NULL;
+
+    if ( pathTexture == NULL ) {
+        puts("Loading default texture");
+        texture = load_default_texture();
+    } else {
+
+    }
 
     FILE *fp = fopen(pathModel, "r");
     if (fp == NULL){
@@ -246,7 +273,8 @@ ModelData load_model_from_path(const char *pathModel, const char *pathTexture, b
         verts, vertsCount, 
         tris, trisCount, 
         normals, normalCount,
-        uvs, uvsCount
+        uvs, uvsCount,
+        texture
     );
 
     fclose(fp);
@@ -262,9 +290,12 @@ ModelData init_model(
     Vec3 *vert, size_t vertsCount, 
     Triangle *tri, size_t trisCount, 
     Vec3 *normals, size_t normalsCount,
-    Vec3 *uvs, size_t uvsCount
+    Vec3 *uvs, size_t uvsCount,
+    TextureData *texture
 ) {
     ModelData model;
+
+    model.texture = texture;
 
     model.trisCount = trisCount;
     model.vertsCount = vertsCount;
@@ -316,11 +347,22 @@ void free_model(ModelData *model) {
 
     free(model->verts);
     free(model->tris);
+    free_texture(model->texture);
+    free(model->texture);
 
     model->verts = NULL;
     model->tris = NULL;
     model->normals = NULL;
     model->uvs = NULL;
+    model->texture = NULL;
+}
+
+void free_texture(TextureData *texture) {
+    if ( texture == NULL ) return;
+    if ( texture->colors == NULL ) return;
+    
+    free(texture->colors);
+    texture->colors = NULL;
 }
 
 Instance init_instance(ModelData *model, Transforms transform){

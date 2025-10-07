@@ -16,8 +16,8 @@ int main() {
     // ModelData teapot = load_model_from_path("./assets/newell_teaset/teapot.obj", NULL, true);
     // ModelData teacup = load_model_from_path("./assets/newell_teaset/teacup.obj", NULL, true);
     // ModelData spoon = load_model_from_path("./assets/newell_teaset/spoon.obj", NULL, true);
-    // ModelData cube = load_model_from_path("./assets/cube.obj", NULL, false, false);
-    ModelData triangle = triangle_shape();
+    ModelData cube = load_model_from_path("./assets/cube.obj", NULL, false, false);
+    // ModelData triangle = triangle_shape();
 
     // printf("%ld %ld %ld %ld \n", cube.vertsCount, cube.trisCount, cube.normalsCount, cube.uvsCount);
 
@@ -28,8 +28,20 @@ int main() {
     // free_model(&teapot);
     // free_model(&teacup);
     // free_model(&spoon);
-    // free_model(&cube);
-    free_model(&triangle);
+
+    for(uint16_t y = 0; y < cube.texture->height; y++){
+        if (y % 50 == 0) {
+            for(uint16_t x = 0; x < cube.texture->width; x++){
+                if (x % 50 == 0) {
+                    printf("%d ", cube.texture->colors[y*cube.texture->width+x].r);
+                }
+            }
+            puts(" ");
+        }
+    }
+
+    free_model(&cube);
+    // free_model(&triangle);
 
 
     // Stop measuring time and calculate the elapsed time
