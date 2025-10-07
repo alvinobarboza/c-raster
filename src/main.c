@@ -67,9 +67,15 @@ int main(void)
     ModelData icosahedron = icosahedron_shape();
     ModelData torus = torus_shape();
     ModelData uvSphere = uv_sphere_shape();
+    ModelData triangle = triangle_shape();
 
     // TODO: better instance loading
     Instance instances[] = {
+        init_instance(&triangle, (Transforms){
+            .position = (Vec3){.x = 0.0f, .y = 0.0f, .z = 6.0f},
+            .rotation = (Vec3){.x = 0.0f, .y = 0.0f, .z = 0.0f},
+            .scale = (Vec3){.x = 1.0f, .y = 1.0f, .z = 1.0f}
+        }),
         init_instance(&spoon, (Transforms){
             .position = (Vec3){.x = 0.0f, .y = 0.0f, .z = 4.0f},
             .rotation = (Vec3){.x = 0.0f, .y = 0.0f, .z = 0.0f},

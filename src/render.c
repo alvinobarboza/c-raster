@@ -279,15 +279,19 @@ void one_vertex_in_front(
 
     Vec3 pointBprime = point_on_plane_from_ab(t.vertex[inFrontA], t.vertex[newB], ratioAB);
     Vec3 normalBprime = point_on_plane_from_ab(t.normal[inFrontA], t.normal[newB], ratioAB);
+    Vec3 uvBprime = point_on_plane_from_ab(t.uv[inFrontA], t.uv[newB], ratioAB);
 
     Vec3 pointCprime = point_on_plane_from_ab(t.vertex[inFrontA], t.vertex[newC], ratioAC);
     Vec3 normalCprime = point_on_plane_from_ab(t.normal[inFrontA], t.normal[newC], ratioAC);
+    Vec3 uvCprime = point_on_plane_from_ab(t.uv[inFrontA], t.uv[newC], ratioAC);
 
     t.vertex[newB] = pointBprime;
     t.normal[newB] = vec3_normal(normalBprime);
+    t.uv[newB] = uvBprime;
 
     t.vertex[newC] = pointCprime;
     t.normal[newC] = vec3_normal(normalCprime);
+    t.uv[newC] = uvCprime;
 
     clipped->trisClipped[clipped->trisClippedCount] = t;
     clipped->trisClippedCount++;
@@ -305,18 +309,23 @@ void two_vertices_in_front(
 
     Vec3 pointAprime = point_on_plane_from_ab(t.vertex[vA], t.vertex[vC], ratioAC);
     Vec3 normalAprime = point_on_plane_from_ab(t.normal[vA], t.normal[vC], ratioAC);
+    Vec3 uvAprime = point_on_plane_from_ab(t.uv[vA], t.uv[vC], ratioAC);
 
     Vec3 pointBprime = point_on_plane_from_ab(t.vertex[vB], t.vertex[vC], ratioBC);
     Vec3 normalBprime = point_on_plane_from_ab(t.normal[vB], t.normal[vC], ratioBC);
+    Vec3 uvBprime = point_on_plane_from_ab(t.uv[vB], t.uv[vC], ratioBC);
     
     t1.vertex[sharedIndex] = pointAprime;
     t1.normal[sharedIndex] = vec3_normal(normalAprime);
+    t1.uv[sharedIndex] = uvAprime;
 
     t2.vertex[newIndex] = pointAprime;
     t2.normal[newIndex] = vec3_normal(normalAprime);
+    t2.uv[newIndex] = uvAprime;
 
     t2.vertex[sharedIndex] = pointBprime;
     t2.normal[sharedIndex] = vec3_normal(normalBprime);
+    t2.uv[sharedIndex] = uvBprime;
 
     clipped->trisClipped[clipped->trisClippedCount] = t1;
     clipped->trisClipped[indexAhead] = t2;
@@ -353,6 +362,12 @@ void render_scene(Cam c, Scene scene) {
             clipped->trisWorld[n].vertex[VERTEX_B] = mult_matrix_by_vec3(m_transform, clipped->model->verts[tp.v2]);
             clipped->trisWorld[n].vertex[VERTEX_C] = mult_matrix_by_vec3(m_transform, clipped->model->verts[tp.v3]);
 
+            if(clipped->model->uvsCount){
+                clipped->trisWorld[n].uv[VERTEX_A] = clipped->model->uvs[tp.t1];
+                clipped->trisWorld[n].uv[VERTEX_B] = clipped->model->uvs[tp.t2];
+                clipped->trisWorld[n].uv[VERTEX_C] = clipped->model->uvs[tp.t3];
+            }
+
             // If model was loaded from file, it can have their own normals
             // Otherwise, calculate based on vertex position
             if (clipped->fromObj) {
@@ -360,7 +375,7 @@ void render_scene(Cam c, Scene scene) {
                 clipped->trisWorld[n].normal[VERTEX_B] = mult_matrix_by_vec3(normalRotationTransposed, clipped->model->normals[tp.n2]);
                 clipped->trisWorld[n].normal[VERTEX_C] = mult_matrix_by_vec3(normalRotationTransposed, clipped->model->normals[tp.n3]);
                 continue;
-            } 
+            }
 
             Vec3 v1 = vec3_sub(clipped->trisWorld[n].vertex[VERTEX_B], clipped->trisWorld[n].vertex[VERTEX_A]);
             Vec3 v2 = vec3_sub(clipped->trisWorld[n].vertex[VERTEX_C], clipped->trisWorld[n].vertex[VERTEX_A]);
@@ -413,8 +428,6 @@ void render_scene(Cam c, Scene scene) {
                     
                     continue;
                 }
-                
-                // TODO: UVs
 
                 if (d1 > FLT_MIN && d2 < 0.0f && d3 < 0.0f) {
                     one_vertex_in_front(plane, clipped, tri, VERTEX_A, VERTEX_B, VERTEX_C);
