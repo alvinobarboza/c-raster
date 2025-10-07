@@ -1,8 +1,15 @@
 #include <stdio.h>
+#include <sys/time.h>
+
 #include "models.h"
 #include "shapes.h"
 
 int main() {
+
+    // Start measuring time
+    struct timeval begin, end;
+    gettimeofday(&begin, 0);
+
 	// ModelData ammoBox = load_model_from_path("./assets/ammo_box_1_1.obj", "./assets/ammo_mp_1.png", true);
 	// free_model(&ammoBox);
 	
@@ -24,5 +31,13 @@ int main() {
     // free_model(&cube);
     free_model(&triangle);
 
+
+    // Stop measuring time and calculate the elapsed time
+    gettimeofday(&end, 0);
+    long seconds = end.tv_sec - begin.tv_sec;
+    long microseconds = end.tv_usec - begin.tv_usec;
+    double elapsed = seconds + microseconds*1e-6;
+    
+    printf("Time measured: %.5f seconds.\n", elapsed);
 	return 0;
 }
