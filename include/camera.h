@@ -42,14 +42,15 @@ typedef struct Cam {
 typedef struct Point {
     int x, y;
     float brightness, zDepth;
+    Vec3 normal, uvCoord;
 } Point;
 
 void swap_point_values(Point *p1, Point *p2);
 void put_pixel(Cam c, Color color, int x, int y, float h, float depth);
 void clear_canvas(Cam c);
 
-Point viewport_to_canvas(Cam c, float x, float y, float z);
-Point project_vertex(Cam c, Vec3 v);
+Point viewport_to_canvas(Cam c, float x, float y, float z, Vec3 n, Vec3 t);
+Point project_vertex(Cam c, Vec3 v, Vec3 n, Vec3 t);
 
 Cam init_camera(int w, int h, Vec3 position, Vec3 rotation);
 void free_camera(Cam c);

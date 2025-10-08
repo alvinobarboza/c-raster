@@ -175,17 +175,18 @@ void draw_filled_triangle(Cam c, Point p0, Point p1, Point p2, Color color) {
     free(z012);
 }
 
-void render_triangle(Cam c, FullTriangle tri) {
-    Point pointA = project_vertex(c, tri.vertex[VERTEX_A]);
-    Point pointB = project_vertex(c, tri.vertex[VERTEX_B]);
-    Point pointC = project_vertex(c, tri.vertex[VERTEX_C]);
+void render_triangle(Cam c, FullTriangle tri, TextureData *texture) {
+    Point pointA = project_vertex(c, tri.vertex[VERTEX_A], tri.normal[VERTEX_A], tri.uv[VERTEX_A]);
+    Point pointB = project_vertex(c, tri.vertex[VERTEX_B], tri.normal[VERTEX_B], tri.uv[VERTEX_B]);
+    Point pointC = project_vertex(c, tri.vertex[VERTEX_C], tri.normal[VERTEX_C], tri.uv[VERTEX_C]);
 
     draw_filled_triangle(
         c, 
         pointA,
         pointB,
         pointC, 
-        tri.color);
+        tri.color, 
+        texture);
     
     draw_wireframe_triangle(
         c, 

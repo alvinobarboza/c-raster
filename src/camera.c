@@ -43,21 +43,23 @@ void clear_canvas(Cam c) {
     }
 }
 
-Point viewport_to_canvas(Cam c, float x, float y, float z) {
+Point viewport_to_canvas(Cam c, float x, float y, float z, Vec3 n, Vec3 t) {
     return (Point) {
         .brightness = 1.0f,
         .x = x * (c.width/c.view.width),
         .y = y * (c.height/c.view.height),
-        .zDepth = z
+        .zDepth = z,
+        .normal = n,
+        .uvCoord = t
     };
 }
 
-Point project_vertex(Cam c, Vec3 v) {
+Point project_vertex(Cam c, Vec3 v, Vec3 n, Vec3 t) {
     return viewport_to_canvas(
         c, 
         v.x * c.view.d / v.z,
         v.y * c.view.d / v.z,
-        v.z
+        v.z, n, t
     );
 }
 
