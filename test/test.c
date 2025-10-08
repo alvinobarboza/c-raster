@@ -1,8 +1,79 @@
 #include <stdio.h>
 #include <sys/time.h>
+#include <stdlib.h>
 
 #include "models.h"
 #include "shapes.h"
+#include "camera.h"
+
+
+#define w 100
+#define h 50
+
+char canvas[w*h];
+
+void canvas_clear() {
+    for (int i = 0; i < w*h; i++) {
+        canvas[i] = '.';
+    }
+}
+
+void render_canvas() {
+    for(int y = 0; y < h; y++){
+        for(int x = 0; x < w; x++) {
+            printf("%c", canvas[y*w+x]);
+        }
+        puts(" ");
+    }
+}
+
+void draw_top_bottom(Point pointA, Point pointB, Point pointC) {
+    if (pointB.x > pointC.x) {
+        Point t = pointB;
+        pointB = pointC;
+        pointC = t;
+    }
+
+    float invslope1 = (float)(pointB.x - pointA.x) / (float)(pointB.y - pointA.y);
+    float invslope2 = (float)(pointC.x - pointA.x) / (float)(pointC.y - pointA.y);
+
+    float curx1 = pointA.x;
+    float curx2 = pointA.x;
+
+    for(int scanlineY = pointA.y; scanlineY <= pointC.y; scanlineY++) {
+
+        for(int x = curx1; x <= curx2; x++){
+            canvas[scanlineY*w+x] = '0';
+        }
+
+        curx1 += invslope1;
+        curx2 += invslope2;
+    }
+}
+
+void draw_bottom_top(Point pointA, Point pointB, Point pointC) {
+    if (pointB.x < pointA.x) {
+        Point t = pointB;
+        pointB = pointA;
+        pointA = t;
+    }
+
+    float invslope1 = (float)(pointC.x - pointA.x) / (float)(pointC.y - pointA.y);
+    float invslope2 = (float)(pointC.x - pointB.x) / (float)(pointC.y - pointB.y);
+
+    float curx1 = pointC.x;
+    float curx2 = pointC.x;
+
+    for(int scanlineY = pointC.y; scanlineY > pointA.y; scanlineY--) {
+
+        for(int x = curx1; x <= curx2; x++){
+            canvas[scanlineY*w+x] = '0';
+        }
+
+        curx1 -= invslope1;
+        curx2 -= invslope2;
+    }
+}
 
 int main() {
 
@@ -10,38 +81,53 @@ int main() {
     struct timeval begin, end;
     gettimeofday(&begin, 0);
 
-	// ModelData ammoBox = load_model_from_path("./assets/ammo_box_1_1.obj", "./assets/ammo_mp_1.png", true);
-	// free_model(&ammoBox);
-	
-    // ModelData teapot = load_model_from_path("./assets/newell_teaset/teapot.obj", NULL, true);
-    // ModelData teacup = load_model_from_path("./assets/newell_teaset/teacup.obj", NULL, true);
-    // ModelData spoon = load_model_from_path("./assets/newell_teaset/spoon.obj", NULL, true);
-    ModelData cube = load_model_from_path("./assets/cube.obj", NULL, false, false);
-    // ModelData triangle = triangle_shape();
+    // CODE 
+    // testing new algorithm to avoid so many mallocs and make it easier to interpolate
+    // between normals and uvs 
+    // Test subject: https://www.sunshine2k.de/coding/java/TriangleRasterization/TriangleRasterization.html
+    canvas_clear();
 
-    // printf("%ld %ld %ld %ld \n", cube.vertsCount, cube.trisCount, cube.normalsCount, cube.uvsCount);
+    Point pointA = (Point) {.x = 20, .y = 10};
+    Point pointB = (Point) {.x = 7, .y = 18};
+    Point pointC = (Point) {.x = 40, .y = 30};
 
-    // for(size_t i = 0; i < cube.uvsCount; i++) {
-    //     print_vec3("uvs:", cube.uvs[i]);
-    // }
-
-    // free_model(&teapot);
-    // free_model(&teacup);
-    // free_model(&spoon);
-
-    for(uint16_t y = 0; y < cube.texture->height; y++){
-        if (y % 20 == 0) {
-            for(uint16_t x = 0; x < cube.texture->width; x++){
-                if (x % 20 == 0) {
-                    printf("%03d ", cube.texture->colors[y*cube.texture->width+x].r);
-                }
-            }
-            puts(" ");
-        }
+    if (pointB.y < pointA.y) {
+        Point t = pointB;
+        pointB = pointA;
+        pointA = t;
     }
 
-    free_model(&cube);
-    // free_model(&triangle);
+    if (pointC.y < pointA.y) {
+        Point t = pointC;
+        pointC = pointA;
+        pointA = t;
+    }
+
+    if (pointC.y < pointB.y) {
+        Point t = pointC;
+        pointC = pointB;
+        pointB = t;
+    }
+    
+    if (pointB.y == pointC.y) {
+        draw_top_bottom(pointA, pointB, pointC);
+    } else if (pointA.y == pointB.y) {
+        draw_bottom_top(pointA, pointB, pointC);
+    } else {
+        Point pointAC = (Point) {
+            .x = pointA.x + ((float)(pointB.y - pointA.y) / (float)(pointC.y - pointA.y) * (float)(pointC.x - pointA.x)), 
+            .y = pointB.y};
+        draw_top_bottom(pointA, pointB, pointAC);
+        draw_bottom_top(pointB, pointAC, pointC);        
+    }
+
+    // canvas[pointA.y*w+pointA.x] = 'A';
+    // canvas[pointB.y*w+pointB.x] = 'B';
+    // canvas[pointC.y*w+pointC.x] = 'C';
+
+    render_canvas();
+
+    // END CODE
 
 
     // Stop measuring time and calculate the elapsed time
