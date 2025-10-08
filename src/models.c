@@ -93,13 +93,6 @@ ModelData load_model_from_path(const char *pathModel, const char *pathTexture, b
     ModelData model = {0};
     TextureData *texture = NULL;
 
-    if ( pathTexture == NULL ) {
-        puts("Loading default texture");
-        texture = load_default_texture();
-    } else {
-
-    }
-
     FILE *fp = fopen(pathModel, "r");
     if (fp == NULL){
         return cube_shape();
@@ -142,6 +135,15 @@ ModelData load_model_from_path(const char *pathModel, const char *pathTexture, b
                 if ( triCheck > 2 && buffer[i] == ' ' ) trisCount++;
             }
         }
+    }
+
+    if (uvsCount > 0 && pathTexture == NULL ) {
+        puts("Loading default texture");
+        texture = load_default_texture();
+    } 
+
+    if (uvsCount > 0 && pathTexture != NULL ) {
+        printf("Loading %s texture\n", pathTexture);
     }
 
     printf("tris: %ld verts: %ld normals: %ld uvs: %ld \n", trisCount, vertsCount, normalCount, uvsCount);

@@ -45,6 +45,7 @@ typedef struct FullTriangle {
     Vec3 normal[3];
     Vec3 uv[3];
     Color color;
+    TextureData *texture;
 } FullTriangle;
 
 typedef struct Sphere {

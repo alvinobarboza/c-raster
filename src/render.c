@@ -22,7 +22,7 @@ float * interpolate(int i0, float d0, int i1, float d1) {
     // Last value included
     values = malloc(sizeof(float) * (abs(di) + 2));
 
-    float a = dd / (float)(di);
+    float a = dd / (float)(abs(di));
     float d = d0;
 
     for (int i = i0; i <= i1; i++) {
@@ -75,7 +75,7 @@ void draw_wireframe_triangle(Cam c, Point p0, Point p1, Point p2, Color color) {
     draw_line(c, p2, p0, color);
 }
 
-void draw_filled_triangle(Cam c, Point p0, Point p1, Point p2, Color color) {
+void draw_filled_triangle(Cam c, Point p0, Point p1, Point p2, Color color, TextureData *texture) {
     // Sort the points so that p0.y <= p1.y <= p2.y
     if (p1.y < p0.y) swap_point_values(&p1, &p0);
     if (p2.y < p0.y) swap_point_values(&p2, &p0);
@@ -175,7 +175,7 @@ void draw_filled_triangle(Cam c, Point p0, Point p1, Point p2, Color color) {
     free(z012);
 }
 
-void render_triangle(Cam c, FullTriangle tri, TextureData *texture) {
+void render_triangle(Cam c, FullTriangle tri) {
     Point pointA = project_vertex(c, tri.vertex[VERTEX_A], tri.normal[VERTEX_A], tri.uv[VERTEX_A]);
     Point pointB = project_vertex(c, tri.vertex[VERTEX_B], tri.normal[VERTEX_B], tri.uv[VERTEX_B]);
     Point pointC = project_vertex(c, tri.vertex[VERTEX_C], tri.normal[VERTEX_C], tri.uv[VERTEX_C]);
@@ -186,7 +186,7 @@ void render_triangle(Cam c, FullTriangle tri, TextureData *texture) {
         pointB,
         pointC, 
         tri.color, 
-        texture);
+        tri.texture);
     
     draw_wireframe_triangle(
         c, 
@@ -364,6 +364,7 @@ void render_scene(Cam c, Scene scene) {
             clipped->trisWorld[n].vertex[VERTEX_C] = mult_matrix_by_vec3(m_transform, clipped->model->verts[tp.v3]);
 
             if(clipped->model->uvsCount){
+                clipped->trisWorld[n].texture = clipped->model->texture;
                 clipped->trisWorld[n].uv[VERTEX_A] = clipped->model->uvs[tp.t1];
                 clipped->trisWorld[n].uv[VERTEX_B] = clipped->model->uvs[tp.t2];
                 clipped->trisWorld[n].uv[VERTEX_C] = clipped->model->uvs[tp.t3];
