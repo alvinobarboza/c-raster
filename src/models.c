@@ -59,12 +59,25 @@ TextureData *load_default_texture() {
     texture->width = w;
     texture->height = h;
 
+    int tile = w / 7;
+
+    Color currentY = BLACK;
+    Color oldY = RAYWHITE;
     for(uint16_t y = 0; y < h; y++) {
+        if (y % tile == 0 ){
+            Color temp = currentY;
+            currentY = oldY;
+            oldY = temp;
+        }
+        Color current = currentY;
+        Color old = oldY;
         for(uint16_t x = 0; x < w; x++) {
-            texture->colors[y*w+x].r = y % 255;
-            texture->colors[y*w+x].g = y % 255;
-            texture->colors[y*w+x].b = y % 255;
-            texture->colors[y*w+x].a = 255;
+            if (x % tile == 0 ){
+                Color temp = current;
+                current = old;
+                old = temp;
+            }
+            texture->colors[y*w+x] = current;
         }   
     }
     return texture;

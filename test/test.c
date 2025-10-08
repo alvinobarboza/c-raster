@@ -30,10 +30,10 @@ int main() {
     // free_model(&spoon);
 
     for(uint16_t y = 0; y < cube.texture->height; y++){
-        if (y % 50 == 0) {
+        if (y % 20 == 0) {
             for(uint16_t x = 0; x < cube.texture->width; x++){
-                if (x % 50 == 0) {
-                    printf("%d ", cube.texture->colors[y*cube.texture->width+x].r);
+                if (x % 20 == 0) {
+                    printf("%03d ", cube.texture->colors[y*cube.texture->width+x].r);
                 }
             }
             puts(" ");
