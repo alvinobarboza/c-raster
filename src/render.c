@@ -5,6 +5,7 @@
 #include <float.h>
 #include <stdint.h>
 #include "render.h"
+#include "maths.h"
 
 // Must deallocate after use
 float * interpolate(int i0, float d0, int i1, float d1) {
@@ -73,6 +74,118 @@ void draw_wireframe_triangle(Cam c, Point p0, Point p1, Point p2, Color color) {
     draw_line(c, p0, p1, color);
     draw_line(c, p1, p2, color);
     draw_line(c, p2, p0, color);
+}
+
+
+void draw_top_bottom(Cam c, Point pointA, Point pointB, Point pointC, Color color) {
+    // if (pointB.x > pointC.x) swap_point_values(&pointB, &pointC);
+
+    float abX = (float)(pointB.x - pointA.x) / (float)(pointB.y - pointA.y);
+    float acX = (float)(pointC.x - pointA.x) / (float)(pointC.y - pointA.y);
+
+    float abZ = (float)(pointB.zDepth - pointA.zDepth) / (float)(pointB.y - pointA.y);
+    float acZ = (float)(pointC.zDepth - pointA.zDepth) / (float)(pointC.y - pointA.y);
+
+    float xLeft = pointA.x;
+    float xRight = pointA.x;
+
+    float zLeft = pointA.zDepth;
+    float zRight = pointA.zDepth;
+
+    if (pointB.x > pointC.x) {
+        float t = abX;
+        abX = acX;
+        acX = t;
+    }
+
+    // if (pointB.zDepth < pointA.zDepth) {
+    //     float t = abZ;
+    //     abZ = acZ;
+    //     acZ = t;
+    // }
+
+    for(int scanlineY = pointA.y; scanlineY <= pointC.y; scanlineY++) {
+        
+        int length = xRight - xLeft;
+        length = length <= 0 ? 1 : length;
+        for(int x = xLeft; x <= xRight; x++){
+            float ratioZ = (float)(x - xLeft) / (float)length;
+            float depth = lerp_a_b(zLeft, zRight, ratioZ);
+            put_pixel(c, color, x, scanlineY, 1, depth);
+        }
+
+        xLeft += abX;
+        xRight += acX;
+
+        zLeft += abZ;
+        zRight += acZ;
+    }
+}
+
+void draw_bottom_top(Cam c, Point pointA, Point pointB, Point pointC, Color color) {
+    // if (pointB.x < pointA.x) swap_point_values(&pointB, &pointA);
+
+    float caX = (float)(pointC.x - pointA.x) / (float)(pointC.y - pointA.y);
+    float cbX = (float)(pointC.x - pointB.x) / (float)(pointC.y - pointB.y);
+
+    float caZ = (float)(pointC.zDepth - pointA.zDepth) / (float)(pointC.y - pointA.y);
+    float cbZ = (float)(pointC.zDepth - pointB.zDepth) / (float)(pointC.y - pointB.y);
+
+    float xLeft = pointC.x;
+    float xRight = pointC.x;
+
+    float zLeft = pointC.zDepth;
+    float zRight = pointC.zDepth;
+
+    if (pointB.x < pointA.x) {
+        float t = caX;
+        caX = cbX;
+        cbX = t;
+    }
+
+    // if (pointB.zDepth < pointA.zDepth) {
+    //     float t = cbZ;
+    //     cbZ = caZ;
+    //     caZ = t;
+    // }
+
+    for(int scanlineY = pointC.y; scanlineY > pointA.y; scanlineY--) {
+
+        int length = xRight - xLeft;
+        length = length <= 0 ? 1 : length;
+        for(int x = xLeft; x <= xRight; x++){
+            float ratioZ = (float)(x - xLeft) / (float)length;
+            float depth = lerp_a_b(zLeft, zRight, ratioZ);
+            put_pixel(c, color, x, scanlineY, 1, depth);  
+        }
+
+        xLeft -= caX;
+        xRight -= cbX;
+
+        zLeft -= caZ;
+        zRight -= cbZ;
+    }
+}
+
+
+void draw_filled_triangle_2(Cam c, Point pointA, Point pointB, Point pointC, Color color) {
+    // Sort the points so that pointA.y <= pointB.y <= pointC.y
+    if (pointB.y < pointA.y) swap_point_values(&pointB, &pointA);
+    if (pointC.y < pointA.y) swap_point_values(&pointC, &pointA);
+    if (pointC.y < pointB.y) swap_point_values(&pointC, &pointB);
+
+    if (pointB.y == pointC.y) {
+        draw_top_bottom(c, pointA, pointB, pointC, color);
+    } else if (pointA.y == pointB.y) {
+        draw_bottom_top(c, pointA, pointB, pointC, color);
+    } else {
+        Point pointAC = (Point) {
+            .x = pointA.x + ((float)(pointB.y - pointA.y) / (float)(pointC.y - pointA.y) * (float)(pointC.x - pointA.x)), 
+            .y = pointB.y,
+            .zDepth = pointA.zDepth + ((float)(pointB.y - pointA.y) / (float)(pointC.y - pointA.y) * (float)(pointC.zDepth - pointA.zDepth))};
+        draw_top_bottom(c, pointA, pointB, pointAC, color);
+        draw_bottom_top(c, pointB, pointAC, pointC, color);        
+    }
 }
 
 void draw_filled_triangle(Cam c, Point p0, Point p1, Point p2, Color color, TextureData *texture) {
@@ -180,13 +293,20 @@ void render_triangle(Cam c, FullTriangle tri) {
     Point pointB = project_vertex(c, tri.vertex[VERTEX_B], tri.normal[VERTEX_B], tri.uv[VERTEX_B]);
     Point pointC = project_vertex(c, tri.vertex[VERTEX_C], tri.normal[VERTEX_C], tri.uv[VERTEX_C]);
 
-    draw_filled_triangle(
+    // draw_filled_triangle(
+    //     c, 
+    //     pointA,
+    //     pointB,
+    //     pointC, 
+    //     tri.color, 
+    //     tri.texture);
+
+    draw_filled_triangle_2(
         c, 
         pointA,
         pointB,
         pointC, 
-        tri.color, 
-        tri.texture);
+        tri.color);
     
     draw_wireframe_triangle(
         c, 
@@ -343,9 +463,9 @@ void render_scene(Cam c, Scene scene) {
     matrix_transpose(normalRotation, normalRotationTransposed);
 
     for(size_t i = 0; i < scene.objectCount; i++){
-        // if ( i != 3) {
-        //     continue;
-        // }
+        if ( i > 1) {
+            continue;
+        }
         Instance *clipped = &scene.instances[i];
 
         matrix_multiplication(c.matrixTransform, clipped->transforms.matrixTransform, m_transform);

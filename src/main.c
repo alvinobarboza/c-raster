@@ -1,6 +1,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <sys/time.h>
+#include <unistd.h>
+
 
 #include "raylib.h"
 #include "transforms.h"
@@ -71,6 +74,11 @@ int main(void)
 
     // TODO: better instance loading
     Instance instances[] = {
+        init_instance(&cube, (Transforms) {
+            .position = (Vec3){.x = 1.0f, .y = 0.0f, .z = 6.5f},
+            .rotation = (Vec3){.x = 0.0f, .y = 0.0f, .z = 0.0f},
+            .scale = (Vec3){.x = 1.0f, .y = 1.0f, .z = 1.0f},
+        }),
         init_instance(&triangle, (Transforms){
             .position = (Vec3){.x = 0.0f, .y = 0.0f, .z = 6.0f},
             .rotation = (Vec3){.x = 0.0f, .y = 0.0f, .z = 0.0f},
@@ -88,11 +96,6 @@ int main(void)
         }),
         init_instance(&teapot, (Transforms) {
             .position = (Vec3){.x = -2.5, .y = 0.0f, .z = 5.0f},
-            .rotation = (Vec3){.x = 0.0f, .y = 0.0f, .z = 0.0f},
-            .scale = (Vec3){.x = 1.0f, .y = 1.0f, .z = 1.0f},
-        }),
-        init_instance(&cube, (Transforms) {
-            .position = (Vec3){.x = 3.0f, .y = 0.0f, .z = 4.5f},
             .rotation = (Vec3){.x = 0.0f, .y = 0.0f, .z = 0.0f},
             .scale = (Vec3){.x = 1.0f, .y = 1.0f, .z = 1.0f},
         }),
@@ -193,7 +196,19 @@ int main(void)
             renderTexture = LoadTextureFromImage(img);
         }
 
+        // struct timeval begin, end;
+        // gettimeofday(&begin, 0);
+
         render_scene(camera, scene);
+
+        // Stop measuring time and calculate the elapsed time
+        // gettimeofday(&end, 0);
+        // long seconds = end.tv_sec - begin.tv_sec;
+        // long microseconds = end.tv_usec - begin.tv_usec;
+        // double elapsed = seconds + microseconds*1e-6;
+
+        // printf("Time measured: %.5f seconds.\n", elapsed);
+
         UpdateTexture(renderTexture, camera.canvas);
         
         BeginDrawing();

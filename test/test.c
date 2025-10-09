@@ -1,14 +1,17 @@
 #include <stdio.h>
 #include <sys/time.h>
 #include <stdlib.h>
+#include <math.h>
+#include <unistd.h>
 
 #include "models.h"
 #include "shapes.h"
 #include "camera.h"
+#include "transforms.h"
 
 
-#define w 100
-#define h 50
+#define w 60
+#define h 30
 
 char canvas[w*h];
 
@@ -43,7 +46,10 @@ void draw_top_bottom(Point pointA, Point pointB, Point pointC) {
     for(int scanlineY = pointA.y; scanlineY <= pointC.y; scanlineY++) {
 
         for(int x = curx1; x <= curx2; x++){
-            canvas[scanlineY*w+x] = '0';
+            int i = scanlineY*w+x;
+            if (i >= 0 && i < w*h ){
+                canvas[i] = '0';
+            }
         }
 
         curx1 += invslope1;
@@ -67,7 +73,10 @@ void draw_bottom_top(Point pointA, Point pointB, Point pointC) {
     for(int scanlineY = pointC.y; scanlineY > pointA.y; scanlineY--) {
 
         for(int x = curx1; x <= curx2; x++){
-            canvas[scanlineY*w+x] = '0';
+            int i = scanlineY*w+x;
+            if (i >= 0 && i < w*h){
+                canvas[i] = '0';
+            }
         }
 
         curx1 -= invslope1;
@@ -85,11 +94,12 @@ int main() {
     // testing new algorithm to avoid so many mallocs and make it easier to interpolate
     // between normals and uvs 
     // Test subject: https://www.sunshine2k.de/coding/java/TriangleRasterization/TriangleRasterization.html
+
     canvas_clear();
 
-    Point pointA = (Point) {.x = 20, .y = 10};
-    Point pointB = (Point) {.x = 7, .y = 18};
-    Point pointC = (Point) {.x = 40, .y = 30};
+    Point pointA = (Point) {.x = 50, .y = 16};
+    Point pointB = (Point) {.x = 5, .y = 5};
+    Point pointC = (Point) {.x = 20, .y = 27};
 
     if (pointB.y < pointA.y) {
         Point t = pointB;
@@ -121,11 +131,19 @@ int main() {
         draw_bottom_top(pointB, pointAC, pointC);        
     }
 
-    // canvas[pointA.y*w+pointA.x] = 'A';
-    // canvas[pointB.y*w+pointB.x] = 'B';
-    // canvas[pointC.y*w+pointC.x] = 'C';
+    canvas[pointA.y*w+pointA.x] = 'A';
+    canvas[pointB.y*w+pointB.x] = 'B';
+    canvas[pointC.y*w+pointC.x] = 'C';
 
     render_canvas();
+
+    float start = 10;
+    float finish = 100;
+    float length = finish - start;
+
+    float i = 55;
+
+    printf("%f\n", ((i-start) * 100 / length)/100);
 
     // END CODE
 

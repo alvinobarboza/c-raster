@@ -4,9 +4,15 @@
 #include "camera.h"
 
 void swap_point_values(Point *p1, Point *p2) {
-    Point temp = *p1;
-    *p1 = *p2;
-    *p2 = temp;
+    // Point temp = *p1;
+    // *p1 = *p2;
+    // *p2 = temp;
+    float x = p1->x;
+    float y = p1->y;
+    p1->x = p2->x;
+    p1->y = p2->y;
+    p2->x = x;
+    p2->y = y;
 }
 
 void put_pixel(Cam c, Color color, int x, int y, float h, float depth) {
