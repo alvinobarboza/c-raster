@@ -137,13 +137,10 @@ int main() {
 
     render_canvas();
 
-    float start = 10;
-    float finish = 100;
-    float length = finish - start;
+    int count = 100;
+    int data = count * 0.5;
 
-    float i = 55;
-
-    printf("%f\n", ((i-start) * 100 / length)/100);
+    printf("%d\n", data);
 
     // END CODE
 

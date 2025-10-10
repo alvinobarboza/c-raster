@@ -7,7 +7,7 @@
 
 void draw_line(Cam c, Point pos0, Point pos1 , Color color);
 void draw_wireframe_triangle(Cam c, Point p0, Point p1, Point p2, Color color);
-void draw_filled_triangle(Cam c, Point p0, Point p1, Point p2, Color color, TextureData *texture);
+void draw_filled_triangle(Cam c, Point pointA, Point pointB, Point pointC, Color color, TextureData *texture);
 void render_triangle(Cam c, FullTriangle tri);
 void render_model(Cam c, Instance instance);
 void render_scene(Cam c, Scene scene);

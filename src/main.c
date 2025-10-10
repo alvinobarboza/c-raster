@@ -58,8 +58,8 @@ int main(void)
         WIDTH, HEIGHT, 
         // (Vec3) {.x = 0.0f, .y = 0.0f, .z = 0.0f},
         // (Vec3) {.x = 0.0f, .y = 0.0f, .z = 0.0f}
-        (Vec3) {.x = 6.54f, .y = 4.09f, .z = -2.35f},
-        (Vec3) {.x = -18.87, .y = 26.68, .z = 0}
+        (Vec3) {.x = 1.69f, .y = 0.38f, .z = 3.06f},
+        (Vec3) {.x = 11.27f, .y = 92.73f, .z = 0}
     );
 
     ModelData teapot = load_model_from_path("./assets/newell_teaset/teapot.obj", NULL, false, false);
@@ -206,8 +206,8 @@ int main(void)
         // long seconds = end.tv_sec - begin.tv_sec;
         // long microseconds = end.tv_usec - begin.tv_usec;
         // double elapsed = seconds + microseconds*1e-6;
-
         // printf("Time measured: %.5f seconds.\n", elapsed);
+
 
         UpdateTexture(renderTexture, camera.canvas);
         

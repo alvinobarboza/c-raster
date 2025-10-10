@@ -1,40 +1,34 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <math.h>
+#include <stdio.h>
 #include "camera.h"
 
 void swap_point_values(Point *p1, Point *p2) {
-    // Point temp = *p1;
-    // *p1 = *p2;
-    // *p2 = temp;
-    float x = p1->x;
-    float y = p1->y;
-    p1->x = p2->x;
-    p1->y = p2->y;
-    p2->x = x;
-    p2->y = y;
+    Point temp = *p1;
+    *p1 = *p2;
+    *p2 = temp;
 }
 
 void put_pixel(Cam c, Color color, int x, int y, float h, float depth) {
-    x = c.width/2 + x;
-	y = c.height/2 - y - 1;
+    x = c.width * 0.5 + x;
+	y = c.height * 0.5 - y - 1;
     float z = 1 / depth;
 
 	if (x < 0 || x >= c.width || y < 0 || y >= c.height) {
 		return;
 	}
 
-    if (c.depthBuffer[y*c.width+x] > z) {
+    if (c.depthBuffer[y*c.width+x] >= z) {
         return;
     }
 
-    Color shaded = {0};
-    shaded.r = color.r * h;
-    shaded.g = color.g * h;
-    shaded.b = color.b * h;
-    shaded.a = OPAQUE;
+    color.r = color.r * h;
+    color.g = color.g * h;
+    color.b = color.b * h;
+    color.a = OPAQUE;
 
-	c.canvas[y*c.width+x] = shaded;
+	c.canvas[y*c.width+x] = color;
     c.depthBuffer[y*c.width+x] = z;
 }
 
