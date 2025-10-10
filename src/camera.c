@@ -13,7 +13,7 @@ void swap_point_values(Point *p1, Point *p2) {
 void put_pixel(Cam c, Color color, int x, int y, float h, float depth) {
     x = c.width * 0.5 + x;
 	y = c.height * 0.5 - y - 1;
-    float z = 1 / depth;
+    float z = 1 / (depth+1);
 
 	if (x < 0 || x >= c.width || y < 0 || y >= c.height) {
 		return;
