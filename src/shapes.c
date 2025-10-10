@@ -202,8 +202,8 @@ ModelData square_shape() {
 ModelData triangle_shape() {
     Vec3 uv_verts[] = {
         { 1.0f,  1.0f,  0.0f}, // 0 front top right
-        { 0.0f,  0.0f,  0.0f}, // 1 front top left
-        { 0.0f,  1.0f,  0.0f}, // 2 front bottom left
+        { 0.0f,  1.0f,  0.0f}, // 1 front top left
+        { 0.0f,  0.0f,  0.0f}, // 2 front bottom left
     };
     Vec3 tris_verts[] = {
         { 1.0f,  1.0f,  0.0f}, // 0 front top right
@@ -218,5 +218,5 @@ ModelData triangle_shape() {
         },
     };
 
-    return init_model(tris_verts, 3, tris_tris, 1, NULL, 0, uv_verts, 3, NULL);
+    return init_model(tris_verts, 3, tris_tris, 1, NULL, 0, uv_verts, 3, load_default_texture());
 }

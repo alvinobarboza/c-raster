@@ -80,7 +80,7 @@ void draw_wireframe_triangle(Cam c, Point p0, Point p1, Point p2, Color color) {
     draw_line(c, p2, p0, color);
 }
 
-void draw_top_bottom(Cam c, Point pointA, Point pointB, Point pointC, Color color) {
+void draw_top_bottom(Cam c, Point pointA, Point pointB, Point pointC, Color color, TextureData *texture) {
     if (pointB.x > pointC.x) swap_point_values(&pointB, &pointC);
 
     float lengthAB = pointB.y - pointA.y;
@@ -129,6 +129,12 @@ void draw_top_bottom(Cam c, Point pointA, Point pointB, Point pointC, Color colo
             nInner = vec3_lerp_a_b(nLeft, nRight, ratioX);
             uvInner = vec3_lerp_a_b(uvLeft, uvRight, ratioX);
 
+            if (texture != NULL) {
+                if (texture->colors != NULL) {
+                    color = texel_from_texture(texture, uvInner.x , uvInner.y );
+                }
+            }
+
             put_pixel(c, color, x, scanlineY, 1, depth);
             depth += xZ;
         }
@@ -142,7 +148,7 @@ void draw_top_bottom(Cam c, Point pointA, Point pointB, Point pointC, Color colo
     }
 }
 
-void draw_bottom_top(Cam c, Point pointA, Point pointB, Point pointC, Color color) {
+void draw_bottom_top(Cam c, Point pointA, Point pointB, Point pointC, Color color, TextureData *texture) {
     if (pointB.x < pointA.x) swap_point_values(&pointB, &pointA);
 
     float lengthAC = pointC.y - pointA.y;
@@ -193,6 +199,12 @@ void draw_bottom_top(Cam c, Point pointA, Point pointB, Point pointC, Color colo
             nInner = vec3_lerp_a_b(nLeft, nRight, ratioX);
             uvInner = vec3_lerp_a_b(uvLeft, uvRight, ratioX);
 
+            if (texture != NULL) {
+                if (texture->colors != NULL) {
+                    color = texel_from_texture(texture, uvInner.x , uvInner.y );
+                }
+            }
+
             put_pixel(c, color, x, scanlineY, 1, depth);
             depth += xZ;
         }
@@ -214,9 +226,9 @@ void draw_filled_triangle(Cam c, Point pointA, Point pointB, Point pointC, Color
     if (pointC.y < pointB.y) swap_point_values(&pointC, &pointB);
 
     if (pointB.y == pointC.y) {
-        draw_top_bottom(c, pointA, pointB, pointC, color);
+        draw_top_bottom(c, pointA, pointB, pointC, color, texture);
     } else if (pointA.y == pointB.y) {
-        draw_bottom_top(c, pointA, pointB, pointC, color);
+        draw_bottom_top(c, pointA, pointB, pointC, color, texture);
     } else {
 
         Point pointAC = (Point) {
@@ -233,8 +245,8 @@ void draw_filled_triangle(Cam c, Point pointA, Point pointB, Point pointC, Color
         float ratioACtoAprimeC = lengthAprimeC / lengthAC;
         pointAC.uvCoord = vec3_lerp_a_b(pointA.uvCoord, pointC.uvCoord, ratioACtoAprimeC);
 
-        draw_top_bottom(c, pointA, pointB, pointAC, color);
-        draw_bottom_top(c, pointB, pointAC, pointC, color);        
+        draw_top_bottom(c, pointA, pointB, pointAC, color, texture);
+        draw_bottom_top(c, pointB, pointAC, pointC, color, texture);        
     }
 }
 
@@ -406,9 +418,9 @@ void render_scene(Cam c, Scene scene) {
     matrix_transpose(normalRotation, normalRotationTransposed);
 
     for(size_t i = 0; i < scene.objectCount; i++){
-        // if ( i > 1) {
-        //     continue;
-        // }
+        if ( i != 0) {
+            continue;
+        }
         Instance *clipped = &scene.instances[i];
 
         matrix_multiplication(c.matrixTransform, clipped->transforms.matrixTransform, m_transform);

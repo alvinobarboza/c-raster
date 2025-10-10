@@ -74,15 +74,15 @@ int main(void)
 
     // TODO: better instance loading
     Instance instances[] = {
+        init_instance(&triangle, (Transforms){
+            .position = (Vec3){.x = 0.0f, .y = 0.0f, .z = 6.0f},
+            .rotation = (Vec3){.x = 0.0f, .y = 0.0f, .z = 45.0f},
+            .scale = (Vec3){.x = 1.0f, .y = 1.0f, .z = 1.0f}
+        }),
         init_instance(&cube, (Transforms) {
             .position = (Vec3){.x = 1.0f, .y = 0.0f, .z = 6.5f},
             .rotation = (Vec3){.x = 0.0f, .y = 0.0f, .z = 0.0f},
             .scale = (Vec3){.x = 1.0f, .y = 1.0f, .z = 1.0f},
-        }),
-        init_instance(&triangle, (Transforms){
-            .position = (Vec3){.x = 0.0f, .y = 0.0f, .z = 6.0f},
-            .rotation = (Vec3){.x = 0.0f, .y = 0.0f, .z = 0.0f},
-            .scale = (Vec3){.x = 1.0f, .y = 1.0f, .z = 1.0f}
         }),
         init_instance(&spoon, (Transforms){
             .position = (Vec3){.x = 0.0f, .y = 0.0f, .z = 4.0f},

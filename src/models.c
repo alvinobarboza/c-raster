@@ -59,9 +59,9 @@ TextureData *load_default_texture() {
     texture->width = w;
     texture->height = h;
 
-    int tile = w / 7;
+    int tile = w / 2;
 
-    Color currentY = BLACK;
+    Color currentY = DARKGRAY;
     Color oldY = RAYWHITE;
     for(uint16_t y = 0; y < h; y++) {
         if (y % tile == 0 ){
@@ -454,4 +454,18 @@ void update_instance_transforms(Instance *instance) {
             instance->boundingSphere.radius = r;
         }
     }
+}
+
+Color texel_from_texture(TextureData *texture, float ux, float uy) {
+    if (ux > 1 || ux < 0 || uy > 1 || uy < 0) {
+        return BLACK;
+    }
+
+    uint16_t x = texture->width * ux;
+    uint16_t y = texture->height * uy;
+    uint16_t i = y * texture->width + x;
+    if (i > texture->width * texture->height) {
+        return BLACK;
+    }
+    return texture->colors[i];
 }

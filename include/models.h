@@ -67,6 +67,7 @@ typedef struct Instance {
 // Not full OBJ parser, just v, vn, vt and f data - 
 // That's not the point of this project
 ModelData load_model_from_path(const char *pathModel, const char *pathTexture, bool reorder, bool flipNormals);
+TextureData *load_default_texture();
 
 ModelData init_model(
     Vec3 *verts, size_t vertsCount, 
@@ -82,5 +83,7 @@ Instance init_instance(ModelData *model, Transforms transform);
 void free_instance(Instance *instance);
 
 void update_instance_transforms(Instance *instance);
+
+Color texel_from_texture(TextureData *texture, float ux, float uy);
 
 #endif
