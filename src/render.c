@@ -263,14 +263,14 @@ float ratio_ab_from_plane(ViewPlane plane, Vec3 inFrontA, Vec3 behindB) {
     return t;
 }
 
-// Formula: 
+// Formula: This is a "lerp" function "who knew..."
 // Q = A + t(B−A)
 // Q > Actual point on plane 
 // t > Intersection ratio
 // A > Vertex in front of the positive plane's normal vector
 // B > Vexter behind plane's normal vector 
 Vec3 point_on_plane_from_ab(Vec3 inFrontA, Vec3 behindB, float t) {
-    return vec3_add(inFrontA, vec3_multiply(vec3_sub(behindB, inFrontA),t));
+    return vec3_lerp_a_b(inFrontA, behindB, t);
 }
 
 void one_vertex_in_front( 
