@@ -177,3 +177,13 @@ Vec3 vec3_sub(Vec3 v1, Vec3 v2) {
         .z = v1.z - v2.z,
     };
 }
+
+void vec3_swap_values(Vec3 *v1, Vec3 *v2) {
+    Vec3 temp = *v1;
+    *v1 = *v2;
+    *v2 = temp;
+}
+
+Vec3 vec3_lerp_a_b(Vec3 a, Vec3 b, float ratio) {
+    return vec3_add(a, vec3_multiply(vec3_sub(b, a),ratio));
+}
