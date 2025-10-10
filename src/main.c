@@ -181,6 +181,10 @@ int main(void)
             camera_turn_right(&camera, deltaTurnSpeed);
         }
 
+        if (IsKeyPressed(KEY_Z)) {
+            camera.renderDepth = !camera.renderDepth;
+        }
+
         // TODO: Use mouse to look around
         // Vector2 mouse = GetMouseDelta();
         // printf("mouse x:%+03.02f y:%+03.02f\n",mouse.x, mouse.y);

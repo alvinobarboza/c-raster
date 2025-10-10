@@ -25,6 +25,7 @@ typedef struct ViewPlane {
 // Camera struct holding all render related properties
 // "Cam" to avoid conflict with raylib "Camera"
 typedef struct Cam {
+    bool renderDepth;
     Color *canvas;
     float *depthBuffer;
     float *matrixTransform;

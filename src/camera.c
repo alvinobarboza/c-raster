@@ -23,10 +23,17 @@ void put_pixel(Cam c, Color color, int x, int y, float h, float depth) {
         return;
     }
 
-    color.r = color.r * h;
-    color.g = color.g * h;
-    color.b = color.b * h;
-    color.a = OPAQUE;
+    if (c.renderDepth) {
+        color.r = 255 * z;
+        color.g = 255 * z;
+        color.b = 255 * z;
+        color.a = OPAQUE;
+    } else {
+        color.r = color.r * h;
+        color.g = color.g * h;
+        color.b = color.b * h;
+        color.a = OPAQUE;        
+    }
 
 	c.canvas[y*c.width+x] = color;
     c.depthBuffer[y*c.width+x] = z;
@@ -35,9 +42,9 @@ void put_pixel(Cam c, Color color, int x, int y, float h, float depth) {
 void clear_canvas(Cam c) { 
     size_t length = c.height * c.width;
     for(size_t i = 0; i < length; i++) {
-        c.canvas[i].r = 50;
-        c.canvas[i].g = 50;
-        c.canvas[i].b = 50;
+        c.canvas[i].r = 35;
+        c.canvas[i].g = 35;
+        c.canvas[i].b = 35;
         c.canvas[i].a = OPAQUE;
         c.depthBuffer[i] = 0;
     }
@@ -116,6 +123,7 @@ Cam init_camera(int w, int h, Vec3 position, Vec3 rotation) {
     };
 
     Cam camera = (Cam) {
+        .renderDepth = false,
         .canvas = malloc(sizeof(Color) * w * h),
         .depthBuffer = malloc(sizeof(float) * w * h),
         .width = w,
