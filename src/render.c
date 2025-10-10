@@ -83,11 +83,14 @@ void draw_wireframe_triangle(Cam c, Point p0, Point p1, Point p2, Color color) {
 void draw_top_bottom(Cam c, Point pointA, Point pointB, Point pointC, Color color) {
     if (pointB.x > pointC.x) swap_point_values(&pointB, &pointC);
 
-    float abX = (float)(pointB.x - pointA.x) / (float)(pointB.y - pointA.y);
-    float acX = (float)(pointC.x - pointA.x) / (float)(pointC.y - pointA.y);
+    float lengthAB = pointB.y - pointA.y;
+    float lengthAC = pointC.y - pointA.y;
 
-    float abZ = (float)(pointB.zDepth - pointA.zDepth) / (float)(pointB.y - pointA.y);
-    float acZ = (float)(pointC.zDepth - pointA.zDepth) / (float)(pointC.y - pointA.y);
+    float abX = (float)(pointB.x - pointA.x) / lengthAB;
+    float acX = (float)(pointC.x - pointA.x) / lengthAC;
+
+    float abZ = (float)(pointB.zDepth - pointA.zDepth) / lengthAB;
+    float acZ = (float)(pointC.zDepth - pointA.zDepth) / lengthAC;
 
     float xLeft = pointA.x;
     float xRight = pointA.x;
@@ -95,8 +98,24 @@ void draw_top_bottom(Cam c, Point pointA, Point pointB, Point pointC, Color colo
     float zLeft = pointA.zDepth;
     float zRight = pointA.zDepth;
 
+    Vec3 nLeft = pointA.normal;
+    Vec3 nRight = pointA.normal;
+    Vec3 nInner = (Vec3) {0};
+
+    Vec3 uvLeft = pointA.uvCoord;
+    Vec3 uvRight = pointA.uvCoord;
+    Vec3 uvInner = (Vec3) {0};
+
     for(int scanlineY = pointA.y; scanlineY <= pointC.y; scanlineY++) {
         
+        float ratioY = lengthAC != 0 ? (scanlineY - pointA.y) / lengthAC : 0;
+
+        uvLeft = vec3_lerp_a_b(pointA.uvCoord, pointB.uvCoord, ratioY);
+        uvRight = vec3_lerp_a_b(pointA.uvCoord, pointC.uvCoord, ratioY);
+
+        nLeft = vec3_lerp_a_b(pointA.normal, pointB.normal, ratioY);
+        nRight = vec3_lerp_a_b(pointA.normal, pointC.normal, ratioY);
+
         float xZ = zLeft;
         if (xRight != xLeft) {
             xZ = (float)(zRight - zLeft) / (float)(xRight - xLeft);
@@ -105,6 +124,11 @@ void draw_top_bottom(Cam c, Point pointA, Point pointB, Point pointC, Color colo
 
         put_pixel(c, BLACK, xLeft, scanlineY, 1, depth);
         for(int x = xLeft-1; x <= xRight; x++){
+            float ratioX = (x - xLeft - 1) / (xRight - xLeft);
+
+            nInner = vec3_lerp_a_b(nLeft, nRight, ratioX);
+            uvInner = vec3_lerp_a_b(uvLeft, uvRight, ratioX);
+
             put_pixel(c, color, x, scanlineY, 1, depth);
             depth += xZ;
         }
@@ -121,11 +145,15 @@ void draw_top_bottom(Cam c, Point pointA, Point pointB, Point pointC, Color colo
 void draw_bottom_top(Cam c, Point pointA, Point pointB, Point pointC, Color color) {
     if (pointB.x < pointA.x) swap_point_values(&pointB, &pointA);
 
-    float caX = (float)(pointC.x - pointA.x) / (float)(pointC.y - pointA.y);
-    float cbX = (float)(pointC.x - pointB.x) / (float)(pointC.y - pointB.y);
+    float lengthAC = pointC.y - pointA.y;
+    float legnthBC = pointC.y - pointB.y;
+    float lengthCA = pointA.y - pointC.y;
 
-    float caZ = (float)(pointC.zDepth - pointA.zDepth) / (float)(pointC.y - pointA.y);
-    float cbZ = (float)(pointC.zDepth - pointB.zDepth) / (float)(pointC.y - pointB.y);
+    float caX = (float)(pointC.x - pointA.x) / lengthAC;
+    float cbX = (float)(pointC.x - pointB.x) / legnthBC;
+
+    float caZ = (float)(pointC.zDepth - pointA.zDepth) / lengthAC;
+    float cbZ = (float)(pointC.zDepth - pointB.zDepth) / legnthBC;
 
     float xLeft = pointC.x;
     float xRight = pointC.x;
@@ -133,7 +161,23 @@ void draw_bottom_top(Cam c, Point pointA, Point pointB, Point pointC, Color colo
     float zLeft = pointC.zDepth;
     float zRight = pointC.zDepth;
 
+    Vec3 nLeft = pointC.normal;
+    Vec3 nRight = pointC.normal;
+    Vec3 nInner = (Vec3) {0};
+
+    Vec3 uvLeft = pointC.uvCoord;
+    Vec3 uvRight = pointC.uvCoord;
+    Vec3 uvInner = (Vec3) {0};
+
     for(int scanlineY = pointC.y; scanlineY >= pointA.y; scanlineY--) {
+
+        float ratioY = lengthCA != 0 ? (scanlineY - pointC.y) / lengthCA : 0;
+
+        uvLeft = vec3_lerp_a_b(pointC.uvCoord, pointA.uvCoord, ratioY);
+        uvRight = vec3_lerp_a_b(pointC.uvCoord, pointB.uvCoord, ratioY);
+
+        nLeft = vec3_lerp_a_b(pointC.normal, pointA.normal, ratioY);
+        nRight = vec3_lerp_a_b(pointC.normal, pointB.normal, ratioY);
 
         float xZ = zLeft;
         if (xRight != xLeft) {
@@ -142,7 +186,13 @@ void draw_bottom_top(Cam c, Point pointA, Point pointB, Point pointC, Color colo
         float depth = zLeft;
 
         put_pixel(c, BLACK, xLeft, scanlineY, 1, depth);
-        for(int x = xLeft-1; x <= xRight; x++){
+        for(int x = xLeft-1; x <= xRight; x++) {
+
+            float ratioX = (x - xLeft - 1) / (xRight - xLeft);
+
+            nInner = vec3_lerp_a_b(nLeft, nRight, ratioX);
+            uvInner = vec3_lerp_a_b(uvLeft, uvRight, ratioX);
+
             put_pixel(c, color, x, scanlineY, 1, depth);
             depth += xZ;
         }
@@ -168,10 +218,21 @@ void draw_filled_triangle(Cam c, Point pointA, Point pointB, Point pointC, Color
     } else if (pointA.y == pointB.y) {
         draw_bottom_top(c, pointA, pointB, pointC, color);
     } else {
+
         Point pointAC = (Point) {
             .x = pointA.x + ((float)(pointB.y - pointA.y) / (float)(pointC.y - pointA.y) * (float)(pointC.x - pointA.x)), 
             .y = pointB.y,
-            .zDepth = pointA.zDepth + ((float)(pointB.y - pointA.y) / (float)(pointC.y - pointA.y) * (float)(pointC.zDepth - pointA.zDepth))};
+            .zDepth = pointA.zDepth + ((float)(pointB.y - pointA.y) / (float)(pointC.y - pointA.y) * (float)(pointC.zDepth - pointA.zDepth))
+        };
+
+        Vec3 vecAC = (Vec3) {.x = pointA.x - pointC.x, .y = pointA.y - pointC.y, .z = 0};
+        Vec3 vecAprimeC = (Vec3) {.x = pointA.x - pointAC.x, .y = pointA.y - pointAC.y, .z = 0};
+
+        float lengthAC = vec3_length(vecAC);
+        float lengthAprimeC = vec3_length(vecAprimeC);
+        float ratioACtoAprimeC = lengthAprimeC / lengthAC;
+        pointAC.uvCoord = vec3_lerp_a_b(pointA.uvCoord, pointC.uvCoord, ratioACtoAprimeC);
+
         draw_top_bottom(c, pointA, pointB, pointAC, color);
         draw_bottom_top(c, pointB, pointAC, pointC, color);        
     }
