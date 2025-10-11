@@ -92,51 +92,52 @@ void draw_top_bottom(Cam c, Point pointA, Point pointB, Point pointC, Color colo
     float abZ = (float)(pointB.zDepth - pointA.zDepth) / lengthAB;
     float acZ = (float)(pointC.zDepth - pointA.zDepth) / lengthAC;
 
+    float abU = (float)(pointB.uvCoord.x - pointA.uvCoord.x) / lengthAB;
+    float acU = (float)(pointC.uvCoord.x - pointA.uvCoord.x) / lengthAC;
+
+    float abV = (float)(pointB.uvCoord.y - pointA.uvCoord.y) / lengthAB;
+    float acV = (float)(pointC.uvCoord.y - pointA.uvCoord.y) / lengthAC;
+
     float xLeft = pointA.x;
     float xRight = pointA.x;
 
     float zLeft = pointA.zDepth;
     float zRight = pointA.zDepth;
 
-    Vec3 nLeft = pointA.normal;
-    Vec3 nRight = pointA.normal;
-    Vec3 nInner = (Vec3) {0};
+    float uLeft = pointA.uvCoord.x;
+    float vLeft = pointA.uvCoord.y;
 
-    Vec3 uvLeft = pointA.uvCoord;
-    Vec3 uvRight = pointA.uvCoord;
-    Vec3 uvInner = (Vec3) {0};
+    float uRight = pointA.uvCoord.x;
+    float vRight = pointA.uvCoord.y;
 
     for(int scanlineY = pointA.y; scanlineY <= pointC.y; scanlineY++) {
-        
-        float ratioY = lengthAC != 0 ? (scanlineY - pointA.y) / lengthAC : 0;
-
-        uvLeft = vec3_lerp_a_b(pointA.uvCoord, pointB.uvCoord, ratioY);
-        uvRight = vec3_lerp_a_b(pointA.uvCoord, pointC.uvCoord, ratioY);
-
-        nLeft = vec3_lerp_a_b(pointA.normal, pointB.normal, ratioY);
-        nRight = vec3_lerp_a_b(pointA.normal, pointC.normal, ratioY);
 
         float xZ = zLeft;
+        float xU = uLeft;
+        float xV = vLeft;
         if (xRight != xLeft) {
-            xZ = (float)(zRight - zLeft) / (float)(xRight - xLeft);
+            float xLength = xRight - xLeft;
+            xZ = (float)(zRight - zLeft) / xLength;
+            xU = (float)(uRight - uLeft) / xLength;
+            xV = (float)(vRight - vLeft) / xLength;
         }
+
         float depth = zLeft;
+        float u = uLeft;
+        float v = vLeft;
 
         put_pixel(c, BLACK, xLeft, scanlineY, 1, depth);
         for(int x = xLeft-1; x <= xRight; x++){
-            float ratioX = (x - xLeft - 1) / (xRight - xLeft);
-
-            nInner = vec3_lerp_a_b(nLeft, nRight, ratioX);
-            uvInner = vec3_lerp_a_b(uvLeft, uvRight, ratioX);
-
             if (texture != NULL) {
                 if (texture->colors != NULL) {
-                    color = texel_from_texture(texture, uvInner.x , uvInner.y );
+                    color = texel_from_texture(texture, u , v );
                 }
             }
 
             put_pixel(c, color, x, scanlineY, 1, depth);
             depth += xZ;
+            u += xU;
+            v += xV;
         }
         put_pixel(c, BLACK, xRight, scanlineY, 1, depth);
 
@@ -145,6 +146,12 @@ void draw_top_bottom(Cam c, Point pointA, Point pointB, Point pointC, Color colo
 
         zLeft += abZ;
         zRight += acZ;
+
+        uLeft += abU;
+        uRight += acU;
+
+        vLeft += abV;
+        vRight += acV;
     }
 }
 
@@ -438,6 +445,7 @@ void render_scene(Cam c, Scene scene) {
             clipped->trisWorld[n].vertex[VERTEX_B] = mult_matrix_by_vec3(m_transform, clipped->model->verts[tp.v2]);
             clipped->trisWorld[n].vertex[VERTEX_C] = mult_matrix_by_vec3(m_transform, clipped->model->verts[tp.v3]);
 
+            clipped->trisWorld[n].texture = NULL;
             if(clipped->model->uvsCount){
                 clipped->trisWorld[n].texture = clipped->model->texture;
                 clipped->trisWorld[n].uv[VERTEX_A] = clipped->model->uvs[tp.t1];

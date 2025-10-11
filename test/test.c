@@ -23,10 +23,10 @@ int main() {
     printf("texture: w->%d h->%d\n", cube.texture->width, cube.texture->height);
 
     for(uint16_t y = 0; y < cube.texture->height; y++) {
-        if (y % 10 == 0) {
+        if (y % 15 == 0) {
             bool skip = false;
             for(uint16_t x = 0; x < cube.texture->width; x++) {
-                if (x % 10 == 0)  {
+                if (x % 15 == 0)  {
                     printf("%c ", cube.texture->colors[y*cube.texture->width+x].r == 80 ? '.' : '0');
                     skip = true;
                 }

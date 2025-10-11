@@ -8,6 +8,16 @@ void swap_point_values(Point *p1, Point *p2) {
     Point temp = *p1;
     *p1 = *p2;
     *p2 = temp;
+
+    // Point temp = *p1;
+    
+    // p1->x = p2->x;
+    // p1->y = p2->y;
+    // p1->zDepth = p2->zDepth;
+
+    // p2->x = temp.x;
+    // p2->y = temp.y;
+    // p2->zDepth = temp.zDepth;
 }
 
 void put_pixel(Cam c, Color color, int x, int y, float h, float depth) {

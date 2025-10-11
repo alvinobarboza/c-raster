@@ -13,8 +13,8 @@
 #include "scene.h"
 #include "shapes.h"
 
-#define WIDTH  1280
-#define HEIGHT 720
+#define WIDTH  1600
+#define HEIGHT 900
 #define TARGET_FPS 60
 
 void move_cube(Instance *instance) {
@@ -56,10 +56,10 @@ int main(void)
 
     Cam camera = init_camera(
         WIDTH, HEIGHT, 
-        // (Vec3) {.x = 0.0f, .y = 0.0f, .z = 0.0f},
-        // (Vec3) {.x = 0.0f, .y = 0.0f, .z = 0.0f}
-        (Vec3) {.x = 1.69f, .y = 0.38f, .z = 3.06f},
-        (Vec3) {.x = 11.27f, .y = 92.73f, .z = 0}
+        (Vec3) {.x = 0.0f, .y = 0.0f, .z = 3.0f},
+        (Vec3) {.x = 0.0f, .y = 0.0f, .z = 0.0f}
+        // (Vec3) {.x = 1.69f, .y = 0.38f, .z = 3.06f},
+        // (Vec3) {.x = 11.27f, .y = 92.73f, .z = 0}
     );
 
     ModelData teapot = load_model_from_path("./assets/newell_teaset/teapot.obj", NULL, false, false);
@@ -76,7 +76,7 @@ int main(void)
     Instance instances[] = {
         init_instance(&triangle, (Transforms){
             .position = (Vec3){.x = 0.0f, .y = 0.0f, .z = 6.0f},
-            .rotation = (Vec3){.x = 0.0f, .y = 0.0f, .z = 45.0f},
+            .rotation = (Vec3){.x = 0.0f, .y = 0.0f, .z = 0.0f},
             .scale = (Vec3){.x = 1.0f, .y = 1.0f, .z = 1.0f}
         }),
         init_instance(&cube, (Transforms) {
