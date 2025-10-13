@@ -464,7 +464,7 @@ Color texel_from_texture(TextureData *texture, float u, float v) {
     uint16_t x = u * texture->width;
     uint16_t y = v * texture->height;
     size_t i = y * texture->width + x;
-    if (i > texture->width * texture->height) {
+    if (i >= texture->width * texture->height) {
         return BLACK;
     }
     return texture->colors[i];
