@@ -59,7 +59,7 @@ TextureData *load_default_texture() {
     texture->width = w;
     texture->height = h;
 
-    int tile = w / 2;
+    int tile = w / 7;
 
     Color currentY = DARKGRAY;
     Color oldY = RAYWHITE;
@@ -83,7 +83,7 @@ TextureData *load_default_texture() {
     return texture;
 }
 
-ModelData load_model_from_path(const char *pathModel, const char *pathTexture, bool reorder, bool flipNormals) {
+ModelData load_model_from_path(const char *pathModel, const char *pathTexture, bool reorder, bool flipNormals, bool loadDefatulTex) {
     if (pathModel == NULL) {
         return cube_shape();
     }
@@ -137,7 +137,7 @@ ModelData load_model_from_path(const char *pathModel, const char *pathTexture, b
         }
     }
 
-    if (uvsCount > 0 && pathTexture == NULL ) {
+    if (loadDefatulTex && uvsCount > 0 && pathTexture == NULL ) {
         puts("Loading default texture");
         texture = load_default_texture();
     } 

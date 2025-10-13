@@ -66,7 +66,7 @@ typedef struct Instance {
 
 // Not full OBJ parser, just v, vn, vt and f data - 
 // That's not the point of this project
-ModelData load_model_from_path(const char *pathModel, const char *pathTexture, bool reorder, bool flipNormals);
+ModelData load_model_from_path(const char *pathModel, const char *pathTexture, bool reorder, bool flipNormals, bool loadDefaultTex);
 TextureData *load_default_texture();
 
 ModelData init_model(
