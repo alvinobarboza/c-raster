@@ -86,6 +86,15 @@ void draw_top_bottom(Cam c, Point pointA, Point pointB, Point pointC, Color colo
     float lengthAB = pointB.y - pointA.y;
     float lengthAC = pointC.y - pointA.y;
 
+    // pointA.uvCoord.x = pointA.uvCoord.x / pointA.zDepth;
+    // pointA.uvCoord.y = pointA.uvCoord.y / pointA.zDepth;
+
+    // pointB.uvCoord.x = pointB.uvCoord.x / pointB.zDepth;
+    // pointB.uvCoord.y = pointB.uvCoord.y / pointB.zDepth;
+
+    // pointC.uvCoord.x = pointC.uvCoord.x / pointC.zDepth;
+    // pointC.uvCoord.y = pointC.uvCoord.y / pointC.zDepth;
+
     float abX = (float)(pointB.x - pointA.x) / lengthAB;
     float acX = (float)(pointC.x - pointA.x) / lengthAC;
 
@@ -124,15 +133,15 @@ void draw_top_bottom(Cam c, Point pointA, Point pointB, Point pointC, Color colo
         float depth = zLeft;
 
         put_pixel(c, BLACK, xLeft, scanlineY, 1, depth);
-        for(int x = xLeft-1; x <= xRight; x++){
+        for(int x = xLeft; x <= xRight; x++){
 
-            float ratioX = (x - xLeft - 1) / (xRight - xLeft);
+            float ratioX = (x - xLeft) / (xRight - xLeft);
             nInner = vec3_lerp_a_b(nLeft, nRight, ratioX);
             uvInner = vec3_lerp_a_b(uvLeft, uvRight, ratioX);
 
             if (texture != NULL) {
                 if (texture->colors != NULL) {
-                    color = texel_from_texture(texture, uvInner.x, uvCoord.y);
+                    color = texel_from_texture(texture, uvInner.x , uvInner.y );
                 }
             }
 
@@ -155,6 +164,15 @@ void draw_bottom_top(Cam c, Point pointA, Point pointB, Point pointC, Color colo
     float lengthAC = pointC.y - pointA.y;
     float legnthBC = pointC.y - pointB.y;
     float lengthCA = pointA.y - pointC.y;
+
+    // pointA.uvCoord.x = pointA.uvCoord.x / pointA.zDepth;
+    // pointA.uvCoord.y = pointA.uvCoord.y / pointA.zDepth;
+
+    // pointB.uvCoord.x = pointB.uvCoord.x / pointB.zDepth;
+    // pointB.uvCoord.y = pointB.uvCoord.y / pointB.zDepth;
+
+    // pointC.uvCoord.x = pointC.uvCoord.x / pointC.zDepth;
+    // pointC.uvCoord.y = pointC.uvCoord.y / pointC.zDepth;
 
     float caX = (float)(pointC.x - pointA.x) / lengthAC;
     float cbX = (float)(pointC.x - pointB.x) / legnthBC;
@@ -193,16 +211,16 @@ void draw_bottom_top(Cam c, Point pointA, Point pointB, Point pointC, Color colo
         float depth = zLeft;
 
         put_pixel(c, BLACK, xLeft, scanlineY, 1, depth);
-        for(int x = xLeft-1; x <= xRight; x++) {
+        for(int x = xLeft; x <= xRight; x++) {
 
-            float ratioX = (x - xLeft - 1) / (xRight - xLeft);
+            float ratioX = (x - xLeft) / (xRight - xLeft);
 
             nInner = vec3_lerp_a_b(nLeft, nRight, ratioX);
             uvInner = vec3_lerp_a_b(uvLeft, uvRight, ratioX);
 
             if (texture != NULL) {
                 if (texture->colors != NULL) {
-                    color = texel_from_texture(texture, (uvInner.x/(depth+1))/(1/(depth+1)) , (uvInner.y/(depth+1))/(1/(depth+1)));
+                    color = texel_from_texture(texture, uvInner.x, uvInner.y);
                 }
             }
 
@@ -418,7 +436,7 @@ void render_scene(Cam c, Scene scene) {
     matrix_transpose(normalRotation, normalRotationTransposed);
 
     for(size_t i = 0; i < scene.objectCount; i++){
-        if ( i != 0 && i != 2) {
+        if ( i > 2) {
             continue;
         }
         Instance *clipped = &scene.instances[i];

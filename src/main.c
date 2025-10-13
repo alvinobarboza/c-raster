@@ -39,12 +39,12 @@ void move_cube(Instance *instance) {
     }
     
     if (IsKeyDown(KEY_U)) {
-        instance->transforms.rotation.z += .5f;
+        instance->transforms.rotation.y += 1.5f;
         update_instance_transforms(instance);
     }
     
     if (IsKeyDown(KEY_O)) {
-        instance->transforms.rotation.z -= .5f;
+        instance->transforms.rotation.y -= 1.5f;
         update_instance_transforms(instance);
     }
 }

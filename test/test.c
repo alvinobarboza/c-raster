@@ -18,24 +18,17 @@ int main() {
 
     // CODE 
 
-    ModelData cube = load_model_from_path("./assets/cube.obj", NULL, false, false);
+    uint16_t w = 6;
+    uint16_t h = 6;
+    
+    char values[] = {'.',':','i','l','w','W'};
 
-    printf("texture: w->%d h->%d\n", cube.texture->width, cube.texture->height);
-
-    for(uint16_t y = 0; y < cube.texture->height; y++) {
-        if (y % 15 == 0) {
-            bool skip = false;
-            for(uint16_t x = 0; x < cube.texture->width; x++) {
-                if (x % 15 == 0)  {
-                    printf("%c ", cube.texture->colors[y*cube.texture->width+x].r == 80 ? '.' : '0');
-                    skip = true;
-                }
-            }
-            if (skip) puts(" ");
-        }
+    for(uint16_t y = 0; y < h; y++) {
+        for(uint16_t x = 0; x < w; x++) {
+            printf("%c%c ", values[y], values[x]);
+        }   
+        puts(" ");
     }
-
-    free_model(&cube);
 
     // END CODE
 
