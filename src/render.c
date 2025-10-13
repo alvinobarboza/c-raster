@@ -237,7 +237,6 @@ void draw_filled_triangle(Cam c, Point pointA, Point pointB, Point pointC, Color
     } else if (pointA.y == pointB.y) {
         draw_bottom_top(c, pointA, pointB, pointC, color, texture);
     } else {
-
         Point pointAC = (Point) {
             .x = pointA.x + ((float)(pointB.y - pointA.y) / (float)(pointC.y - pointA.y) * (float)(pointC.x - pointA.x)), 
             .y = pointB.y,

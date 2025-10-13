@@ -456,14 +456,14 @@ void update_instance_transforms(Instance *instance) {
     }
 }
 
-Color texel_from_texture(TextureData *texture, float ux, float uy) {
-    if (ux > 1 || ux < 0 || uy > 1 || uy < 0) {
+Color texel_from_texture(TextureData *texture, float u, float v) {
+    if (u > 1 || u < 0 || v > 1 || v < 0) {
         return BLACK;
     }
 
-    uint16_t x = texture->width * ux;
-    uint16_t y = texture->height * uy;
-    uint16_t i = y * texture->width + x;
+    uint16_t x = u * texture->width;
+    uint16_t y = v * texture->height;
+    size_t i = y * texture->width + x;
     if (i > texture->width * texture->height) {
         return BLACK;
     }
