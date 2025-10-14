@@ -23,20 +23,19 @@ void swap_point_values(Point *p1, Point *p2) {
 void put_pixel(Cam c, Color color, int x, int y, float h, float depth) {
     x = c.width * 0.5 + x;
 	y = c.height * 0.5 - y - 1;
-    float z = 1 / (depth+1);
 
 	if (x < 0 || x >= c.width || y < 0 || y >= c.height) {
 		return;
 	}
 
-    if (c.depthBuffer[y*c.width+x] >= z) {
+    if (c.depthBuffer[y*c.width+x] >= depth) {
         return;
     }
 
     if (c.renderDepth) {
-        color.r = 255 * z;
-        color.g = 255 * z;
-        color.b = 255 * z;
+        color.r = OPAQUE * depth;
+        color.g = OPAQUE * depth;
+        color.b = OPAQUE * depth;
         color.a = OPAQUE;
     } else {
         color.r = color.r * h;
@@ -46,7 +45,7 @@ void put_pixel(Cam c, Color color, int x, int y, float h, float depth) {
     }
 
 	c.canvas[y*c.width+x] = color;
-    c.depthBuffer[y*c.width+x] = z;
+    c.depthBuffer[y*c.width+x] = depth;
 }
 
 void clear_canvas(Cam c) { 

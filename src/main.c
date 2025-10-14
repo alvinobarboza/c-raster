@@ -13,8 +13,8 @@
 #include "scene.h"
 #include "shapes.h"
 
-#define WIDTH  1600
-#define HEIGHT 900
+#define WIDTH  800
+#define HEIGHT 450
 #define TARGET_FPS 60
 
 void move_cube(Instance *instance) {
@@ -84,15 +84,15 @@ int main(void)
 
     // TODO: better instance loading
     Instance instances[] = {
-        init_instance(&triangle, (Transforms){
-            .position = (Vec3){.x = 0.0f, .y = 0.0f, .z = 6.0f},
-            .rotation = (Vec3){.x = 0.0f, .y = 0.0f, .z = 0.0f},
-            .scale = (Vec3){.x = 1.0f, .y = 1.0f, .z = 1.0f}
-        }),
         init_instance(&cube, (Transforms) {
             .position = (Vec3){.x = 1.0f, .y = 0.0f, .z = 6.5f},
             .rotation = (Vec3){.x = 0.0f, .y = 0.0f, .z = 0.0f},
             .scale = (Vec3){.x = 1.0f, .y = 1.0f, .z = 1.0f},
+        }),
+        init_instance(&triangle, (Transforms){
+            .position = (Vec3){.x = 0.0f, .y = 0.0f, .z = 6.0f},
+            .rotation = (Vec3){.x = 0.0f, .y = 0.0f, .z = 0.0f},
+            .scale = (Vec3){.x = 1.0f, .y = 1.0f, .z = 1.0f}
         }),
         init_instance(&spoon, (Transforms){
             .position = (Vec3){.x = 0.0f, .y = 0.0f, .z = 4.0f},

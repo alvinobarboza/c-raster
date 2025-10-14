@@ -86,11 +86,19 @@ void draw_top_bottom(Cam c, Point pointA, Point pointB, Point pointC, Color colo
     float lengthAB = pointB.y - pointA.y;
     float lengthAC = pointC.y - pointA.y;
 
+    float aZ = 1 / pointA.zDepth;
+    float bZ = 1 / pointB.zDepth;
+    float cZ = 1 / pointC.zDepth;
+
     float abX = (float)(pointB.x - pointA.x) / lengthAB;
     float acX = (float)(pointC.x - pointA.x) / lengthAC;
 
-    float abZ = (float)(pointB.zDepth - pointA.zDepth) / lengthAB;
-    float acZ = (float)(pointC.zDepth - pointA.zDepth) / lengthAC;
+    float abZ = (bZ - aZ) / lengthAB;
+    float acZ = (cZ - aZ) / lengthAC;
+
+    pointA.uvCoord = vec3_multiply(pointA.uvCoord, aZ);
+    pointB.uvCoord = vec3_multiply(pointB.uvCoord, bZ);
+    pointC.uvCoord = vec3_multiply(pointC.uvCoord, cZ);
 
     Vec3 abUV = vec3_divide(vec3_sub(pointB.uvCoord, pointA.uvCoord), lengthAB);
     Vec3 acUV = vec3_divide(vec3_sub(pointC.uvCoord, pointA.uvCoord), lengthAC);
@@ -98,8 +106,8 @@ void draw_top_bottom(Cam c, Point pointA, Point pointB, Point pointC, Color colo
     float xLeft = pointA.x;
     float xRight = pointA.x;
 
-    float zLeft = pointA.zDepth;
-    float zRight = pointA.zDepth;
+    float zLeft = aZ;
+    float zRight = aZ;
 
     Vec3 uvLeft = pointA.uvCoord;
     Vec3 uvRight = pointA.uvCoord;
@@ -121,11 +129,8 @@ void draw_top_bottom(Cam c, Point pointA, Point pointB, Point pointC, Color colo
         put_pixel(c, BLACK, xLeft, scanlineY, 1, depth);
         for(int x = xLeft; x <= xRight; x++){
 
-            if (texture != NULL) {
-                if (texture->colors != NULL) {
-                    // color = texel_from_texture(texture, uvInner.x/(1/depth), uvInner.y/(1/depth) );
-                    color = texel_from_texture(texture, uvInner.x, uvInner.y );
-                }
+            if (texture != NULL && texture->colors != NULL) {
+                color = texel_from_texture(texture, uvInner.x/depth, uvInner.y/depth );
             }
 
             put_pixel(c, color, x, scanlineY, 1, depth);
@@ -151,12 +156,20 @@ void draw_bottom_top(Cam c, Point pointA, Point pointB, Point pointC, Color colo
 
     float lengthCA = pointC.y - pointA.y;
     float lengthCB = pointC.y - pointB.y;
+    
+    float aZ = 1 / pointA.zDepth;
+    float bZ = 1 / pointB.zDepth;
+    float cZ = 1 / pointC.zDepth;
 
     float caX = (float)(pointC.x - pointA.x) / lengthCA;
     float cbX = (float)(pointC.x - pointB.x) / lengthCB;
 
-    float caZ = (float)(pointC.zDepth - pointA.zDepth) / lengthCA;
-    float cbZ = (float)(pointC.zDepth - pointB.zDepth) / lengthCB;
+    float caZ = (cZ - aZ) / lengthCA;
+    float cbZ = (cZ - bZ) / lengthCB;
+
+    pointA.uvCoord = vec3_multiply(pointA.uvCoord, aZ);
+    pointB.uvCoord = vec3_multiply(pointB.uvCoord, bZ);
+    pointC.uvCoord = vec3_multiply(pointC.uvCoord, cZ);
 
     Vec3 caUV = vec3_divide(vec3_sub(pointC.uvCoord, pointA.uvCoord), lengthCA);
     Vec3 cbUV = vec3_divide(vec3_sub(pointC.uvCoord, pointB.uvCoord), lengthCB);
@@ -164,8 +177,8 @@ void draw_bottom_top(Cam c, Point pointA, Point pointB, Point pointC, Color colo
     float xLeft = pointC.x;
     float xRight = pointC.x;
 
-    float zLeft = pointC.zDepth;
-    float zRight = pointC.zDepth;
+    float zLeft = cZ;
+    float zRight = cZ;
 
     Vec3 uvLeft = pointC.uvCoord;
     Vec3 uvRight = pointC.uvCoord;
@@ -187,18 +200,14 @@ void draw_bottom_top(Cam c, Point pointA, Point pointB, Point pointC, Color colo
         put_pixel(c, BLACK, xLeft, scanlineY, 1, depth);
         for(int x = xLeft; x <= xRight; x++) {
 
-            if (texture != NULL) {
-                if (texture->colors != NULL) {
-                    // color = texel_from_texture(texture, uvInner.x/(1/depth), uvInner.y/(1/depth));
-                    color = texel_from_texture(texture, uvInner.x, uvInner.y);
-                }
+            if (texture != NULL && texture->colors != NULL) {
+                color = texel_from_texture(texture, uvInner.x/depth, uvInner.y/depth);
             }
 
             put_pixel(c, color, x, scanlineY, 1, depth);
 
             depth += xZ;
             uvInner = vec3_add(uvInner, uvStep);
-
         }
         put_pixel(c, BLACK, xRight, scanlineY, 1, depth);
 
@@ -231,7 +240,7 @@ void draw_filled_triangle(Cam c, Point pointA, Point pointB, Point pointC, Color
         Point pointAC = (Point) {
             .x = pointA.x + t * (float)(pointC.x - pointA.x), 
             .y = pointB.y,
-            .zDepth = pointA.zDepth + t * (float)(pointC.zDepth - pointA.zDepth),
+            .zDepth = pointA.zDepth + t * (pointC.zDepth - pointA.zDepth),
             .uvCoord = vec3_lerp_a_b(pointA.uvCoord, pointC.uvCoord, t),
             .normal = vec3_lerp_a_b(pointA.normal, pointC.normal, t)
         };
