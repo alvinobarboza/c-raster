@@ -137,7 +137,6 @@ float vec3_length(Vec3 v) {
     return sqrtf(vec3_dot(v));
 }
 
-
 Vec3 vec3_multiply(Vec3 v, float n) {
     return (Vec3) {
         .x = v.x * n,
@@ -146,12 +145,16 @@ Vec3 vec3_multiply(Vec3 v, float n) {
     };
 }
 
+Vec3 vec3_divide(Vec3 v, float n) {
+    return (Vec3) {
+        .x = v.x / n,
+        .y = v.y / n,
+        .z = v.z / n
+    };
+}
+
 Vec3 vec3_normal(Vec3 v) {
-    float n = vec3_length(v);
-    v.x = v.x / n;
-    v.y = v.y / n;
-    v.z = v.z / n;
-    return v;
+    return vec3_divide(v,vec3_length(v));
 }
 
 Vec3 vec3_cross(Vec3 v1, Vec3 v2) {

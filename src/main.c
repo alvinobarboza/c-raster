@@ -47,6 +47,16 @@ void move_cube(Instance *instance) {
         instance->transforms.rotation.y -= 1.5f;
         update_instance_transforms(instance);
     }
+
+    if (IsKeyDown(KEY_N)) {
+        instance->transforms.rotation.z += 1.5f;
+        update_instance_transforms(instance);
+    }
+    
+    if (IsKeyDown(KEY_M)) {
+        instance->transforms.rotation.z -= 1.5f;
+        update_instance_transforms(instance);
+    }
 }
 
 int main(void)

@@ -59,7 +59,7 @@ TextureData *load_default_texture() {
     texture->width = w;
     texture->height = h;
 
-    int tile = w / 4;
+    int tile = w / 9;
 
     Color currentY = DARKGRAY;
     Color oldY = RAYWHITE;
@@ -463,6 +463,5 @@ Color texel_from_texture(TextureData *texture, float u, float v) {
     if (i >= texture->width * texture->height) {
         i = (texture->width * texture->height) - 1;
     }
-    if (i < 0 ) i = 0;
     return texture->colors[i];
 }

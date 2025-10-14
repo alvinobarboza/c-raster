@@ -86,20 +86,14 @@ void draw_top_bottom(Cam c, Point pointA, Point pointB, Point pointC, Color colo
     float lengthAB = pointB.y - pointA.y;
     float lengthAC = pointC.y - pointA.y;
 
-    // pointA.uvCoord.x = pointA.uvCoord.x / pointA.zDepth;
-    // pointA.uvCoord.y = pointA.uvCoord.y / pointA.zDepth;
-
-    // pointB.uvCoord.x = pointB.uvCoord.x / pointB.zDepth;
-    // pointB.uvCoord.y = pointB.uvCoord.y / pointB.zDepth;
-
-    // pointC.uvCoord.x = pointC.uvCoord.x / pointC.zDepth;
-    // pointC.uvCoord.y = pointC.uvCoord.y / pointC.zDepth;
-
     float abX = (float)(pointB.x - pointA.x) / lengthAB;
     float acX = (float)(pointC.x - pointA.x) / lengthAC;
 
     float abZ = (float)(pointB.zDepth - pointA.zDepth) / lengthAB;
     float acZ = (float)(pointC.zDepth - pointA.zDepth) / lengthAC;
+
+    Vec3 abUV = vec3_divide(vec3_sub(pointB.uvCoord, pointA.uvCoord), lengthAB);
+    Vec3 acUV = vec3_divide(vec3_sub(pointC.uvCoord, pointA.uvCoord), lengthAC);
 
     float xLeft = pointA.x;
     float xRight = pointA.x;
@@ -107,46 +101,37 @@ void draw_top_bottom(Cam c, Point pointA, Point pointB, Point pointC, Color colo
     float zLeft = pointA.zDepth;
     float zRight = pointA.zDepth;
 
-    Vec3 nLeft = pointA.normal;
-    Vec3 nRight = pointA.normal;
-    Vec3 nInner = (Vec3) {0};
-
     Vec3 uvLeft = pointA.uvCoord;
     Vec3 uvRight = pointA.uvCoord;
     Vec3 uvInner = (Vec3) {0};
 
     for(int scanlineY = pointA.y; scanlineY <= pointC.y; scanlineY++) {
 
-        float ratioY = lengthAC != 0 ? (scanlineY - pointA.y) / lengthAC : 0;
-
-        uvLeft = vec3_lerp_a_b(pointA.uvCoord, pointB.uvCoord, ratioY);
-        uvRight = vec3_lerp_a_b(pointA.uvCoord, pointC.uvCoord, ratioY);
-
-        nLeft = vec3_lerp_a_b(pointA.normal, pointB.normal, ratioY);
-        nRight = vec3_lerp_a_b(pointA.normal, pointC.normal, ratioY);
-
         float xZ = zLeft;
+        Vec3 uvStep = {0};
         if (xRight != xLeft) {
             float xLength = xRight - xLeft;
             xZ = (float)(zRight - zLeft) / xLength;
+
+            uvStep = vec3_divide(vec3_sub(uvRight, uvLeft), xLength);
         }
         float depth = zLeft;
+        uvInner = uvLeft;
 
         put_pixel(c, BLACK, xLeft, scanlineY, 1, depth);
         for(int x = xLeft; x <= xRight; x++){
 
-            float ratioX = (x - xLeft) / (xRight - xLeft);
-            nInner = vec3_lerp_a_b(nLeft, nRight, ratioX);
-            uvInner = vec3_lerp_a_b(uvLeft, uvRight, ratioX);
-
             if (texture != NULL) {
                 if (texture->colors != NULL) {
-                    color = texel_from_texture(texture, uvInner.x , uvInner.y );
+                    // color = texel_from_texture(texture, uvInner.x/(1/depth), uvInner.y/(1/depth) );
+                    color = texel_from_texture(texture, uvInner.x, uvInner.y );
                 }
             }
 
             put_pixel(c, color, x, scanlineY, 1, depth);
+
             depth += xZ;
+            uvInner = vec3_add(uvInner, uvStep);
         }
         put_pixel(c, BLACK, xRight, scanlineY, 1, depth);
 
@@ -155,30 +140,26 @@ void draw_top_bottom(Cam c, Point pointA, Point pointB, Point pointC, Color colo
 
         zLeft += abZ;
         zRight += acZ;
+
+        uvLeft = vec3_add(uvLeft, abUV);
+        uvRight = vec3_add(uvRight, acUV);
     }
 }
 
 void draw_bottom_top(Cam c, Point pointA, Point pointB, Point pointC, Color color, TextureData *texture) {
     if (pointB.x < pointA.x) swap_point_values(&pointB, &pointA);
 
-    float lengthAC = pointC.y - pointA.y;
-    float legnthBC = pointC.y - pointB.y;
-    float lengthCA = pointA.y - pointC.y;
+    float lengthCA = pointC.y - pointA.y;
+    float lengthCB = pointC.y - pointB.y;
 
-    // pointA.uvCoord.x = pointA.uvCoord.x / pointA.zDepth;
-    // pointA.uvCoord.y = pointA.uvCoord.y / pointA.zDepth;
+    float caX = (float)(pointC.x - pointA.x) / lengthCA;
+    float cbX = (float)(pointC.x - pointB.x) / lengthCB;
 
-    // pointB.uvCoord.x = pointB.uvCoord.x / pointB.zDepth;
-    // pointB.uvCoord.y = pointB.uvCoord.y / pointB.zDepth;
+    float caZ = (float)(pointC.zDepth - pointA.zDepth) / lengthCA;
+    float cbZ = (float)(pointC.zDepth - pointB.zDepth) / lengthCB;
 
-    // pointC.uvCoord.x = pointC.uvCoord.x / pointC.zDepth;
-    // pointC.uvCoord.y = pointC.uvCoord.y / pointC.zDepth;
-
-    float caX = (float)(pointC.x - pointA.x) / lengthAC;
-    float cbX = (float)(pointC.x - pointB.x) / legnthBC;
-
-    float caZ = (float)(pointC.zDepth - pointA.zDepth) / lengthAC;
-    float cbZ = (float)(pointC.zDepth - pointB.zDepth) / legnthBC;
+    Vec3 caUV = vec3_divide(vec3_sub(pointC.uvCoord, pointA.uvCoord), lengthCA);
+    Vec3 cbUV = vec3_divide(vec3_sub(pointC.uvCoord, pointB.uvCoord), lengthCB);
 
     float xLeft = pointC.x;
     float xRight = pointC.x;
@@ -186,46 +167,38 @@ void draw_bottom_top(Cam c, Point pointA, Point pointB, Point pointC, Color colo
     float zLeft = pointC.zDepth;
     float zRight = pointC.zDepth;
 
-    Vec3 nLeft = pointC.normal;
-    Vec3 nRight = pointC.normal;
-    Vec3 nInner = (Vec3) {0};
-
     Vec3 uvLeft = pointC.uvCoord;
     Vec3 uvRight = pointC.uvCoord;
     Vec3 uvInner = (Vec3) {0};
 
     for(int scanlineY = pointC.y; scanlineY >= pointA.y; scanlineY--) {
 
-        float ratioY = lengthCA != 0 ? (scanlineY - pointC.y) / lengthCA : 0;
-
-        uvLeft = vec3_lerp_a_b(pointC.uvCoord, pointA.uvCoord, ratioY);
-        uvRight = vec3_lerp_a_b(pointC.uvCoord, pointB.uvCoord, ratioY);
-
-        nLeft = vec3_lerp_a_b(pointC.normal, pointA.normal, ratioY);
-        nRight = vec3_lerp_a_b(pointC.normal, pointB.normal, ratioY);
-
         float xZ = zLeft;
+        Vec3 uvStep = {0};
         if (xRight != xLeft) {
-            xZ = (float)(zRight - zLeft) / (float)(xRight - xLeft);
+            float xLength = xRight - xLeft;
+            xZ = (float)(zRight - zLeft) / xLength;
+
+            uvStep = vec3_divide(vec3_sub(uvRight, uvLeft), xLength);
         }
         float depth = zLeft;
+        uvInner = uvLeft;
 
         put_pixel(c, BLACK, xLeft, scanlineY, 1, depth);
         for(int x = xLeft; x <= xRight; x++) {
 
-            float ratioX = (x - xLeft) / (xRight - xLeft);
-
-            nInner = vec3_lerp_a_b(nLeft, nRight, ratioX);
-            uvInner = vec3_lerp_a_b(uvLeft, uvRight, ratioX);
-
             if (texture != NULL) {
                 if (texture->colors != NULL) {
+                    // color = texel_from_texture(texture, uvInner.x/(1/depth), uvInner.y/(1/depth));
                     color = texel_from_texture(texture, uvInner.x, uvInner.y);
                 }
             }
 
             put_pixel(c, color, x, scanlineY, 1, depth);
+
             depth += xZ;
+            uvInner = vec3_add(uvInner, uvStep);
+
         }
         put_pixel(c, BLACK, xRight, scanlineY, 1, depth);
 
@@ -234,6 +207,9 @@ void draw_bottom_top(Cam c, Point pointA, Point pointB, Point pointC, Color colo
 
         zLeft -= caZ;
         zRight -= cbZ;
+
+        uvLeft = vec3_sub(uvLeft, caUV);
+        uvRight = vec3_sub(uvRight, cbUV);
     }
 }
 
@@ -249,19 +225,16 @@ void draw_filled_triangle(Cam c, Point pointA, Point pointB, Point pointC, Color
     } else if (pointA.y == pointB.y) {
         draw_bottom_top(c, pointA, pointB, pointC, color, texture);
     } else {
+
+        float t = (float)(pointB.y - pointA.y) / (float)(pointC.y - pointA.y);
+
         Point pointAC = (Point) {
-            .x = pointA.x + ((float)(pointB.y - pointA.y) / (float)(pointC.y - pointA.y) * (float)(pointC.x - pointA.x)), 
+            .x = pointA.x + t * (float)(pointC.x - pointA.x), 
             .y = pointB.y,
-            .zDepth = pointA.zDepth + ((float)(pointB.y - pointA.y) / (float)(pointC.y - pointA.y) * (float)(pointC.zDepth - pointA.zDepth))
+            .zDepth = pointA.zDepth + t * (float)(pointC.zDepth - pointA.zDepth),
+            .uvCoord = vec3_lerp_a_b(pointA.uvCoord, pointC.uvCoord, t),
+            .normal = vec3_lerp_a_b(pointA.normal, pointC.normal, t)
         };
-
-        Vec3 vecAC = (Vec3) {.x = pointA.x - pointC.x, .y = pointA.y - pointC.y, .z = 0};
-        Vec3 vecAprimeC = (Vec3) {.x = pointA.x - pointAC.x, .y = pointA.y - pointAC.y, .z = 0};
-
-        float lengthAC = vec3_length(vecAC);
-        float lengthAprimeC = vec3_length(vecAprimeC);
-        float ratioACtoAprimeC = lengthAprimeC / lengthAC;
-        pointAC.uvCoord = vec3_lerp_a_b(pointA.uvCoord, pointC.uvCoord, ratioACtoAprimeC);
 
         draw_top_bottom(c, pointA, pointB, pointAC, color, texture);
         draw_bottom_top(c, pointB, pointAC, pointC, color, texture);        
@@ -436,7 +409,7 @@ void render_scene(Cam c, Scene scene) {
     matrix_transpose(normalRotation, normalRotationTransposed);
 
     for(size_t i = 0; i < scene.objectCount; i++){
-        if ( i > 2) {
+        if ( i > 1) {
             continue;
         }
         Instance *clipped = &scene.instances[i];
