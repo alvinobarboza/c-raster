@@ -242,7 +242,7 @@ void draw_filled_triangle(Cam c, Point pointA, Point pointB, Point pointC, Color
         Point pointAC = (Point) {
             .x = pointA.x + t * (float)(pointC.x - pointA.x), 
             .y = pointB.y,
-            .zDepth = pointA.zDepth + t * (pointC.zDepth - pointA.zDepth),
+            .zDepth = lerp_a_b(pointA.zDepth, pointC.zDepth, t),
             .uvCoord = vec3_lerp_a_b(pointA.uvCoord, pointC.uvCoord, t),
             .normal = vec3_lerp_a_b(pointA.normal, pointC.normal, t)
         };
