@@ -90,8 +90,8 @@ void draw_top_bottom(Cam c, Point pointA, Point pointB, Point pointC, Color colo
     float bZ = 1 / pointB.zDepth;
     float cZ = 1 / pointC.zDepth;
 
-    float abX = (float)(pointB.x - pointA.x) / lengthAB;
-    float acX = (float)(pointC.x - pointA.x) / lengthAC;
+    float abX = (pointB.x - pointA.x) / lengthAB;
+    float acX = (pointC.x - pointA.x) / lengthAC;
 
     float abZ = (bZ - aZ) / lengthAB;
     float acZ = (cZ - aZ) / lengthAC;
@@ -119,7 +119,7 @@ void draw_top_bottom(Cam c, Point pointA, Point pointB, Point pointC, Color colo
         Vec3 uvStep = {0};
         if (xRight != xLeft) {
             float xLength = xRight - xLeft;
-            xZ = (float)(zRight - zLeft) / xLength;
+            xZ = (zRight - zLeft) / xLength;
 
             uvStep = vec3_divide(vec3_sub(uvRight, uvLeft), xLength);
         }
@@ -161,8 +161,8 @@ void draw_bottom_top(Cam c, Point pointA, Point pointB, Point pointC, Color colo
     float bZ = 1 / pointB.zDepth;
     float cZ = 1 / pointC.zDepth;
 
-    float caX = (float)(pointC.x - pointA.x) / lengthCA;
-    float cbX = (float)(pointC.x - pointB.x) / lengthCB;
+    float caX = (pointC.x - pointA.x) / lengthCA;
+    float cbX = (pointC.x - pointB.x) / lengthCB;
 
     float caZ = (cZ - aZ) / lengthCA;
     float cbZ = (cZ - bZ) / lengthCB;
@@ -190,7 +190,7 @@ void draw_bottom_top(Cam c, Point pointA, Point pointB, Point pointC, Color colo
         Vec3 uvStep = {0};
         if (xRight != xLeft) {
             float xLength = xRight - xLeft;
-            xZ = (float)(zRight - zLeft) / xLength;
+            xZ = (zRight - zLeft) / xLength;
 
             uvStep = vec3_divide(vec3_sub(uvRight, uvLeft), xLength);
         }
