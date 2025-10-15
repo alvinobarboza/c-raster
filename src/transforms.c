@@ -188,5 +188,7 @@ void vec3_swap_values(Vec3 *v1, Vec3 *v2) {
 }
 
 Vec3 vec3_lerp_a_b(Vec3 a, Vec3 b, float ratio) {
+    if (ratio > 1) return b;
+    if (ratio < 0) return a;
     return vec3_add(a, vec3_multiply(vec3_sub(b, a),ratio));
 }
