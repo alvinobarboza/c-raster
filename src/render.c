@@ -154,8 +154,8 @@ void draw_top_bottom(Cam c, Point pointA, Point pointB, Point pointC, Color colo
 void draw_bottom_top(Cam c, Point pointA, Point pointB, Point pointC, Color color, TextureData *texture) {
     if (pointB.x < pointA.x) swap_point_values(&pointB, &pointA);
 
-    float lengthCA = pointC.y - pointA.y;
-    float lengthCB = pointC.y - pointB.y;
+    float lengthCA = abs(pointC.y - pointA.y);
+    float lengthCB = abs(pointC.y - pointB.y);
     
     float aZ = 1 / pointA.zDepth;
     float bZ = 1 / pointB.zDepth;
