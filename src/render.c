@@ -134,9 +134,10 @@ void draw_top_bottom(Cam c, Point pointA, Point pointB, Point pointC, Color colo
             }
 
             put_pixel(c, color, x, scanlineY, 1, depth);
-
-            depth += xZ;
-            uvInner = vec3_add(uvInner, uvStep);
+            if (xRight != xLeft) {
+                depth += xZ;
+                uvInner = vec3_add(uvInner, uvStep);
+            }
         }
         put_pixel(c, BLACK, xRight, scanlineY, 1, depth);
 
@@ -205,9 +206,10 @@ void draw_bottom_top(Cam c, Point pointA, Point pointB, Point pointC, Color colo
             }
 
             put_pixel(c, color, x, scanlineY, 1, depth);
-
-            depth += xZ;
-            uvInner = vec3_add(uvInner, uvStep);
+            if (xRight != xLeft) {
+                depth += xZ;
+                uvInner = vec3_add(uvInner, uvStep);                
+            }
         }
         put_pixel(c, BLACK, xRight, scanlineY, 1, depth);
 
