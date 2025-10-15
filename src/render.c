@@ -83,8 +83,8 @@ void draw_wireframe_triangle(Cam c, Point p0, Point p1, Point p2, Color color) {
 void draw_top_bottom(Cam c, Point pointA, Point pointB, Point pointC, Color color, TextureData *texture) {
     if (pointB.x > pointC.x) swap_point_values(&pointB, &pointC);
 
-    float lengthAB = pointB.y - pointA.y;
-    float lengthAC = pointC.y - pointA.y;
+    float lengthAB = abs(pointB.y - pointA.y);
+    float lengthAC = abs(pointC.y - pointA.y);
 
     float aZ = 1 / pointA.zDepth;
     float bZ = 1 / pointB.zDepth;
