@@ -27,7 +27,7 @@ Vec3 load_vec3(const char *buffer, const int index) {
                 tempVert.y = temp;
                 break;
             case 2:
-                tempVert.z = temp;
+                tempVert.z = temp*-1;
                 break;
             }
 
