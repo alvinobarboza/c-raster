@@ -126,20 +126,23 @@ void draw_top_bottom(Cam c, Point pointA, Point pointB, Point pointC, Color colo
         float depth = zLeft;
         uvInner = uvLeft;
 
-        put_pixel(c, BLACK, xLeft, scanlineY, 1, depth);
+        if (texture != NULL && texture->colors != NULL) {
+            color = texel_from_texture(texture, uvInner.x/depth, uvInner.y/depth );
+        }
+
+        put_pixel(c, color, xLeft, scanlineY, 1, depth);
         for(int x = xLeft; x <= xRight; x++){
-
-            if (texture != NULL && texture->colors != NULL) {
-                color = texel_from_texture(texture, uvInner.x/depth, uvInner.y/depth );
-            }
-
             put_pixel(c, color, x, scanlineY, 1, depth);
             if (xRight != xLeft) {
                 depth += xZ;
                 uvInner = vec3_add(uvInner, uvStep);
             }
+
+            if (texture != NULL && texture->colors != NULL) {
+                color = texel_from_texture(texture, uvInner.x/depth, uvInner.y/depth );
+            }
         }
-        put_pixel(c, BLACK, xRight, scanlineY, 1, depth);
+        put_pixel(c, color, xRight, scanlineY, 1, depth);
 
         xLeft += abX;
         xRight += acX;
@@ -198,20 +201,24 @@ void draw_bottom_top(Cam c, Point pointA, Point pointB, Point pointC, Color colo
         float depth = zLeft;
         uvInner = uvLeft;
 
-        put_pixel(c, BLACK, xLeft, scanlineY, 1, depth);
-        for(int x = xLeft; x <= xRight; x++) {
+        if (texture != NULL && texture->colors != NULL) {
+            color = texel_from_texture(texture, uvInner.x/depth, uvInner.y/depth);
+        }
 
-            if (texture != NULL && texture->colors != NULL) {
-                color = texel_from_texture(texture, uvInner.x/depth, uvInner.y/depth);
-            }
+        put_pixel(c, color, xLeft, scanlineY, 1, depth);
+        for(int x = xLeft; x <= xRight; x++) {
 
             put_pixel(c, color, x, scanlineY, 1, depth);
             if (xRight != xLeft) {
                 depth += xZ;
                 uvInner = vec3_add(uvInner, uvStep);                
             }
+
+            if (texture != NULL && texture->colors != NULL) {
+                color = texel_from_texture(texture, uvInner.x/depth, uvInner.y/depth);
+            }
         }
-        put_pixel(c, BLACK, xRight, scanlineY, 1, depth);
+        put_pixel(c, color, xRight, scanlineY, 1, depth);
 
         xLeft -= caX;
         xRight -= cbX;
