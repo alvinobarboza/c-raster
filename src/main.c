@@ -85,6 +85,8 @@ int main(void)
         "./assets/psx_pizza_doggy/flashlight_1.obj", "./assets/psx_pizza_doggy/flashlight_1.png", false, false, true);
     ModelData vhs = load_model_from_path(
         "./assets/psx_pizza_doggy/vhs_tape_1.obj", "./assets/psx_pizza_doggy/vhs_tape_1.png", false, false, true);
+    ModelData marbleBust = load_model_from_path(
+        "./assets/polyhaven_rico_b3d/marble_bust.obj", "./assets/polyhaven_rico_b3d/marble_bust.jpg", false, false, true);
    
     // TODO: Render tranparent objects last
     // ModelData fakeGodRays = load_model_from_path(
@@ -97,6 +99,11 @@ int main(void)
 
     // TODO: better instance loading
     Instance instances[] = {
+        init_instance(&marbleBust, (Transforms){
+            .position = (Vec3){.x = 0.0f, .y = 0.0f, .z = 2.0f},
+            .rotation = (Vec3){.x = 0.0f, .y = 0.0f, .z = 0.0f},
+            .scale = (Vec3){.x = 1.5f, .y = 1.5f, .z = 1.5f}
+        }),
         init_instance(&vhs, (Transforms){
             .position = (Vec3){.x = 2.0f, .y = 0.0f, .z = 1.0f},
             .rotation = (Vec3){.x = 0.0f, .y = 0.0f, .z = 0.0f},
