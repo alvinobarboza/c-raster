@@ -29,7 +29,7 @@ https://gabrielgambetta.com/computer-graphics-from-scratch/
 
 # Showcase
 
-## Default texture pattern reding perspective correct
+## Default texture pattern rendering perspective correct
 
 ![Texture rendering](./texture_rendering.png)
 
