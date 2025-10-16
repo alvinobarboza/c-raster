@@ -23,7 +23,7 @@ https://gabrielgambetta.com/computer-graphics-from-scratch/
         -   [x] Render using normal data
     -   [x] UV data
 -   [x] Texture
--   -   [x] Perspective corrected rendering
+    -   [x] Perspective corrected rendering
 -   [ ] Shading
 -   [ ] More...
 
