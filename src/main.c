@@ -75,12 +75,16 @@ int main(void)
     ModelData teapot = load_model_from_path("./assets/newell_teaset/teapot.obj", NULL, false, false, true);
     ModelData teacup = load_model_from_path("./assets/newell_teaset/teacup.obj", NULL, false, false, false);
     ModelData spoon = load_model_from_path("./assets/newell_teaset/spoon.obj", NULL, false, false, false);
-    ModelData keyboard = load_model_from_path("./assets/pc_keyboard_mp_3.obj", "./assets/pc_accessories_mp_1.png", false, false, true);
-    ModelData ammo = load_model_from_path("./assets/ammo_box_1_1.obj", "./assets/ammo_mps_1.png", false, false, true);
+    ModelData keyboard = load_model_from_path(
+        "./assets/psx_pizza_doggy/pc_keyboard_mp_3.obj", "./assets/psx_pizza_doggy/pc_accessories_mp_1.png", false, false, true);
+    ModelData ammo = load_model_from_path(
+        "./assets/psx_pizza_doggy/ammo_box_1_1.obj", "./assets/psx_pizza_doggy/ammo_mp_1.png", false, false, true);
+    ModelData fakeGodRays = load_model_from_path(
+        "./assets/psx_pizza_doggy/fake_light_window_2_double.obj", "./assets/psx_pizza_doggy/fake_light_mp_1.png", false, false, true);
 
-    ModelData icosahedron = icosahedron_shape();
-    ModelData torus = torus_shape();
-    ModelData uvSphere = uv_sphere_shape();
+    // ModelData icosahedron = icosahedron_shape();
+    // ModelData torus = torus_shape();
+    // ModelData uvSphere = uv_sphere_shape();
     // ModelData triangle = triangle_shape();
 
     // TODO: better instance loading
@@ -110,20 +114,10 @@ int main(void)
             .rotation = (Vec3){.x = 0.0f, .y = 0.0f, .z = 0.0f},
             .scale = (Vec3){.x = 1.0f, .y = 1.0f, .z = 1.0f},
         }),
-        init_instance(&icosahedron, (Transforms) {
+        init_instance(&fakeGodRays, (Transforms) {
             .position = (Vec3){.x = 0.25, .y = 1.5f, .z = 20.0f},
             .rotation = (Vec3){.x = 0.0f, .y = 95.0f, .z = 0.0f},
             .scale = (Vec3){.x = 1.0f, .y = 1.0f, .z = 1.0f},
-        }),
-        init_instance(&torus, (Transforms) {
-            .position = (Vec3){.x = 8.25, .y = -1.5f, .z = 15.0f},
-            .rotation = (Vec3){.x = 0.0f, .y = -45.0f, .z = 0.0f},
-            .scale = (Vec3){.x = 2.0f, .y = 2.0f, .z = 2.0f},
-        }),
-        init_instance(&uvSphere, (Transforms) {
-            .position = (Vec3){.x = -0.25, .y = -1.5f, .z = 15.0f},
-            .rotation = (Vec3){.x = 0.0f, .y = 0.0f, .z = 0.0f},
-            .scale = (Vec3){.x = 2.0f, .y = 2.0f, .z = 2.0f},
         })
     };
 
