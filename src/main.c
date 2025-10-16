@@ -66,19 +66,25 @@ int main(void)
 
     Cam camera = init_camera(
         WIDTH, HEIGHT, 
-        (Vec3) {.x = 0.0f, .y = 0.0f, .z = 3.0f},
+        (Vec3) {.x = 0.0f, .y = 0.0f, .z = 0.0f},
         (Vec3) {.x = 0.0f, .y = 0.0f, .z = 0.0f}
         // (Vec3) {.x = 1.69f, .y = 0.38f, .z = 3.06f},
         // (Vec3) {.x = 11.27f, .y = 92.73f, .z = 0}
     );
 
     ModelData teapot = load_model_from_path("./assets/newell_teaset/teapot.obj", NULL, false, false, true);
-    ModelData teacup = load_model_from_path("./assets/newell_teaset/teacup.obj", NULL, false, false, false);
-    ModelData spoon = load_model_from_path("./assets/newell_teaset/spoon.obj", NULL, false, false, false);
+    ModelData teacup = load_model_from_path("./assets/newell_teaset/teacup.obj", NULL, false, false, true);
+    ModelData spoon = load_model_from_path("./assets/newell_teaset/spoon.obj", NULL, false, false, true);
     ModelData keyboard = load_model_from_path(
         "./assets/psx_pizza_doggy/pc_keyboard_mp_3.obj", "./assets/psx_pizza_doggy/pc_accessories_mp_1.png", false, false, true);
     ModelData ammo = load_model_from_path(
         "./assets/psx_pizza_doggy/ammo_box_1_1.obj", "./assets/psx_pizza_doggy/ammo_mp_1.png", false, false, true);
+    ModelData monitor = load_model_from_path(
+        "./assets/psx_pizza_doggy/pc_monitor_mp_1.obj", "./assets/psx_pizza_doggy/pc_monitor_mp_1.png", false, false, true);
+    ModelData flashlight = load_model_from_path(
+        "./assets/psx_pizza_doggy/flashlight_1.obj", "./assets/psx_pizza_doggy/flashlight_1.png", false, false, true);
+    ModelData vhs = load_model_from_path(
+        "./assets/psx_pizza_doggy/vhs_tape_1.obj", "./assets/psx_pizza_doggy/vhs_tape_1.png", false, false, true);
    
     // TODO: Render tranparent objects last
     // ModelData fakeGodRays = load_model_from_path(
@@ -91,30 +97,45 @@ int main(void)
 
     // TODO: better instance loading
     Instance instances[] = {
-        init_instance(&ammo, (Transforms){
-            .position = (Vec3){.x = 0.0f, .y = 0.0f, .z = 6.0f},
+        init_instance(&vhs, (Transforms){
+            .position = (Vec3){.x = 2.0f, .y = 0.0f, .z = 1.0f},
             .rotation = (Vec3){.x = 0.0f, .y = 0.0f, .z = 0.0f},
-            .scale = (Vec3){.x = 3.0f, .y = 3.0f, .z = 3.0f}
+            .scale = (Vec3){.x = 1.0f, .y = 1.0f, .z = 1.0f}
+        }),
+        init_instance(&flashlight, (Transforms){
+            .position = (Vec3){.x = 1.6f, .y = 0.0f, .z = 1.0f},
+            .rotation = (Vec3){.x = 0.0f, .y = 0.0f, .z = 0.0f},
+            .scale = (Vec3){.x = 1.0f, .y = 1.0f, .z = 1.0f}
+        }),
+        init_instance(&ammo, (Transforms){
+            .position = (Vec3){.x = 1.4f, .y = 0.0f, .z = 1.0f},
+            .rotation = (Vec3){.x = 0.0f, .y = 0.0f, .z = 0.0f},
+            .scale = (Vec3){.x = 1.0f, .y = 1.0f, .z = 1.0f}
         }),
         init_instance(&keyboard, (Transforms) {
-            .position = (Vec3){.x = 1.0f, .y = 0.0f, .z = 6.5f},
-            .rotation = (Vec3){.x = 0.0f, .y = 0.0f, .z = 0.0f},
-            .scale = (Vec3){.x = 3.0f, .y = 3.0f, .z = 3.0f},
-        }),
-        init_instance(&spoon, (Transforms){
-            .position = (Vec3){.x = 0.0f, .y = 0.0f, .z = 4.0f},
-            .rotation = (Vec3){.x = 0.0f, .y = 0.0f, .z = 0.0f},
-            .scale = (Vec3){.x = 1.0f, .y = 1.0f, .z = 1.0f}
-        }),
-        init_instance(&teacup, (Transforms){
-            .position = (Vec3){.x = 0.0f, .y = 0.0f, .z = 2.0f},
-            .rotation = (Vec3){.x = 0.0f, .y = 0.0f, .z = 0.0f},
-            .scale = (Vec3){.x = 1.0f, .y = 1.0f, .z = 1.0f}
-        }),
-        init_instance(&teapot, (Transforms) {
-            .position = (Vec3){.x = -2.5, .y = 0.0f, .z = 5.0f},
+            .position = (Vec3){.x = 1.0f, .y = 0.0f, .z = 1.0f},
             .rotation = (Vec3){.x = 0.0f, .y = 0.0f, .z = 0.0f},
             .scale = (Vec3){.x = 1.0f, .y = 1.0f, .z = 1.0f},
+        }),
+        init_instance(&monitor, (Transforms) {
+            .position = (Vec3){.x = 0.4f, .y = 0.0f, .z = 1.0f},
+            .rotation = (Vec3){.x = 0.0f, .y = 0.0f, .z = 0.0f},
+            .scale = (Vec3){.x = 1.0f, .y = 1.0f, .z = 1.0f},
+        }),
+        init_instance(&spoon, (Transforms){
+            .position = (Vec3){.x = 0.2f, .y = 0.0f, .z = 1.0f},
+            .rotation = (Vec3){.x = 0.0f, .y = 0.0f, .z = 0.0f},
+            .scale = (Vec3){.x = 1.0f/8.0f, .y = 1.0f/8.0f, .z = 1.0f/8.0f}
+        }),
+        init_instance(&teacup, (Transforms){
+            .position = (Vec3){.x = 0.0f, .y = 0.0f, .z = 1.0f},
+            .rotation = (Vec3){.x = 0.0f, .y = 0.0f, .z = 0.0f},
+            .scale = (Vec3){.x = 1.0f/8.0f, .y = 1.0f/8.0f, .z = 1.0f/8.0f}
+        }),
+        init_instance(&teapot, (Transforms) {
+            .position = (Vec3){.x = -.5, .y = 0.0f, .z = 1.0f},
+            .rotation = (Vec3){.x = 0.0f, .y = 0.0f, .z = 0.0f},
+            .scale = (Vec3){.x = 1.0f/9.0f, .y = 1.0f/8.0f, .z = 1.0f/8.0f},
         })
         // init_instance(&fakeGodRays, (Transforms) {
         //     .position = (Vec3){.x = 0.25, .y = 1.5f, .z = 10.0f},
