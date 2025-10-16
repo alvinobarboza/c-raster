@@ -79,8 +79,10 @@ int main(void)
         "./assets/psx_pizza_doggy/pc_keyboard_mp_3.obj", "./assets/psx_pizza_doggy/pc_accessories_mp_1.png", false, false, true);
     ModelData ammo = load_model_from_path(
         "./assets/psx_pizza_doggy/ammo_box_1_1.obj", "./assets/psx_pizza_doggy/ammo_mp_1.png", false, false, true);
-    ModelData fakeGodRays = load_model_from_path(
-        "./assets/psx_pizza_doggy/fake_light_window_2_double.obj", "./assets/psx_pizza_doggy/fake_light_mp_1.png", false, false, true);
+   
+    // TODO: Render tranparent objects last
+    // ModelData fakeGodRays = load_model_from_path(
+    //     "./assets/psx_pizza_doggy/fake_light_window_2_double.obj", "./assets/psx_pizza_doggy/fake_light_mp_1.png", false, false, true);
 
     // ModelData icosahedron = icosahedron_shape();
     // ModelData torus = torus_shape();
@@ -113,12 +115,12 @@ int main(void)
             .position = (Vec3){.x = -2.5, .y = 0.0f, .z = 5.0f},
             .rotation = (Vec3){.x = 0.0f, .y = 0.0f, .z = 0.0f},
             .scale = (Vec3){.x = 1.0f, .y = 1.0f, .z = 1.0f},
-        }),
-        init_instance(&fakeGodRays, (Transforms) {
-            .position = (Vec3){.x = 0.25, .y = 1.5f, .z = 20.0f},
-            .rotation = (Vec3){.x = 0.0f, .y = 95.0f, .z = 0.0f},
-            .scale = (Vec3){.x = 1.0f, .y = 1.0f, .z = 1.0f},
         })
+        // init_instance(&fakeGodRays, (Transforms) {
+        //     .position = (Vec3){.x = 0.25, .y = 1.5f, .z = 10.0f},
+        //     .rotation = (Vec3){.x = 0.0f, .y = 95.0f, .z = 0.0f},
+        //     .scale = (Vec3){.x = 1.0f, .y = 1.0f, .z = 1.0f},
+        // })
     };
 
     // TODO: Proper scene builder

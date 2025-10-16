@@ -24,8 +24,26 @@ https://gabrielgambetta.com/computer-graphics-from-scratch/
     -   [x] UV data
 -   [x] Texture
     -   [x] Perspective corrected rendering
+    -   [ ] Transparency
 -   [ ] Shading
 -   [ ] More...
+
+# Building
+
+On windows it uses `Mingw-w64-x86_64-winpthreads` for building and `GnuWin32` make, on Linux, I can't garantee for now, exactly all dependencies but, `build-essentials` of your platform should work, also, it depends on X11, so maybe, further configuration is need.
+With this in mind, just do the following;
+
+-   build process expects a `bin` directory, so, you should create it `mkdir bin`(on powershell all command will work as expected).
+
+```bash
+$ make release && ./bin/c_raster
+```
+
+To run in debug mode, do the following;
+
+```bash
+$ make run
+```
 
 # Showcase
 
@@ -48,20 +66,3 @@ https://gabrielgambetta.com/computer-graphics-from-scratch/
 ## Frustum culling and clipping planes
 
 ![Bottom and far plane clipping on view](./frustum_culling.png)
-
-# Building
-
-On windows it uses `Mingw-w64-x86_64-winpthreads` for building and `GnuWin32` make, on Linux, I can't garantee for now, exactly all dependencies but, `build-essentials` of your platform should work, also, it depends on X11, so maybe, further configuration is need.
-With this in mind, just do the following;
-
--   build process expects a `bin` directory, so, you should create it `mkdir bin`(on powershell all command will work as expected).
-
-```bash
-$ make release && ./bin/c_raster
-```
-
-To run in debug mode, do the following;
-
-```bash
-$ make run
-```
