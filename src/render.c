@@ -239,11 +239,20 @@ void draw_filled_triangle(Cam c, Point pointA, Point pointB, Point pointC, Color
 
         float t = (float)(pointB.y - pointA.y) / (float)(pointC.y - pointA.y);
 
+        // must convert to perspective here, like in the draw functions
+        float aZ = 1 / pointA.zDepth;
+        float cZ = 1 / pointC.zDepth;
+        float acZ = lerp_a_b(aZ, cZ, t);
+
+        Vec3 aUV = vec3_multiply(pointA.uvCoord, aZ);
+        Vec3 cUV = vec3_multiply(pointC.uvCoord, cZ);
+        Vec3 acUV = vec3_lerp_a_b(aUV, cUV, t);
+
         Point pointAC = (Point) {
-            .x = pointA.x + t * (float)(pointC.x - pointA.x), 
+            .x = lerp_a_b(pointA.x, pointC.x, t), 
             .y = pointB.y,
-            .zDepth = lerp_a_b(pointA.zDepth, pointC.zDepth, t),
-            .uvCoord = vec3_lerp_a_b(pointA.uvCoord, pointC.uvCoord, t),
+            .zDepth = 1 / acZ, // convert back to actual Z values
+            .uvCoord = vec3_divide(acUV, acZ), // same here
             .normal = vec3_lerp_a_b(pointA.normal, pointC.normal, t)
         };
 
@@ -420,9 +429,9 @@ void render_scene(Cam c, Scene scene) {
     matrix_transpose(normalRotation, normalRotationTransposed);
 
     for(size_t i = 0; i < scene.objectCount; i++){
-        if ( i > 1) {
-            continue;
-        }
+        // if ( i > 1) {
+        //     continue;
+        // }
         Instance *clipped = &scene.instances[i];
 
         matrix_multiplication(c.matrixTransform, clipped->transforms.matrixTransform, m_transform);

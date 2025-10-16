@@ -59,7 +59,7 @@ TextureData *load_default_texture() {
     texture->width = w;
     texture->height = h;
 
-    int tile = w / 9;
+    int tile = w / 12;
 
     Color currentY = DARKGRAY;
     Color oldY = RAYWHITE;
