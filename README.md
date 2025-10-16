@@ -26,6 +26,8 @@ https://gabrielgambetta.com/computer-graphics-from-scratch/
     -   [x] Perspective corrected rendering
     -   [ ] Transparency
 -   [ ] Shading
+    -   [ ] Phong
+    -   [ ] Shadow map
 -   [ ] More...
 
 # Building
