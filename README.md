@@ -21,12 +21,17 @@ https://gabrielgambetta.com/computer-graphics-from-scratch/
     -   [x] Vertex data
     -   [x] Normal data
         -   [x] Render using normal data
-    -   [ ] UV data
+    -   [x] UV data
+-   [x] Texture
+-   -   [x] Perspective corrected rendering
 -   [ ] Shading
--   [ ] Texture
 -   [ ] More...
 
 # Showcase
+
+## Default texture pattern reding perspective correct
+
+![Texture rendering](./texture_rendering.png)
 
 ## Mix of objects loaded from file and generated from code
 
