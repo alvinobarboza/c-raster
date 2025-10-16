@@ -75,7 +75,8 @@ int main(void)
     ModelData teapot = load_model_from_path("./assets/newell_teaset/teapot.obj", NULL, false, false, true);
     ModelData teacup = load_model_from_path("./assets/newell_teaset/teacup.obj", NULL, false, false, false);
     ModelData spoon = load_model_from_path("./assets/newell_teaset/spoon.obj", NULL, false, false, false);
-    ModelData cube = load_model_from_path("./assets/cube.obj", NULL, false, false, true);
+    ModelData keyboard = load_model_from_path("./assets/pc_keyboard_mp_3.obj", "./assets/pc_accessories_mp_1.png", false, false, true);
+    ModelData ammo = load_model_from_path("./assets/ammo_box_1_1.obj", "./assets/ammo_mps_1.png", false, false, true);
 
     ModelData icosahedron = icosahedron_shape();
     ModelData torus = torus_shape();
@@ -84,16 +85,16 @@ int main(void)
 
     // TODO: better instance loading
     Instance instances[] = {
-        init_instance(&cube, (Transforms) {
+        init_instance(&ammo, (Transforms){
+            .position = (Vec3){.x = 0.0f, .y = 0.0f, .z = 6.0f},
+            .rotation = (Vec3){.x = 0.0f, .y = 0.0f, .z = 0.0f},
+            .scale = (Vec3){.x = 3.0f, .y = 3.0f, .z = 3.0f}
+        }),
+        init_instance(&keyboard, (Transforms) {
             .position = (Vec3){.x = 1.0f, .y = 0.0f, .z = 6.5f},
             .rotation = (Vec3){.x = 0.0f, .y = 0.0f, .z = 0.0f},
-            .scale = (Vec3){.x = 1.0f, .y = 1.0f, .z = 1.0f},
+            .scale = (Vec3){.x = 3.0f, .y = 3.0f, .z = 3.0f},
         }),
-        // init_instance(&triangle, (Transforms){
-        //     .position = (Vec3){.x = 0.0f, .y = 0.0f, .z = 6.0f},
-        //     .rotation = (Vec3){.x = 0.0f, .y = 0.0f, .z = 0.0f},
-        //     .scale = (Vec3){.x = 1.0f, .y = 1.0f, .z = 1.0f}
-        // }),
         init_instance(&spoon, (Transforms){
             .position = (Vec3){.x = 0.0f, .y = 0.0f, .z = 4.0f},
             .rotation = (Vec3){.x = 0.0f, .y = 0.0f, .z = 0.0f},

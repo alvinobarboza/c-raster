@@ -83,7 +83,36 @@ TextureData *load_default_texture() {
     return texture;
 }
 
-ModelData load_model_from_path(const char *pathModel, const char *pathTexture, bool reorder, bool flipNormals, bool loadDefatulTex) {
+TextureData *load_texture(const char *pathTexture) {
+
+    Image tempImage = LoadImage(pathTexture);
+    if (tempImage.width == 0) {
+        UnloadImage(tempImage);
+        return NULL;
+    }
+
+    TextureData *texture = malloc(sizeof(TextureData));
+    texture->colors = malloc(sizeof(Color) * tempImage.width * tempImage.height);
+    texture->width = tempImage.width;
+    texture->height = tempImage.height;
+
+    printf("%d x %d \n", tempImage.width, tempImage.height);
+
+    for(int y = tempImage.height - 1; y >= 0 ; y--){
+        int yI = (tempImage.height - y - 1);
+        for(int x = 0; x < tempImage.width; x++){
+            texture->colors[yI*tempImage.width+x] = GetImageColor(tempImage, x, y);
+        }
+    }
+
+    UnloadImage(tempImage);
+
+    return texture;
+}
+
+ModelData load_model_from_path(
+    const char *pathModel, 
+    const char *pathTexture, bool reorder, bool flipNormals, bool loadDefatulTex) {
     if (pathModel == NULL) {
         return cube_shape();
     }
@@ -137,13 +166,25 @@ ModelData load_model_from_path(const char *pathModel, const char *pathTexture, b
         }
     }
 
+    // Just a simple fallback cascade for displaying texture anyway
     if (loadDefatulTex && uvsCount > 0 && pathTexture == NULL ) {
         puts("Loading default texture");
-        texture = load_default_texture();
+        texture = load_texture("./assets/default.jpg");
+        if (texture == NULL) {
+            texture = load_default_texture();
+        }
     } 
 
+    // Just a simple fallback cascade for displaying texture anyway
     if (uvsCount > 0 && pathTexture != NULL ) {
         printf("Loading %s texture\n", pathTexture);
+        texture = load_texture(pathTexture);
+        if (texture == NULL) {
+            texture = load_texture("./assets/default.jpg");
+            if (texture == NULL) {
+                texture = load_default_texture();
+            }
+        }
     }
 
     printf("tris: %ld verts: %ld normals: %ld uvs: %ld \n", trisCount, vertsCount, normalCount, uvsCount);
