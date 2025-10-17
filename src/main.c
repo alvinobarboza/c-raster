@@ -220,6 +220,10 @@ int main(void)
             camera.renderDepth = !camera.renderDepth;
         }
 
+        if (IsKeyPressed(KEY_X)) {
+            camera.wireFrame = !camera.wireFrame;
+        }
+
         // TODO: Use mouse to look around
         // Vector2 mouse = GetMouseDelta();
         // printf("mouse x:%+03.02f y:%+03.02f\n",mouse.x, mouse.y);

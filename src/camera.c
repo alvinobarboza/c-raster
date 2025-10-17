@@ -64,7 +64,7 @@ Point viewport_to_canvas(Cam c, float x, float y, float z, Vec3 n, Vec3 t) {
         .brightness = 1.0f,
         .x = x * (c.width/c.view.width),
         .y = y * (c.height/c.view.height),
-        .zDepth = z,
+        .zDepth = NEAR_PLANE_DISTANCE/z,
         .normal = n,
         .uvCoord = t
     };
@@ -133,6 +133,7 @@ Cam init_camera(int w, int h, Vec3 position, Vec3 rotation) {
 
     Cam camera = (Cam) {
         .renderDepth = false,
+        .wireFrame = false,
         .canvas = malloc(sizeof(Color) * w * h),
         .depthBuffer = malloc(sizeof(float) * w * h),
         .width = w,

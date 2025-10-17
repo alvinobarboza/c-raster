@@ -51,8 +51,8 @@ void draw_line(Cam c, Point pointA, Point pointB , Color color){
 
         for(int x = pointA.x; x <= pointB.x; x++) {
             put_pixel(c, color, x, ys, 1, zs);
+            zs += abZ;
             ys += abY;
-            zs += abZ - 0.2;
         }
         return;
     }
@@ -69,8 +69,8 @@ void draw_line(Cam c, Point pointA, Point pointB , Color color){
 
     for(int y = pointA.y; y <= pointB.y; y++) {
         put_pixel(c, color, xs, y, 1, zs);
+        zs += abZ;
         xs += abX;
-        zs += abZ - 0.2;
     }
 }
 
@@ -126,7 +126,12 @@ void draw_top_bottom(Cam c, Point pointA, Point pointB, Point pointC, Color colo
             color = texel_from_texture(texture, uvInner.x/depth, uvInner.y/depth );
         }
 
-        put_pixel(c, color, xLeft, scanlineY, 1, depth);
+        if (c.wireFrame) {
+            put_pixel(c, BLACK, xLeft, scanlineY, 1, depth);  
+        } else {
+            put_pixel(c, color, xLeft, scanlineY, 1, depth);
+        }
+
         for(int x = xLeft; x <= xRight; x++){
             put_pixel(c, color, x, scanlineY, 1, depth);
             if (xRight != xLeft) {
@@ -138,7 +143,12 @@ void draw_top_bottom(Cam c, Point pointA, Point pointB, Point pointC, Color colo
                 color = texel_from_texture(texture, uvInner.x/depth, uvInner.y/depth );
             }
         }
-        put_pixel(c, color, xRight, scanlineY, 1, depth);
+
+        if (c.wireFrame) {
+            put_pixel(c, BLACK, xRight, scanlineY, 1, depth);  
+        } else {
+            put_pixel(c, color, xRight, scanlineY, 1, depth);
+        }
 
         xLeft += abX;
         xRight += acX;
@@ -197,7 +207,12 @@ void draw_bottom_top(Cam c, Point pointA, Point pointB, Point pointC, Color colo
             color = texel_from_texture(texture, uvInner.x/depth, uvInner.y/depth);
         }
 
-        put_pixel(c, color, xLeft, scanlineY, 1, depth);
+        if (c.wireFrame) {
+            put_pixel(c, BLACK, xLeft, scanlineY, 1, depth);  
+        } else {
+            put_pixel(c, color, xLeft, scanlineY, 1, depth);
+        }
+
         for(int x = xLeft; x <= xRight; x++) {
 
             put_pixel(c, color, x, scanlineY, 1, depth);
@@ -210,7 +225,11 @@ void draw_bottom_top(Cam c, Point pointA, Point pointB, Point pointC, Color colo
                 color = texel_from_texture(texture, uvInner.x/depth, uvInner.y/depth);
             }
         }
-        put_pixel(c, color, xRight, scanlineY, 1, depth);
+        if (c.wireFrame) {
+            put_pixel(c, BLACK, xRight, scanlineY, 1, depth);  
+        } else {
+            put_pixel(c, color, xRight, scanlineY, 1, depth);
+        }
 
         xLeft -= caX;
         xRight -= cbX;
@@ -268,13 +287,15 @@ void render_triangle(Cam c, FullTriangle tri) {
         pointC, 
         tri.color,
         tri.texture);
-    
-    // draw_wireframe_triangle(
-    //     c, 
-    //     pointA,
-    //     pointB,
-    //     pointC, 
-    //     BLACK);
+
+    if(c.wireFrame) {
+        draw_wireframe_triangle(
+        c, 
+        pointA,
+        pointB,
+        pointC, 
+        BLACK);
+    }
 }
 
 // Book treats each vertex as the normal vector from the camera, but the calculation should be 
