@@ -17,52 +17,52 @@
 #define HEIGHT 450
 #define TARGET_FPS 60
 
-void move_cube(Instance *instance) {
+void move_cube(Instance *instance, float delta) {
     if (IsKeyDown(KEY_I)) {
-        instance->transforms.position.z += .5f;
+        instance->transforms.position.z += .5f*delta;
         update_instance_transforms(instance);
     }
     
     if (IsKeyDown(KEY_K)) {
-        instance->transforms.position.z -= .5f;
+        instance->transforms.position.z -= .5f*delta;
         update_instance_transforms(instance);
     }
 
     if (IsKeyDown(KEY_J)) {
-        instance->transforms.position.x -= .5f;
+        instance->transforms.position.x -= .5f*delta;
         update_instance_transforms(instance);
     }
     
     if (IsKeyDown(KEY_L)) {
-        instance->transforms.position.x += .5f;
+        instance->transforms.position.x += .5f*delta;
         update_instance_transforms(instance);
     }
     
     if (IsKeyDown(KEY_U)) {
-        instance->transforms.rotation.y += 1.5f;
+        instance->transforms.rotation.y += 15.0f*delta;
         update_instance_transforms(instance);
     }
     
     if (IsKeyDown(KEY_O)) {
-        instance->transforms.rotation.y -= 1.5f;
+        instance->transforms.rotation.y -= 15.0f*delta;
         update_instance_transforms(instance);
     }
 
     if (IsKeyDown(KEY_N)) {
-        instance->transforms.rotation.z += 1.5f;
+        instance->transforms.rotation.z += 15.0f*delta;
         update_instance_transforms(instance);
     }
     
     if (IsKeyDown(KEY_M)) {
-        instance->transforms.rotation.z -= 1.5f;
+        instance->transforms.rotation.z -= 15.0f*delta;
         update_instance_transforms(instance);
     }
 }
 
 int main(void)
 {
-    float moveSpeed = 5.0f;
-    float turnSpeed = 60.0f;
+    float moveSpeed = 2.0f;
+    float turnSpeed = 40.0f;
 
     Cam camera = init_camera(
         WIDTH, HEIGHT, 
@@ -118,6 +118,11 @@ int main(void)
 
     // TODO: better instance loading
     Instance instances[] = {
+        init_instance(&marbleBust, (Transforms){
+            .position = (Vec3){.x = -1.3, .y = 0.0f, .z = .6f},
+            .rotation = (Vec3){.x = 0.0f, .y = 0.0f, .z = 0.0f},
+            .scale = (Vec3){.x = 1.0f, .y = 1.0f, .z = 1.0f}
+        }),
         init_instance(&floor, (Transforms){
             .position = (Vec3){.x = 0.0f, .y = 0.0f, .z = 1.0f},
             .rotation = (Vec3){.x = 0.0f, .y = 0.0f, .z = 0.0f},
@@ -188,11 +193,6 @@ int main(void)
             .rotation = (Vec3){.x = 0.0f, .y = -62.0f, .z = 0.0f},
             .scale = (Vec3){.x = 1.0f, .y = 1.0f, .z = 1.0f}
         }),
-        init_instance(&marbleBust, (Transforms){
-            .position = (Vec3){.x = -1.3, .y = 0.0f, .z = .6f},
-            .rotation = (Vec3){.x = 0.0f, .y = 0.0f, .z = 0.0f},
-            .scale = (Vec3){.x = 1.0f, .y = 1.0f, .z = 1.0f}
-        }),
         // init_instance(&fakeGodRays, (Transforms) {
         //     .position = (Vec3){.x = 0.25, .y = 1.5f, .z = 10.0f},
         //     .rotation = (Vec3){.x = 0.0f, .y = 95.0f, .z = 0.0f},
@@ -219,8 +219,8 @@ int main(void)
     {
         clear_canvas(camera);
 
-        move_cube(&instances[0]);
         float delta = GetFrameTime();
+        move_cube(&instances[0], delta);
 
         float deltaMoveSpeed = moveSpeed * delta;
         float deltaTurnSpeed = turnSpeed * delta;

@@ -49,6 +49,10 @@ $ make run
 
 # Showcase
 
+## Simple scene without lighting
+
+![Scene rendering](./scene_showcase.png)
+
 ## Default texture pattern rendering perspective correct
 
 ![Texture rendering](./texture_rendering.png)
@@ -60,11 +64,3 @@ $ make run
 ## Utah teapot/set from OBJ file
 
 ![Utah teapot/set from OBJ file](./obj_loading.png)
-
-## Back face culling and depth pass
-
-![Back face culling and depth buffer](./depth_pass_and_back_face_culling.png)
-
-## Frustum culling and clipping planes
-
-![Bottom and far plane clipping on view](./frustum_culling.png)
