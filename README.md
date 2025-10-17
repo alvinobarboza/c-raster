@@ -53,14 +53,6 @@ $ make run
 
 ![Scene rendering](./scene_showcase.png)
 
-## Default texture pattern rendering perspective correct
+## Depth buffer
 
-![Texture rendering](./texture_rendering.png)
-
-## Mix of objects loaded from file and generated from code
-
-![From OBJ file and code](./obj_loading-1.png)
-
-## Utah teapot/set from OBJ file
-
-![Utah teapot/set from OBJ file](./obj_loading.png)
+![Depth buffer](./depth_buffer.png)

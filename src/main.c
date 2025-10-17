@@ -68,8 +68,8 @@ int main(void)
         WIDTH, HEIGHT, 
         // (Vec3) {.x = 0.0f, .y = 0.0f, .z = 0.0f},
         // (Vec3) {.x = 0.0f, .y = 0.0f, .z = 0.0f}
-        (Vec3) {.x = .8f, .y = 1.88f, .z = .05f},
-        (Vec3) {.x = -44.74f, .y = 35.64f, .z = 0}
+        (Vec3) {.x = .93f, .y = 1.43f, .z = .16f},
+        (Vec3) {.x = -21.01f, .y = 43.65f, .z = 0}
     );
 
     ModelData teapot = load_model_from_path("./assets/newell_teaset/teapot.obj", "./assets/psx_pizza_doggy/metal_mp_3.png", false, false, true);
