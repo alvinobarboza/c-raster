@@ -1,4 +1,4 @@
-# Blender 3.4.0 MTL File: 'PSX Mega Pack (source file).blend'
+# Blender 4.5.3 LTS MTL File: 'None'
 # www.blender.org
 
 newmtl wood_1
@@ -9,4 +9,4 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 1
-map_Kd C:/wood_1.png
+map_Kd wood_1.png
