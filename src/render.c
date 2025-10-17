@@ -438,11 +438,14 @@ void two_vertices_in_front(
 
 void render_scene(Cam c, Scene scene) {
     float m_transform[M4X4];
-    float normalRotation[M4X4];
-    float normalRotationTransposed[M4X4];
+    float m_rotation[M4X4];
 
-    make_rotation_matrix(normalRotation, c.rotation);
-    matrix_transpose(normalRotation, normalRotationTransposed);
+    float normalRotationCam[M4X4];
+    float normalRotationInstante[M4X4];
+    float normalRotationTransposedCam[M4X4];
+
+    make_rotation_matrix(normalRotationCam, c.rotation);
+    matrix_transpose(normalRotationCam, normalRotationTransposedCam);
 
     for(size_t i = 0; i < scene.objectCount; i++){
         // if ( i > 1) {
@@ -476,9 +479,12 @@ void render_scene(Cam c, Scene scene) {
             // If model was loaded from file, it can have their own normals
             // Otherwise, calculate based on vertex position
             if (clipped->fromObj) {
-                clipped->trisWorld[n].normal[VERTEX_A] = mult_matrix_by_vec3(normalRotationTransposed, clipped->model->normals[tp.n1]);
-                clipped->trisWorld[n].normal[VERTEX_B] = mult_matrix_by_vec3(normalRotationTransposed, clipped->model->normals[tp.n2]);
-                clipped->trisWorld[n].normal[VERTEX_C] = mult_matrix_by_vec3(normalRotationTransposed, clipped->model->normals[tp.n3]);
+                make_rotation_matrix(normalRotationInstante, clipped->transforms.rotation);
+                matrix_multiplication(normalRotationTransposedCam, normalRotationInstante, m_rotation);
+
+                clipped->trisWorld[n].normal[VERTEX_A] = mult_matrix_by_vec3(m_rotation, clipped->model->normals[tp.n1]);
+                clipped->trisWorld[n].normal[VERTEX_B] = mult_matrix_by_vec3(m_rotation, clipped->model->normals[tp.n2]);
+                clipped->trisWorld[n].normal[VERTEX_C] = mult_matrix_by_vec3(m_rotation, clipped->model->normals[tp.n3]);
                 continue;
             }
 
