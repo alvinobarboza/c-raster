@@ -51,9 +51,9 @@ void put_pixel(Cam c, Color color, int x, int y, float h, float depth) {
 void clear_canvas(Cam c) { 
     size_t length = c.height * c.width;
     for(size_t i = 0; i < length; i++) {
-        c.canvas[i].r = 35;
-        c.canvas[i].g = 35;
-        c.canvas[i].b = 35;
+        c.canvas[i].r = 80;
+        c.canvas[i].g = 80;
+        c.canvas[i].b = 80;
         c.canvas[i].a = OPAQUE;
         c.depthBuffer[i] = 0;
     }
