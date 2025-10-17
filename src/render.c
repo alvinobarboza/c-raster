@@ -86,19 +86,15 @@ void draw_top_bottom(Cam c, Point pointA, Point pointB, Point pointC, Color colo
     float lengthAB = abs(pointB.y - pointA.y);
     float lengthAC = abs(pointC.y - pointA.y);
 
-    float aZ = 1 / pointA.zDepth;
-    float bZ = 1 / pointB.zDepth;
-    float cZ = 1 / pointC.zDepth;
-
     float abX = (pointB.x - pointA.x) / lengthAB;
     float acX = (pointC.x - pointA.x) / lengthAC;
 
-    float abZ = (bZ - aZ) / lengthAB;
-    float acZ = (cZ - aZ) / lengthAC;
+    float abZ = (pointB.zDepth - pointA.zDepth) / lengthAB;
+    float acZ = (pointC.zDepth - pointA.zDepth) / lengthAC;
 
-    pointA.uvCoord = vec3_multiply(pointA.uvCoord, aZ);
-    pointB.uvCoord = vec3_multiply(pointB.uvCoord, bZ);
-    pointC.uvCoord = vec3_multiply(pointC.uvCoord, cZ);
+    pointA.uvCoord = vec3_multiply(pointA.uvCoord, pointA.zDepth);
+    pointB.uvCoord = vec3_multiply(pointB.uvCoord, pointB.zDepth);
+    pointC.uvCoord = vec3_multiply(pointC.uvCoord, pointC.zDepth);
 
     Vec3 abUV = vec3_divide(vec3_sub(pointB.uvCoord, pointA.uvCoord), lengthAB);
     Vec3 acUV = vec3_divide(vec3_sub(pointC.uvCoord, pointA.uvCoord), lengthAC);
@@ -106,8 +102,8 @@ void draw_top_bottom(Cam c, Point pointA, Point pointB, Point pointC, Color colo
     float xLeft = pointA.x;
     float xRight = pointA.x;
 
-    float zLeft = aZ;
-    float zRight = aZ;
+    float zLeft = pointA.zDepth;
+    float zRight = pointA.zDepth;
 
     Vec3 uvLeft = pointA.uvCoord;
     Vec3 uvRight = pointA.uvCoord;
@@ -160,20 +156,16 @@ void draw_bottom_top(Cam c, Point pointA, Point pointB, Point pointC, Color colo
 
     float lengthCA = abs(pointC.y - pointA.y);
     float lengthCB = abs(pointC.y - pointB.y);
-    
-    float aZ = 1 / pointA.zDepth;
-    float bZ = 1 / pointB.zDepth;
-    float cZ = 1 / pointC.zDepth;
 
     float caX = (pointC.x - pointA.x) / lengthCA;
     float cbX = (pointC.x - pointB.x) / lengthCB;
 
-    float caZ = (cZ - aZ) / lengthCA;
-    float cbZ = (cZ - bZ) / lengthCB;
+    float caZ = (pointC.zDepth - pointA.zDepth) / lengthCA;
+    float cbZ = (pointC.zDepth - pointB.zDepth) / lengthCB;
 
-    pointA.uvCoord = vec3_multiply(pointA.uvCoord, aZ);
-    pointB.uvCoord = vec3_multiply(pointB.uvCoord, bZ);
-    pointC.uvCoord = vec3_multiply(pointC.uvCoord, cZ);
+    pointA.uvCoord = vec3_multiply(pointA.uvCoord, pointA.zDepth);
+    pointB.uvCoord = vec3_multiply(pointB.uvCoord, pointB.zDepth);
+    pointC.uvCoord = vec3_multiply(pointC.uvCoord, pointC.zDepth);
 
     Vec3 caUV = vec3_divide(vec3_sub(pointC.uvCoord, pointA.uvCoord), lengthCA);
     Vec3 cbUV = vec3_divide(vec3_sub(pointC.uvCoord, pointB.uvCoord), lengthCB);
@@ -181,8 +173,8 @@ void draw_bottom_top(Cam c, Point pointA, Point pointB, Point pointC, Color colo
     float xLeft = pointC.x;
     float xRight = pointC.x;
 
-    float zLeft = cZ;
-    float zRight = cZ;
+    float zLeft = pointC.zDepth;
+    float zRight = pointC.zDepth;
 
     Vec3 uvLeft = pointC.uvCoord;
     Vec3 uvRight = pointC.uvCoord;
@@ -245,21 +237,17 @@ void draw_filled_triangle(Cam c, Point pointA, Point pointB, Point pointC, Color
     } else {
 
         float t = (float)(pointB.y - pointA.y) / (float)(pointC.y - pointA.y);
+        float acZ = lerp_a_b(pointA.zDepth, pointC.zDepth, t);
 
-        // must convert to perspective here, like in the draw functions
-        float aZ = 1 / pointA.zDepth;
-        float cZ = 1 / pointC.zDepth;
-        float acZ = lerp_a_b(aZ, cZ, t);
-
-        Vec3 aUV = vec3_multiply(pointA.uvCoord, aZ);
-        Vec3 cUV = vec3_multiply(pointC.uvCoord, cZ);
+        Vec3 aUV = vec3_multiply(pointA.uvCoord, pointA.zDepth);
+        Vec3 cUV = vec3_multiply(pointC.uvCoord, pointC.zDepth);
         Vec3 acUV = vec3_lerp_a_b(aUV, cUV, t);
 
         Point pointAC = (Point) {
             .x = lerp_a_b(pointA.x, pointC.x, t), 
             .y = pointB.y,
-            .zDepth = 1 / acZ, // convert back to actual Z values
-            .uvCoord = vec3_divide(acUV, acZ), // same here
+            .zDepth = acZ,
+            .uvCoord = vec3_divide(acUV, acZ),
             .normal = vec3_lerp_a_b(pointA.normal, pointC.normal, t)
         };
 
